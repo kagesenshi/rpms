@@ -36,7 +36,8 @@ Requires: postgresql-libs postgresql
 Requires: libffi krb5-libs openldap-clients openldap
 Requires(pre): /usr/sbin/useradd, /usr/bin/getent
 Requires(postun): /usr/sbin/userdel
-Requires: %{name}-logos = %{version}-%{release}
+Provides: %{name} = %{version}-%{release}
+Requires: %{name}-logos = %{version}
 
 %package logos
 Summary: Logo files for %{name}
