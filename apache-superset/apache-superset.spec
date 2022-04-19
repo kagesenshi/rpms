@@ -256,10 +256,6 @@ find ${RPM_BUILD_ROOT}/opt/%{name}/lib/python%{python_version}/site-packages/sup
 
 export QA_RPATHS=$(( 0x0002 ))
 
-%post common
-/opt/%{name}/venv/bin/python -m compileall -q /opt/%{name}/ > /dev/null 2>&1 
-/usr/bin/systemctl daemon-reload
-
 %clean
 rm -rf $RPM_BUILD_ROOT
 
@@ -267,6 +263,25 @@ rm -rf $RPM_BUILD_ROOT
 /usr/bin/getent group %{group_name} >/dev/null || /usr/sbin/groupadd -r %{group_name}
 /usr/bin/getent passwd %{user_name} >/dev/null || /usr/sbin/useradd -r \
      -g %{group_name} -d /opt/%{name}/ -s /sbin/nologin %{user_name}
+
+%post common
+/opt/%{name}/venv/bin/python -m compileall -q /opt/%{name}/ > /dev/null 2>&1 
+/usr/bin/systemctl daemon-reload
+%systemd_post %{name}-web.service
+%systemd_post %{name}-scheduler.service
+%systemd_post %{name}-worker.service
+
+%preun common
+%systemd_preun %{name}-web.service
+%systemd_preun %{name}-scheduler.service
+%systemd_preun %{name}-worker.service
+
+%postun common
+%systemd_postun_with_restart %{name}-web.service
+%systemd_postun_with_restart %{name}-scheduler.service
+%systemd_postun_with_restart %{name}-worker.service
+/usr/bin/systemctl daemon-reload
+
 
 %files
 
