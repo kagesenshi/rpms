@@ -38,9 +38,15 @@ Requires(pre): /usr/sbin/useradd, /usr/bin/getent
 Requires(postun): /usr/sbin/userdel
 Provides: %{name} = %{version}-%{release}
 Requires: %{name}-logos = %{version}
+AutoProv: no
+AutoReq: no
+
 
 %package logos
 Summary: Logo files for %{name}
+AutoProv: no
+AutoReq: no
+
 
 %description
 ETL workflow management and monitoring on Apache Airflow
@@ -237,11 +243,13 @@ rm -rf $RPM_BUILD_ROOT
 %systemd_postun_with_restart %{name}-worker.service
 /usr/bin/systemctl daemon-reload
 
+%files 
+%dir /opt/%{name}/
 
 %files common
 %defattr(644, root, root ,755)
 %exclude /opt/%{name}/lib/python*/site-packages/airflow/www/templates/appbuilder/navbar.html
-/opt/%{name}/
+/opt/%{name}/*
 %attr(755, root, root) %{_bindir}/%{name}
 %attr(755, root, root) /opt/%{name}/bin/*
 %attr(755, %{user_name}, %{group_name}) %{_sysconfdir}/%{name}
