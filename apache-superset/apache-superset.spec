@@ -6,8 +6,8 @@
 %define group_name apache-superset
 
 Name:       apache-superset
-Version:    1.4.1
-Release:    5%{?dist}
+Version:    1.4.1rc1
+Release:    6%{?dist}
 Summary:    Data visualization and dashboard
 
 License:    Apache2
@@ -289,6 +289,9 @@ rm -rf $RPM_BUILD_ROOT
 %attr(644, root, root) /opt/%{name}/superset-frontend/src/assets/branding/*
 
 %changelog
+* Tue Apr 19 2022 Izhar Firdaus <kagesenshi.87@gmail.com> 1.4.1rc1-6
+- new package built with tito
+
 * Tue Apr 19 2022 Izhar Firdaus <kagesenshi.87@gmail.com> 1.4.1-5
 - initial update to tito
 
