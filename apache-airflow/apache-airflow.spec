@@ -6,7 +6,7 @@
 
 Name:       apache-airflow
 Version:    2.2.5
-Release:    4%{?dist}
+Release:    5%{?dist}
 Summary:    ETL workflow management and monitoring
 
 License:    Apache2
@@ -259,6 +259,10 @@ rm -rf $RPM_BUILD_ROOT
 
 
 %changelog
+* Wed Apr 20 2022 Izhar Firdaus <kagesenshi.87@gmail.com> 2.2.5-5
+- lock requires logo to version but not to release tag
+  (kagesenshi.87@gmail.com)
+
 * Tue Apr 19 2022 Izhar Firdaus <kagesenshi.87@gmail.com> 2.2.5-4
 - build from pypi
 
