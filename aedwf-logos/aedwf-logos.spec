@@ -7,7 +7,7 @@
 
 Name: aedwf-logos
 Version: 2.2.5
-Release: 0%{?dist}
+Release: 1%{?dist}
 Summary: AE Data Workflow logo resources
 
 License: Proprietary
@@ -42,4 +42,7 @@ cp src/aedwf-logo.png ${STATIC_DIR}
 /opt/apache-airflow/lib/python%{python_version}/site-packages/airflow/www/templates/appbuilder/*.html
 
 %changelog
+* Wed Apr 20 2022 Izhar Firdaus <kagesenshi.87@gmail.com> 2.2.5-1
+- new package built with tito
+
 
