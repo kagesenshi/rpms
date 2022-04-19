@@ -12,7 +12,8 @@ Summary:    Data visualization and dashboard
 
 License:    Apache2
 URL:        http://superset.apache.org
-AutoReqProv: no
+AutoReq: no
+AutoProv: no
 Source0:    https://dlcdn.apache.org/superset/%{version}/%{name}-%{version}-source.tar.gz
 BuildRequires:  python%{python_version}
 BuildRequires: pkgconfig(python-%{python_version}) >= %{python_version}
@@ -33,11 +34,15 @@ Requires:   postgresql-libs postgresql
 Requires(pre): /usr/sbin/useradd, /usr/bin/getent
 Requires(postun): /usr/sbin/userdel
 Requires: chromedriver
-Requires: %{name}-logos = %{version}-%{release}
+Requires: %{name}-logos = %{version}
 Provides: %{name} = %{version}-%{release}
+AutoReq: no
+AutoProv: no
 
 %package logos
 Summary: Logos for %{name}
+AutoReq: no
+AutoProv: no
 
 %description
 Data visualization and dashboard on Apache Superset
@@ -284,11 +289,12 @@ rm -rf $RPM_BUILD_ROOT
 
 
 %files
+%dir /opt/%{name}/
 
 %files common
 %defattr(644, root, root ,755)
 %exclude /opt/%{name}/superset-frontend/src/assets/branding/
-/opt/%{name}/
+/opt/%{name}/*
 %attr(755, root, root) /usr/bin/%{name}
 %attr(755, root, root) /opt/%{name}/bin/*
 %config /etc/sysconfig/%{name}
