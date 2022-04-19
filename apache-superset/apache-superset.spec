@@ -7,7 +7,7 @@
 
 Name:       apache-superset
 Version:    1.4.1rc1
-Release:    6%{?dist}
+Release:    7%{?dist}
 Summary:    Data visualization and dashboard
 
 License:    Apache2
@@ -289,6 +289,9 @@ rm -rf $RPM_BUILD_ROOT
 %attr(644, root, root) /opt/%{name}/superset-frontend/src/assets/branding/*
 
 %changelog
+* Tue Apr 19 2022 Izhar Firdaus <kagesenshi.87@gmail.com> 1.4.1rc1-7
+- initial update to tito
+
 * Sat May 08 2021 Izhar Firdaus <kagesenshi.87@gmail.com> 1.1.0-3
 - fix cython dep issue in CentOS (kagesenshi.87@gmail.com)
 
