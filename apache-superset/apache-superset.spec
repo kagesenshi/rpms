@@ -256,14 +256,14 @@ find ${RPM_BUILD_ROOT}/opt/%{name}/lib/python%{python_version}/site-packages/sup
 
 export QA_RPATHS=$(( 0x0002 ))
 
-%post
+%post common
 /opt/%{name}/venv/bin/python -m compileall -q /opt/%{name}/ > /dev/null 2>&1 
 /usr/bin/systemctl daemon-reload
 
 %clean
 rm -rf $RPM_BUILD_ROOT
 
-%pre
+%pre common
 /usr/bin/getent group %{group_name} >/dev/null || /usr/sbin/groupadd -r %{group_name}
 /usr/bin/getent passwd %{user_name} >/dev/null || /usr/sbin/useradd -r \
      -g %{group_name} -d /opt/%{name}/ -s /sbin/nologin %{user_name}
