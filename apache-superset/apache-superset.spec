@@ -7,7 +7,7 @@
 
 Name:       apache-superset
 Version:    1.4.2
-Release:    9%{?dist}
+Release:    10%{?dist}
 Summary:    Data visualization and dashboard
 
 License:    Apache2
@@ -313,6 +313,9 @@ rm -rf $RPM_BUILD_ROOT
 /opt/%{name}/lib/python%{python_version}/site-packages/superset/static/assets/images/superset-logo-horiz.png
 
 %changelog
+* Wed Apr 20 2022 Izhar Firdaus <kagesenshi.87@gmail.com> 1.4.2-10
+- relocate logo asset to logos package (kagesenshi.87@gmail.com)
+
 * Wed Apr 20 2022 Izhar Firdaus <kagesenshi.87@gmail.com> 1.4.2-9
 - disable autoreqprov (kagesenshi.87@gmail.com)
 - bump to 1.4.2 (kagesenshi.87@gmail.com)
