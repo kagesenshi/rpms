@@ -6,7 +6,7 @@
 
 Name:       apache-airflow
 Version:    2.2.5
-Release:    3%{?dist}
+Release:    4%{?dist}
 Summary:    ETL workflow management and monitoring
 
 License:    Apache2
@@ -25,7 +25,7 @@ BuildRequires: systemd-rpm-macros
 BuildRequires: krb5-devel openldap-devel
 BuildRequires: systemd-rpm-macros python-rpm-macros
 BuildRequires: /usr/bin/pathfix.py
-BuildRequires: npm yarnpkg
+#BuildRequires: npm yarnpkg
 Requires: %{name}-common = %{version}-%{release}
 
 %package common
@@ -56,15 +56,15 @@ rm -rf %{_builddir}/%{name}/
 
 %build
 rm -rf $RPM_BUILD_ROOT
-pushd airflow/www
-   ./compile_assets.sh
-popd 
+#pushd airflow/www
+#   ./compile_assets.sh
+#popd 
 
 %install
 mkdir -p ${RPM_BUILD_ROOT}/opt/%{name}/
 #cp -r * ${RPM_BUILD_ROOT}/opt/%{name}/
 python%{python_version} -m venv ${RPM_BUILD_ROOT}/opt/%{name}/
-${RPM_BUILD_ROOT}/opt/%{name}/bin/pip install ".[celery,async,postgres,mysql,odbc,apache.druid,apache.spark,apache.webhdfs,rabbitmq,redis,ftp,grpc,http,imap,jdbc,kerberos,ldap,papermill,sftp,sqlite,ssh]" --constraint https://raw.githubusercontent.com/apache/airflow/constraints-%{version}/constraints-%{python_version}.txt
+${RPM_BUILD_ROOT}/opt/%{name}/bin/pip install "apache-airflow[celery,async,postgres,mysql,odbc,apache.druid,apache.spark,apache.webhdfs,rabbitmq,redis,ftp,grpc,http,imap,jdbc,kerberos,ldap,papermill,sftp,sqlite,ssh]" --constraint https://raw.githubusercontent.com/apache/airflow/constraints-%{version}/constraints-%{python_version}.txt
 #pushd ${RPM_BUILD_ROOT}/opt/%{name}/lib/python%{python_version}/site-packages/airflow/www/
 #   ./compile_assets.sh
 #popd
@@ -258,6 +258,9 @@ rm -rf $RPM_BUILD_ROOT
 
 
 %changelog
+* Tue Apr 19 2022 Izhar Firdaus <kagesenshi.87@gmail.com> 2.2.5-4
+- build from pypi
+
 * Tue Apr 19 2022 Izhar Firdaus <kagesenshi.87@gmail.com> 2.2.5-3
 - change path of navbar html (kagesenshi.87@gmail.com)
 
