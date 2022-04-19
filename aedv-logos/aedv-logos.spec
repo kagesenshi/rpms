@@ -39,7 +39,7 @@ cp src/superset-logo-horiz.png ${ASSET_DIR}
 %defattr(644,root,root,755)
 /opt/apache-superset/superset-frontend/src/assets/branding/*.png
 /opt/apache-superset/superset-frontend/src/assets/branding/*.svg
-/opt/%{name}/lib/python%{python_version}/site-packages/superset/static/assets/images/superset-logo-horiz.png
+/opt/apache-superset/lib/python%{python_version}/site-packages/superset/static/assets/images/superset-logo-horiz.png
 
 %changelog
 * Wed Apr 20 2022 Izhar Firdaus <kagesenshi.87@gmail.com> 1.4.2-3
