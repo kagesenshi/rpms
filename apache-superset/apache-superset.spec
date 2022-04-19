@@ -294,6 +294,7 @@ rm -rf $RPM_BUILD_ROOT
 %files common
 %defattr(644, root, root ,755)
 %exclude /opt/%{name}/superset-frontend/src/assets/branding/
+%exclude /opt/%{name}/lib/python%{python_version}/site-packages/superset/static/assets/images/superset-logo-horiz.png
 /opt/%{name}/*
 %attr(755, root, root) /usr/bin/%{name}
 %attr(755, root, root) /opt/%{name}/bin/*
@@ -307,7 +308,9 @@ rm -rf $RPM_BUILD_ROOT
 %attr(-,root,root) /etc/logrotate.d/%{name}
 
 %files logos
-%attr(644, root, root) /opt/%{name}/superset-frontend/src/assets/branding/*
+%defattr(644,root,root,755)
+/opt/%{name}/superset-frontend/src/assets/branding/*
+/opt/%{name}/lib/python%{python_version}/site-packages/superset/static/assets/images/superset-logo-horiz.png
 
 %changelog
 * Wed Apr 20 2022 Izhar Firdaus <kagesenshi.87@gmail.com> 1.4.2-9
