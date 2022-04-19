@@ -6,7 +6,7 @@
 
 Name:       apache-airflow
 Version:    2.2.5
-Release:    2%{?dist}
+Release:    3%{?dist}
 Summary:    ETL workflow management and monitoring
 
 License:    Apache2
@@ -258,6 +258,9 @@ rm -rf $RPM_BUILD_ROOT
 
 
 %changelog
+* Tue Apr 19 2022 Izhar Firdaus <kagesenshi.87@gmail.com> 2.2.5-3
+- change path of navbar html (kagesenshi.87@gmail.com)
+
 * Tue Apr 19 2022 Izhar Firdaus <kagesenshi.87@gmail.com> 2.2.5-2
 - update to use tito
 
