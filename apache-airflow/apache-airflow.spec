@@ -239,7 +239,7 @@ rm -rf $RPM_BUILD_ROOT
 
 %files common
 %defattr(644, root, root ,755)
-%exclude /opt/%{name}/eggs/cp*/apache_airflow*/airflow/www/templates/appbuilder/navbar.html
+%exclude /opt/%{name}/lib/python*/site-packages/airflow/www/templates/appbuilder/navbar.html
 /opt/%{name}/
 %attr(755, root, root) %{_bindir}/%{name}
 %attr(755, root, root) /opt/%{name}/bin/*
@@ -254,7 +254,8 @@ rm -rf $RPM_BUILD_ROOT
 %attr(-,root,root) %{_sysconfdir}/logrotate.d/%{name}
 
 %files logos
-%attr(644,root,root) /opt/%{name}/eggs/cp*/apache_airflow*/airflow/www/templates/appbuilder/navbar.html
+%attr(644,root,root) /opt/%{name}/lib/python*/site-packages/airflow/www/templates/appbuilder/navbar.html
+
 
 %changelog
 * Tue Apr 19 2022 Izhar Firdaus <kagesenshi.87@gmail.com> 2.2.5-2
