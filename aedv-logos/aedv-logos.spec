@@ -7,7 +7,7 @@
 
 Name: aedv-logos
 Version: 1.4.2
-Release: 2%{?dist}
+Release: 3%{?dist}
 Summary: AE Data Visualization logo resources
 
 License: Proprietary
@@ -42,6 +42,9 @@ cp src/superset-logo-horiz.png ${ASSET_DIR}
 /opt/%{name}/lib/python%{python_version}/site-packages/superset/static/assets/images/superset-logo-horiz.png
 
 %changelog
+* Wed Apr 20 2022 Izhar Firdaus <kagesenshi.87@gmail.com> 1.4.2-3
+- add logo to asset dir (kagesenshi.87@gmail.com)
+
 * Wed Apr 20 2022 Izhar Firdaus <kagesenshi.87@gmail.com> 1.4.2-2
 - new package built with tito
 
