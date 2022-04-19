@@ -3,6 +3,7 @@
 # Fedora packaging guidelines:
 # https://docs.fedoraproject.org/en-US/packaging-guidelines/
 %define debug_package %{nil}
+%define python_version 3.8
 
 Name: aedv-logos
 Version: 1.4.2
@@ -26,15 +27,19 @@ Logo resources override for AE Data Visualization
 %install
 
 BRAND_DIR=${RPM_BUILD_ROOT}/opt/apache-superset/superset-frontend/src/assets/branding/
+ASSET_DIR=${RPM_BUILD_ROOT}/opt/apache-superset/lib/python%{python_version}/site-packages/superset/static/assets/images/
 
 mkdir -p ${BRAND_DIR}
+mkdir -p ${ASSET_DIR}
 
 cp src/* ${BRAND_DIR}
+cp src/superset-logo-horiz.png ${ASSET_DIR}
 
 %files
 %defattr(644,root,root,755)
 /opt/apache-superset/superset-frontend/src/assets/branding/*.png
 /opt/apache-superset/superset-frontend/src/assets/branding/*.svg
+/opt/%{name}/lib/python%{python_version}/site-packages/superset/static/assets/images/superset-logo-horiz.png
 
 %changelog
 * Wed Apr 20 2022 Izhar Firdaus <kagesenshi.87@gmail.com> 1.4.2-2
