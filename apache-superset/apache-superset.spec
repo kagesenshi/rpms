@@ -17,7 +17,7 @@ AutoProv: no
 Source0:    https://dlcdn.apache.org/superset/%{version}/%{name}-%{version}-source.tar.gz
 BuildRequires:  python%{python_version}
 BuildRequires: pkgconfig(python-%{python_version}) >= %{python_version}
-BuildRequires: postgresql-devel mysql-devel
+BuildRequires: postgresql-devel mariadb-devel
 BuildRequires: gcc-c++ cyrus-sasl-devel
 BuildRequires: postgresql-devel
 BuildRequires: perl-interpreter findutils
