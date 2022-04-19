@@ -6,7 +6,7 @@
 
 Name: aedv-logos
 Version: 1.4.2
-Release: 1%{?dist}
+Release: 2%{?dist}
 Summary: AE Data Visualization logo resources
 
 License: Proprietary
@@ -37,5 +37,8 @@ cp src/* ${BRAND_DIR}
 /opt/apache-superset/superset-frontend/src/assets/branding/*.svg
 
 %changelog
+* Wed Apr 20 2022 Izhar Firdaus <kagesenshi.87@gmail.com> 1.4.2-2
+- new package built with tito
+
 
 
