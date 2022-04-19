@@ -6,7 +6,7 @@
 
 Name:       apache-airflow
 Version:    2.2.5
-Release:    1%{?dist}
+Release:    2%{?dist}
 Summary:    ETL workflow management and monitoring
 
 License:    Apache2
@@ -257,6 +257,9 @@ rm -rf $RPM_BUILD_ROOT
 %attr(644,root,root) /opt/%{name}/eggs/cp*/apache_airflow*/airflow/www/templates/appbuilder/navbar.html
 
 %changelog
+* Tue Apr 19 2022 Izhar Firdaus <kagesenshi.87@gmail.com> 2.2.5-2
+- update to use tito
+
 * Thu Feb 11 2021 Izhar Firdaus <kagesenshi.87@gmail.com> 1.0.0-2
 - new package built with tito
 
