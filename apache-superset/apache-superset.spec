@@ -6,8 +6,8 @@
 %define group_name apache-superset
 
 Name:       apache-superset
-Version:    1.4.2
-Release:    1%{?dist}
+Version:    1.4.1
+Release:    4%{?dist}
 Summary:    Data visualization and dashboard
 
 License:    Apache2
