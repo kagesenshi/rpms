@@ -8,7 +8,7 @@
 
 Name:       apache-airflow
 Version:    2.2.5
-Release:    7%{?dist}
+Release:    8%{?dist}
 Summary:    ETL workflow management and monitoring
 
 License:    Apache2
@@ -270,6 +270,10 @@ rm -rf $RPM_BUILD_ROOT
 
 
 %changelog
+* Thu Apr 21 2022 Izhar Firdaus <kagesenshi.87@gmail.com> 2.2.5-8
+- another attempt to stop centos builder from stripping binaries
+  (kagesenshi.87@gmail.com)
+
 * Thu Apr 21 2022 Izhar Firdaus <kagesenshi.87@gmail.com> 2.2.5-7
 - export dont_strip (kagesenshi.87@gmail.com)
 
