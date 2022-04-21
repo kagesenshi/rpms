@@ -6,7 +6,7 @@
 
 Name:       apache-airflow
 Version:    2.2.5
-Release:    6%{?dist}
+Release:    7%{?dist}
 Summary:    ETL workflow management and monitoring
 
 License:    Apache2
@@ -268,6 +268,9 @@ rm -rf $RPM_BUILD_ROOT
 
 
 %changelog
+* Thu Apr 21 2022 Izhar Firdaus <kagesenshi.87@gmail.com> 2.2.5-7
+- export dont_strip (kagesenshi.87@gmail.com)
+
 * Wed Apr 20 2022 Izhar Firdaus <kagesenshi.87@gmail.com> 2.2.5-6
 - dont use autoreqprov in common (kagesenshi.87@gmail.com)
 
