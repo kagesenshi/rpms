@@ -68,6 +68,7 @@ rm -rf $RPM_BUILD_ROOT
 #popd 
 
 %install
+export DONT_STRIP=1
 mkdir -p ${RPM_BUILD_ROOT}/opt/%{name}/
 #cp -r * ${RPM_BUILD_ROOT}/opt/%{name}/
 python%{python_version} -m venv ${RPM_BUILD_ROOT}/opt/%{name}/
