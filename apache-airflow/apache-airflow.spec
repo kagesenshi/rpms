@@ -3,6 +3,8 @@
 %define python_version 3.8
 %define user_name apache-airflow
 %define group_name apache-airflow
+%global _enable_debug_package 0
+%global __os_install_post /usr/lib/rpm/brp-compress %{nil}
 
 Name:       apache-airflow
 Version:    2.2.5
