@@ -16,7 +16,7 @@
 
 Name: %{vendor}-spark%{spark_major}
 Version: %{spark_version}
-Release: 0%{?dist}
+Release: 1%{?dist}
 Summary: Apache Spark
 Requires(pre): shadow-utils
 BuildRequires: systemd-rpm-macros python-rpm-macros
@@ -341,4 +341,9 @@ exit 0
 
 
 %changelog
+* Sat Apr 23 2022 Izhar Firdaus <kagesenshi.87@gmail.com> 2.4.8-1
+- update package to use tito
+- lock to python abi 
+- use mariadb jdbc instead of mysql
+
 
