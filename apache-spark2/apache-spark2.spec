@@ -266,7 +266,7 @@ cat << EOF > %{buildroot}/%{_sysconfdir}/%{spark}/spark-env.sh
 
 umask 002
 export JAVA_HOME=/usr/lib/jvm/jre-%{java_version}/
-export PYSPARK_PYTHON=%{venv}
+export PYSPARK_PYTHON=%{venv}/bin/python
 EOF
 
 cat << EOF > %{buildroot}/%{_sysconfdir}/%{spark}/hive-site.xml
