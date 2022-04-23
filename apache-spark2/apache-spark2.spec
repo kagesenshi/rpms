@@ -26,7 +26,13 @@ Summary: Apache Spark
 Requires(pre): shadow-utils
 BuildRequires: systemd-rpm-macros python-rpm-macros
 BuildRequires: python(abi) = %{python_version}
+%if 0%{?fedora}
+BuildRequires: python-virtualenv
+%endif
+
+%if 0%{?rhel}
 BuildRequires: python2-virtualenv
+%endif
 BuildRequires: /usr/bin/pathfix.py
 BuildRequires: perl-interpreter findutils
 Requires: mariadb-java-client
@@ -41,13 +47,11 @@ Source1: https://archive.apache.org/dist/spark/spark-%{spark_version}/%{spark_pa
 
 Requires: java-%{java_version}-openjdk-headless
 Requires: python(abi) = %{python_version}
-Requires: python2-virtualenv
 Requires: %{name}-python
 
 %package python
 Summary: Python virtualenv for Apache Spark
 Requires: python(abi) = %{python_version}
-Requires: python2-virtualenv
 AutoReq: no
 AutoProv: no
 
@@ -79,7 +83,13 @@ mkdir -p %{buildroot}/%{_datadir}/%{name}/
 
 cp hive-metastore.sql %{buildroot}/%{_datadir}/%{name}/hive-metastore.sql
 
-virtualenv-2 %{buildroot}/%{venv}
+%if 0%{?fedora}
+virtualenv --python /usr/bin/python2 %{buildroot}/%{venv}
+%endif
+
+%if 0%{?rhel}
+virtualenv-2 --python /usr/bin/python2 %{buildroot}/%{venv}
+%endif
 
 %{buildroot}/%{venv}/bin/pip install numpy scikit-learn pandas dask
 
