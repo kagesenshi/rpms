@@ -28,6 +28,7 @@ BuildRequires: systemd-rpm-macros python-rpm-macros
 BuildRequires: python(abi) = %{python_version}
 BuildRequires: python2-virtualenv
 BuildRequires: /usr/bin/pathfix.py
+BuildRequires: perl-interpreter findutils
 Requires: mariadb-java-client
 BuildArch:      noarch
 AutoReq: no
