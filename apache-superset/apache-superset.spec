@@ -1,5 +1,6 @@
 %define debug_package %{nil}
-%define __strip /bin/true
+%global _enable_debug_package 0
+%global __os_install_post /usr/lib/rpm/brp-compress %{nil}
 %define _build_id_links none
 %define python_version 3.8
 %define user_name apache-superset
