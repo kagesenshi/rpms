@@ -20,11 +20,9 @@ Release: 0%{?dist}
 Summary: Apache Spark
 Requires(pre): shadow-utils
 BuildRequires: systemd-rpm-macros python-rpm-macros
-BuildRequires: python2
-
+BuildRequires: python(abi) = %{python_version}
 BuildRequires: /usr/bin/pathfix.py
-Requires: mysql-connector-java
-
+Requires: mariadb-java-client
 BuildArch:      noarch
 
 License: Apache
@@ -32,7 +30,8 @@ URL: http://spark.apache.org
 Source0: https://archive.apache.org/dist/spark/spark-%{spark_version}/%{spark_package}.tgz
 Source1: hive-metastore.sql
 
-Requires: java-%{java_version}-openjdk-headless python%{python_version}
+Requires: java-%{java_version}-openjdk-headless
+Requires: python(abi) = %{python_version}
 
 %description
 Big data processing with Apache Spark
@@ -226,8 +225,9 @@ spark.eventLog.enabled           true
 spark.eventLog.dir               %{_localstatedir}/log/%{spark}/event_log/
 spark.history.fs.logDirectory    %{_localstatedir}/log/%{spark}/event_log/
 spark.sql.warehouse.dir          %{_sharedstatedir}/%{spark}/warehouse/
-spark.jars                       /usr/share/java/mysql-connector-java.jar
+spark.jars                       /usr/lib/java/mariadb-java-client.jar
 EOF
+
 
 cat << EOF > %{buildroot}/%{_sysconfdir}/%{spark}/spark-env.sh
 
@@ -244,7 +244,7 @@ cat << EOF > %{buildroot}/%{_sysconfdir}/%{spark}/hive-site.xml
         </property>
         <property>
                 <name>javax.jdo.option.ConnectionDriverName</name>
-                <value>com.mysql.cj.jdbc.Driver</value>
+                <value>org.mariadb.jdbc.Driver</value>
         </property>
         <property>
                 <name>javax.jdo.option.ConnectionUserName</name>
