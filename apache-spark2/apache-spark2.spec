@@ -16,7 +16,7 @@
 
 Name: %{vendor}-spark%{spark_major}
 Version: %{spark_version}
-Release: 1%{?dist}
+Release: 2%{?dist}
 Summary: Apache Spark
 Requires(pre): shadow-utils
 BuildRequires: systemd-rpm-macros python-rpm-macros
@@ -342,6 +342,11 @@ exit 0
 
 
 %changelog
+* Sat Apr 23 2022 Izhar Firdaus <kagesenshi.87@gmail.com> 2.4.8-2
+- extract source1 properly (kagesenshi.87@gmail.com)
+- set source0 (kagesenshi.87@gmail.com)
+- add metastore sql file (kagesenshi.87@gmail.com)
+
 * Sat Apr 23 2022 Izhar Firdaus <kagesenshi.87@gmail.com> 2.4.8-1
 - update package to use tito
 - lock to python abi 
