@@ -27,8 +27,7 @@ BuildArch:      noarch
 
 License: Apache
 URL: http://spark.apache.org
-Source0: https://archive.apache.org/dist/spark/spark-%{spark_version}/%{spark_package}.tgz
-Source1: hive-metastore.sql
+Source1: https://archive.apache.org/dist/spark/spark-%{spark_version}/%{spark_package}.tgz
 
 Requires: java-%{java_version}-openjdk-headless
 Requires: python(abi) = %{python_version}
@@ -55,7 +54,7 @@ mkdir -p %{buildroot}/%{_localstatedir}/log/%{spark}/event_log/
 mkdir -p %{buildroot}/%{_sharedstatedir}/%{spark}/warehouse/
 mkdir -p %{buildroot}/%{_datadir}/%{name}/
 
-cp %{SOURCE1} %{buildroot}/%{_datadir}/%{name}/hive-metastore.sql
+cp hive-metastore.sql %{buildroot}/%{_datadir}/%{name}/hive-metastore.sql
 
 
 cp -r * %{buildroot}/opt/%{vendor}/%{spark_package}
