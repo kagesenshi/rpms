@@ -27,6 +27,7 @@ BuildArch:      noarch
 
 License: Apache
 URL: http://spark.apache.org
+Source0: %{name}-%{version}.tar.gz
 Source1: https://archive.apache.org/dist/spark/spark-%{spark_version}/%{spark_package}.tgz
 
 Requires: java-%{java_version}-openjdk-headless
