@@ -37,7 +37,8 @@ Requires: python(abi) = %{python_version}
 Big data processing with Apache Spark
 
 %prep
-%setup -q -n %{spark_package}
+%setup -q 
+tar xvf %{SOURCE1}
 
 %build
 
@@ -58,8 +59,8 @@ mkdir -p %{buildroot}/%{_datadir}/%{name}/
 cp hive-metastore.sql %{buildroot}/%{_datadir}/%{name}/hive-metastore.sql
 
 
-cp -r * %{buildroot}/opt/%{vendor}/%{spark_package}
-cp -r conf/* %{buildroot}/%{_sysconfdir}/%{spark}
+cp -r %{spark_package}/* %{buildroot}/opt/%{vendor}/%{spark_package}
+cp -r %{spark_package}/conf/* %{buildroot}/%{_sysconfdir}/%{spark}
 
 ln -s ./%{spark_package} %{buildroot}/opt/%{vendor}/%{spark}
 
