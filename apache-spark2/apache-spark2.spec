@@ -36,7 +36,6 @@ BuildRequires: python2-virtualenv
 BuildRequires: /usr/bin/pathfix.py
 BuildRequires: perl-interpreter findutils
 Requires: mariadb-java-client
-BuildArch:      noarch
 AutoReq: no
 AutoProv: no
 
