@@ -94,7 +94,7 @@ virtualenv-2 --python /usr/bin/python2 %{buildroot}/%{venv}
 
 cp -r %{spark_package}/* %{buildroot}/opt/%{vendor}/%{spark_package}
 cp -r %{spark_package}/conf/* %{buildroot}/%{_sysconfdir}/%{spark}
-
+cp jars/*.jar %{buildroot}/opt/%{vendor}/%{spark_package}/jars/
 ln -s ./%{spark_package} %{buildroot}/opt/%{vendor}/%{spark}
 
 cat << EOF > %{buildroot}/%{_bindir}/%{spark}-submit
@@ -259,7 +259,6 @@ spark.eventLog.enabled           true
 spark.eventLog.dir               %{_localstatedir}/log/%{spark}/event_log/
 spark.history.fs.logDirectory    %{_localstatedir}/log/%{spark}/event_log/
 spark.sql.warehouse.dir          %{_sharedstatedir}/%{spark}/warehouse/
-spark.jars                       /usr/lib/java/mariadb-java-client.jar
 EOF
 
 
@@ -278,7 +277,7 @@ cat << EOF > %{buildroot}/%{_sysconfdir}/%{spark}/hive-site.xml
         </property>
         <property>
                 <name>javax.jdo.option.ConnectionDriverName</name>
-                <value>org.mariadb.jdbc.Driver</value>
+                <value>com.mysql.cj.jdbc.Driver</value>
         </property>
         <property>
                 <name>javax.jdo.option.ConnectionUserName</name>
