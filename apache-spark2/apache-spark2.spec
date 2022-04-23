@@ -13,6 +13,11 @@
 %define user_name apache-spark
 %define group_name apache-spark
 %define spark spark%{spark_major}
+%define venv /opt/%{vendor}/%{spark}-python
+%define debug_package %{nil}
+%global _enable_debug_package 0
+%global __os_install_post /usr/lib/rpm/brp-compress %{nil}
+
 
 Name: %{vendor}-spark%{spark_major}
 Version: %{spark_version}
@@ -21,9 +26,12 @@ Summary: Apache Spark
 Requires(pre): shadow-utils
 BuildRequires: systemd-rpm-macros python-rpm-macros
 BuildRequires: python(abi) = %{python_version}
+BuildRequires: python2-virtualenv
 BuildRequires: /usr/bin/pathfix.py
 Requires: mariadb-java-client
 BuildArch:      noarch
+AutoReq: no
+AutoProv: no
 
 License: Apache
 URL: http://spark.apache.org
@@ -32,9 +40,21 @@ Source1: https://archive.apache.org/dist/spark/spark-%{spark_version}/%{spark_pa
 
 Requires: java-%{java_version}-openjdk-headless
 Requires: python(abi) = %{python_version}
+Requires: python2-virtualenv
+Requires: %{name}-python
+
+%package python
+Summary: Python virtualenv for Apache Spark
+Requires: python(abi) = %{python_version}
+Requires: python2-virtualenv
+AutoReq: no
+AutoProv: no
 
 %description
 Big data processing with Apache Spark
+
+%description python
+Python virtualenv for Big data processing with Apache Spark
 
 %prep
 %setup -q 
@@ -58,6 +78,9 @@ mkdir -p %{buildroot}/%{_datadir}/%{name}/
 
 cp hive-metastore.sql %{buildroot}/%{_datadir}/%{name}/hive-metastore.sql
 
+virtualenv-2 %{buildroot}/%{venv}
+
+%{buildroot}/%{venv}/bin/pip install numpy scikit-learn pandas dask
 
 cp -r %{spark_package}/* %{buildroot}/opt/%{vendor}/%{spark_package}
 cp -r %{spark_package}/conf/* %{buildroot}/%{_sysconfdir}/%{spark}
@@ -234,7 +257,7 @@ cat << EOF > %{buildroot}/%{_sysconfdir}/%{spark}/spark-env.sh
 
 umask 002
 export JAVA_HOME=/usr/lib/jvm/jre-%{java_version}/
-export PYSPARK_PYTHON=%{_bindir}/python%{python_version}
+export PYSPARK_PYTHON=%{venv}
 EOF
 
 cat << EOF > %{buildroot}/%{_sysconfdir}/%{spark}/hive-site.xml
@@ -273,9 +296,20 @@ cat << EOF > %{buildroot}/%{_sysconfdir}/%{spark}/beeline-site.xml
 EOF
 
 
+# strip rpmbuildroot paths from virtualenv
+grep -lrZF "#!$RPM_BUILD_ROOT" %{buildroot}/%{venv} | xargs -r -0 perl -p -i -e "s|$RPM_BUILD_ROOT||g"
+find %{buildroot}/%{venv} -type f -regex '.*egg-link$' |xargs -I% grep -lrZF "$RPM_BUILD_ROOT" % | xargs -r -0 perl -p -i -e "s|$RPM_BUILD_ROOT||g"
+grep -lrZF "$RPM_BUILD_ROOT" %{buildroot}/%{venv} | xargs -r -0 perl -p -i -e "s|$RPM_BUILD_ROOT||g"
+
+# cleanup virtualenv
+find %{buildroot}/%{venv} -regex '.*\.pyc$' -exec rm '{}' ';'
+find %{buildroot}/%{venv} -regex '.*\.pyo$' -exec rm '{}' ';'
+
+
 %py2_shebang_fix %{buildroot}/opt/%{vendor}/%{spark_package}/bin/
 %py2_shebang_fix %{buildroot}/opt/%{vendor}/%{spark_package}/python/pyspark/find_spark_home.py
 %py2_shebang_fix %{buildroot}/opt/%{vendor}/%{spark_package}/python/run-tests.py
+%py2_shebang_fix %{buildroot}/%{venv}
 
 
 cat << EOF > %{buildroot}/%{_datadir}/%{name}/README.rst
@@ -310,6 +344,10 @@ EOF
 %dir %attr(2775, %{user_name}, %{group_name}) %{_sharedstatedir}/%{spark}/warehouse
 %dir %attr(2775, %{user_name}, %{group_name}) %{_localstatedir}/log/%{spark}
 %dir %attr(2777, %{user_name}, %{group_name}) %{_localstatedir}/log/%{spark}/event_log/
+
+%files python
+%defattr(-, root, root, -)
+%{venv}
 
 %pre
 
