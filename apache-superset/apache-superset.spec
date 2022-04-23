@@ -8,7 +8,7 @@
 
 Name:       apache-superset
 Version:    1.4.2
-Release:    11%{?dist}
+Release:    12%{?dist}
 Summary:    Data visualization and dashboard
 
 License:    Apache2
@@ -314,6 +314,9 @@ rm -rf $RPM_BUILD_ROOT
 /opt/%{name}/lib/python%{python_version}/site-packages/superset/static/assets/images/superset-logo-horiz.png
 
 %changelog
+* Sat Apr 23 2022 Izhar Firdaus <kagesenshi.87@gmail.com> 1.4.2-12
+- ensure binaries are really not stripped (kagesenshi.87@gmail.com)
+
 * Wed Apr 20 2022 Izhar Firdaus <kagesenshi.87@gmail.com> 1.4.2-11
 - use mariadb-devel (kagesenshi.87@gmail.com)
 
