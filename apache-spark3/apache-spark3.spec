@@ -13,6 +13,11 @@
 %define user_name apache-spark
 %define group_name apache-spark
 %define spark spark%{spark_major}
+%define debug_package %{nil}
+%define venv /opt/%{vendor}/%{spark}-python
+%global _enable_debug_package 0
+%global __os_install_post /usr/lib/rpm/brp-compress %{nil}
+
 
 Name: %{vendor}-spark%{spark_major}
 Version: %{spark_version}
@@ -21,24 +26,31 @@ Summary: Apache Spark
 Requires(pre): shadow-utils
 BuildRequires: systemd-rpm-macros python-rpm-macros
 BuildRequires: python%{python_version}
-
 BuildRequires: /usr/bin/pathfix.py
-Requires: mysql-connector-java
-
-BuildArch:      noarch
+BuildRequires: perl-interpreter findutils
 
 License: Apache
 URL: http://spark.apache.org
-Source0: https://archive.apache.org/dist/spark/spark-%{spark_version}/%{spark_package}.tgz
-Source1: %{spark}-hive-metastore.sql
+Source0: %{name}-%{version}.tar.gz
+Source1: https://archive.apache.org/dist/spark/spark-%{spark_version}/%{spark_package}.tgz
+Requires: java-%{java_version}-openjdk-headless 
+Requires: python%{python_version}
 
-Requires: java-%{java_version}-openjdk-headless python%{python_version}
+%package python
+Summary: Python virtualenv for Apache Spark
+Requires: python%{python_version}
+AutoReq: no
+AutoProv: no
 
 %description
 Big data processing with Apache Spark
 
+%description python
+Python virtualenv for Big data processing with Apache Spark
+
 %prep
-%setup -q -n %{spark_package}
+%setup -q
+tar xvf %{SOURCE1}
 
 %build
 
@@ -56,11 +68,12 @@ mkdir -p %{buildroot}/%{_localstatedir}/log/%{spark}/event_log/
 mkdir -p %{buildroot}/%{_sharedstatedir}/%{spark}/warehouse/
 mkdir -p %{buildroot}/%{_datadir}/%{name}/
 
-cp %{SOURCE1} %{buildroot}/%{_datadir}/%{name}/hive-metastore.sql
+/usr/bin/python%{python_version} -m venv %{buildroot}/%{venv}
+%{buildroot}/%{venv}/bin/pip install numpy scikit-learn pandas dask
 
-
-cp -r * %{buildroot}/opt/%{vendor}/%{spark_package}
-cp -r conf/* %{buildroot}/%{_sysconfdir}/%{spark}
+cp -r %{spark_package}/* %{buildroot}/opt/%{vendor}/%{spark_package}
+cp -r %{spark_package}/conf/* %{buildroot}/%{_sysconfdir}/%{spark}
+cp jars/*.jar  %{buildroot}/opt/%{vendor}/%{spark_package}/jars/
 
 ln -s ./%{spark_package} %{buildroot}/opt/%{vendor}/%{spark}
 
@@ -226,21 +239,20 @@ spark.eventLog.enabled           true
 spark.eventLog.dir               %{_localstatedir}/log/%{spark}/event_log/
 spark.history.fs.logDirectory    %{_localstatedir}/log/%{spark}/event_log/
 spark.sql.warehouse.dir          %{_sharedstatedir}/%{spark}/warehouse/
-spark.jars                       /usr/share/java/mysql-connector-java.jar
 EOF
 
 cat << EOF > %{buildroot}/%{_sysconfdir}/%{spark}/spark-env.sh
 
 umask 002
 export JAVA_HOME=/usr/lib/jvm/jre-%{java_version}/
-export PYSPARK_PYTHON=%{_bindir}/python%{python_version}
+export PYSPARK_PYTHON=%{venv}/bin/python
 EOF
 
 cat << EOF > %{buildroot}/%{_sysconfdir}/%{spark}/hive-site.xml
 <configuration>
         <property>
                 <name>javax.jdo.option.ConnectionURL</name>
-                <value>jdbc:mysql://localhost/%{spark}_hive_metastore</value>
+                <value>jdbc:mysql://localhost/%{spark}_hive_metastore?createDatabaseIfNotExist=true</value>
         </property>
         <property>
                 <name>javax.jdo.option.ConnectionDriverName</name>
@@ -272,23 +284,20 @@ cat << EOF > %{buildroot}/%{_sysconfdir}/%{spark}/beeline-site.xml
 EOF
 
 
+# strip rpmbuildroot paths from virtualenv
+grep -lrZF "#!$RPM_BUILD_ROOT" %{buildroot}/%{venv} | xargs -r -0 perl -p -i -e "s|$RPM_BUILD_ROOT||g"
+find %{buildroot}/%{venv} -type f -regex '.*egg-link$' |xargs -I% grep -lrZF "$RPM_BUILD_ROOT" % | xargs -r -0 perl -p -i -e "s|$RPM_BUILD_ROOT||g"
+grep -lrZF "$RPM_BUILD_ROOT" %{buildroot}/%{venv} | xargs -r -0 perl -p -i -e "s|$RPM_BUILD_ROOT||g"
+
+# cleanup virtualenv
+find %{buildroot}/%{venv} -regex '.*\.pyc$' -exec rm '{}' ';'
+find %{buildroot}/%{venv} -regex '.*\.pyo$' -exec rm '{}' ';'
+
 %py3_shebang_fix %{buildroot}/opt/%{vendor}/%{spark_package}/bin/
 %py3_shebang_fix %{buildroot}/opt/%{vendor}/%{spark_package}/python/pyspark/find_spark_home.py
 %py3_shebang_fix %{buildroot}/opt/%{vendor}/%{spark_package}/python/run-tests.py
+%py3_shebang_fix %{buildroot}/%{venv}
 
-
-cat << EOF > %{buildroot}/%{_datadir}/%{name}/README.rst
-
-You will need to create a metastore database in MySQL/MariaDB::
-
-  create database hive_metastore;
-  grant all privileges on hive_metastore.* to hive@'%' identified by 'hive';
-
-then initialize using::
-
-  mysql hive_metastore < %{_datadir}/%{name}/hive-metastore.sql
-
-EOF
 
 %files
 %defattr(-, root, root, -)
@@ -298,8 +307,6 @@ EOF
 %config %{_sysconfdir}/%{spark}/spark-env.sh
 %config %{_sysconfdir}/%{spark}/hive-site.xml
 %config %{_sysconfdir}/%{spark}/beeline-site.xml
-%{_datadir}/%{name}/hive-metastore.sql
-%{_datadir}/%{name}/README.rst
 %{_sysconfdir}/%{spark}/*.template
 %{_unitdir}/%{spark}-*.service
 %{_sysconfdir}/sysconfig/%{spark}
@@ -309,6 +316,11 @@ EOF
 %dir %attr(2775, %{user_name}, %{group_name}) %{_sharedstatedir}/%{spark}/warehouse
 %dir %attr(2775, %{user_name}, %{group_name}) %{_localstatedir}/log/%{spark}
 %dir %attr(2777, %{user_name}, %{group_name}) %{_localstatedir}/log/%{spark}/event_log/
+
+%files python
+%defattr(-, root, root, -)
+%{venv}
+
 
 %pre
 
