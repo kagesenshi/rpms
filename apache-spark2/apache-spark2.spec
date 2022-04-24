@@ -21,7 +21,7 @@
 
 Name: %{vendor}-spark%{spark_major}
 Version: %{spark_version}
-Release: 3%{?dist}
+Release: 4%{?dist}
 Summary: Apache Spark
 Requires(pre): shadow-utils
 BuildRequires: systemd-rpm-macros python-rpm-macros
@@ -375,6 +375,14 @@ exit 0
 
 
 %changelog
+* Sun Apr 24 2022 Izhar Firdaus <kagesenshi.87@gmail.com> 2.4.8-4
+- delete metastore.sql (kagesenshi.87@gmail.com)
+- add createDatabaseIfNotExist=true into default metastore url
+  (kagesenshi.87@gmail.com)
+- add avro and deltalake jars (kagesenshi.87@gmail.com)
+- include mysql connector java directly into this package
+  (kagesenshi.87@gmail.com)
+
 * Sat Apr 23 2022 Izhar Firdaus <kagesenshi.87@gmail.com> 2.4.8-3
 - remove noarch (kagesenshi.87@gmail.com)
 - use different virtualenv for fedora/rhel (kagesenshi.87@gmail.com)
