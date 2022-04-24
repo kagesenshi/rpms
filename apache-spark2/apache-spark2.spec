@@ -35,7 +35,6 @@ BuildRequires: python2-virtualenv
 %endif
 BuildRequires: /usr/bin/pathfix.py
 BuildRequires: perl-interpreter findutils
-Requires: mariadb-java-client
 AutoReq: no
 AutoProv: no
 
@@ -329,7 +328,6 @@ find %{buildroot}/%{venv} -regex '.*\.pyo$' -exec rm '{}' ';'
 %config %{_sysconfdir}/%{spark}/spark-env.sh
 %config %{_sysconfdir}/%{spark}/hive-site.xml
 %config %{_sysconfdir}/%{spark}/beeline-site.xml
-%{_datadir}/%{name}/README.rst
 %{_sysconfdir}/%{spark}/*.template
 %{_unitdir}/%{spark}-*.service
 %{_sysconfdir}/sysconfig/%{spark}
