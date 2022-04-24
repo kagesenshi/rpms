@@ -80,7 +80,6 @@ mkdir -p %{buildroot}/%{_localstatedir}/log/%{spark}/event_log/
 mkdir -p %{buildroot}/%{_sharedstatedir}/%{spark}/warehouse/
 mkdir -p %{buildroot}/%{_datadir}/%{name}/
 
-cp hive-metastore.sql %{buildroot}/%{_datadir}/%{name}/hive-metastore.sql
 
 %if 0%{?fedora}
 virtualenv --python /usr/bin/python2 %{buildroot}/%{venv}
@@ -273,7 +272,7 @@ cat << EOF > %{buildroot}/%{_sysconfdir}/%{spark}/hive-site.xml
 <configuration>
         <property>
                 <name>javax.jdo.option.ConnectionURL</name>
-                <value>jdbc:mysql://localhost/hive_metastore</value>
+                <value>jdbc:mysql://localhost/hive_metastore?createDatabaseIfNotExist=true</value>
         </property>
         <property>
                 <name>javax.jdo.option.ConnectionDriverName</name>
@@ -321,18 +320,6 @@ find %{buildroot}/%{venv} -regex '.*\.pyo$' -exec rm '{}' ';'
 %py2_shebang_fix %{buildroot}/%{venv}
 
 
-cat << EOF > %{buildroot}/%{_datadir}/%{name}/README.rst
-
-You will need to create a metastore database in MySQL/MariaDB::
-
-  create database hive_metastore;
-  grant all privileges on hive_metastore.* to hive@'%' identified by 'hive';
-
-then initialize using::
-
-  mysql hive_metastore < %{_datadir}/%{name}/hive-metastore.sql
-
-EOF
 
 %files
 %defattr(-, root, root, -)
@@ -342,7 +329,6 @@ EOF
 %config %{_sysconfdir}/%{spark}/spark-env.sh
 %config %{_sysconfdir}/%{spark}/hive-site.xml
 %config %{_sysconfdir}/%{spark}/beeline-site.xml
-%{_datadir}/%{name}/hive-metastore.sql
 %{_datadir}/%{name}/README.rst
 %{_sysconfdir}/%{spark}/*.template
 %{_unitdir}/%{spark}-*.service
