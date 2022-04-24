@@ -21,7 +21,7 @@
 
 Name: %{vendor}-spark%{spark_major}
 Version: %{spark_version}
-Release: 4%{?dist}
+Release: 5%{?dist}
 Summary: Apache Spark
 Requires(pre): shadow-utils
 BuildRequires: systemd-rpm-macros python-rpm-macros
@@ -373,6 +373,9 @@ exit 0
 
 
 %changelog
+* Sun Apr 24 2022 Izhar Firdaus <kagesenshi.87@gmail.com> 2.4.8-5
+- remove no longer required items (kagesenshi.87@gmail.com)
+
 * Sun Apr 24 2022 Izhar Firdaus <kagesenshi.87@gmail.com> 2.4.8-4
 - delete metastore.sql (kagesenshi.87@gmail.com)
 - add createDatabaseIfNotExist=true into default metastore url
