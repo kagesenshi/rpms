@@ -31,7 +31,8 @@ Requires: %{name}-common = %{version}-%{release}
 Summary: Data visualization and dashboard
 Requires: python%{python_version}
 Requires: pkgconfig(python-%{python_version}) == %{python_version}
-Requires:   postgresql-libs postgresql 
+Requires: postgresql-libs postgresql 
+Requires: mariadb-connector-c
 Requires(pre): /usr/sbin/useradd, /usr/bin/getent
 Requires(postun): /usr/sbin/userdel
 Requires: chromedriver
