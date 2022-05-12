@@ -1,0 +1,30 @@
+FROM fedora:35
+
+RUN dnf update -y && \
+    dnf install 'dnf-command(copr)' -y && \
+    dnf copr enable izhar/data-engineering -y && \
+    dnf clean all 
+
+RUN dnf copr enable izhar/aet -y && \
+    dnf install mariadb-connector-c apache-superset -y && \
+    dnf swap apache-superset-logos aedv-logos -y && \
+    dnf clean all
+
+ADD google-chrome.repo /etc/yum.repos.d/google-chrome.repo
+
+RUN dnf install google-chrome-stable -y && \
+    dnf clean all 
+
+ADD entrypoint.sh /usr/bin/entrypoint.sh
+RUN chmod a+x /usr/bin/entrypoint.sh
+WORKDIR /var/lib/apache-superset/
+USER apache-superset
+
+ENV PYTHONPATH=/etc/apache-superset \
+    ACCESS_LOG=/var/log/apache-superset/access.log \
+    ERROR_LOG=/var/log/apache-superset/errors.log \
+    PYTHONUNBUFFERED=1 \
+    LC_ALL=en_US.utf8 \
+    LANG=en_US.utf8
+
+ENTRYPOINT ["/usr/bin/entrypoint.sh"]
