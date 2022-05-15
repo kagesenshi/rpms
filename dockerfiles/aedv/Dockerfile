@@ -2,6 +2,7 @@ FROM fedora:35
 
 RUN dnf update -y && \
     dnf install 'dnf-command(copr)' -y && \
+    dnf install iputils glibc-langpack-en net-tools nmap bind-utils -y && \
     dnf copr enable izhar/data-engineering -y && \
     dnf clean all 
 

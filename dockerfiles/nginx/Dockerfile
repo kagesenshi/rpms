@@ -4,13 +4,13 @@ RUN dnf update -y && \
     dnf install iputils net-tools nmap bind-utils glibc-langpack-en -y && \
     dnf clean all 
 
-RUN dnf install redis -y && \
+RUN dnf install nginx -y && \
     dnf clean all
 
-USER redis
+USER root
 
 ENV LC_ALL=en_US.utf8 \
     LANG=en_US.utf8
 
-EXPOSE 6379/tcp
-ENTRYPOINT ["/usr/bin/redis-server", "/etc/redis/redis.conf", "--daemonize","no"]
+EXPOSE 80/tcp 443/tcp
+ENTRYPOINT ["/usr/sbin/nginx"]
