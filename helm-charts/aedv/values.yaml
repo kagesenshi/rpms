@@ -2,12 +2,19 @@
 # This is a YAML-formatted file.
 # Declare variables to be passed into your templates.
 
+namespace: default
+
 replicaCount: 1
 
 image:
   repository: registry.gitlab.com/abyres/releases/aedv
   pullPolicy: Always
   # Overrides the image tag whose default is the chart appVersion.
+  tag: "latest"
+
+redis_image:
+  repository: registry.gitlab.com/abyres/releases/redis
+  pullPolicy: Always
   tag: "latest"
 
 imagePullSecrets: []
@@ -41,21 +48,23 @@ service:
   port: 80
   targetPort: 8999
 
+redis_service:
+  type: ClusterIP
+  port: 6379
+  targetPort: 6379
+
 ingress:
   enabled: true
   className: ""
-  annotations: {}
-    # kubernetes.io/ingress.class: nginx
+  annotations: 
+    kubernetes.io/ingress.class: nginx
     # kubernetes.io/tls-acme: "true"
   hosts:
     - host: superset.rancher.home.kagesenshi.org 
       paths:
         - path: /
           pathType: ImplementationSpecific
-  tls: []
-  #  - secretName: chart-example-tls
-  #    hosts:
-  #      - chart-example.local
+  tls: true
 
 resources: {}
   # We usually recommend not to specify default resources and to leave this as a conscious
@@ -84,10 +93,10 @@ affinity: {}
 
 superset: 
   secret_key: "\x02\x01thisismyscretkey\x01\x02\\e\\y\\y\\h"
-  base_url: 'http://superset.rancher.home.kagesenshi.org/'
+  base_url: 'https://superset.rancher.home.kagesenshi.org/'
   db_uri: 'mysql://root:pass@10.210.14.53/apache_superset'
-  broker_url: 'redis://10.210.14.53:6379/3'
-  cache_redis_url: 'redis://10.210.14.53:6379/2'
+  broker_url: ''
+  cache_redis_url: ''
   celery_result_backend: 'db+mysql://root:pass@10.210.14.53/apache_superset_cache'
   celeryd_debug_level: 'DEBUG'
   worker_instances: 3

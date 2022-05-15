@@ -8,6 +8,7 @@ if [ "$1" == "start" ];then
         --timeout 120 \
         --limit-request-line 0 \
         --limit-request-field_size 0 \
+        --forwarded-allow-ips="*" \
         "superset.app:create_app()"
 elif [ "$1" == "worker" ];then
     /opt/apache-superset/bin/celery worker \

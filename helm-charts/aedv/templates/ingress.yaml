@@ -16,6 +16,7 @@ apiVersion: extensions/v1beta1
 kind: Ingress
 metadata:
   name: {{ $fullName }}
+  namespace: {{ .Values.namespace }}
   labels:
     {{- include "aedv.labels" . | nindent 4 }}
   {{- with .Values.ingress.annotations }}
@@ -28,12 +29,10 @@ spec:
   {{- end }}
   {{- if .Values.ingress.tls }}
   tls:
-    {{- range .Values.ingress.tls }}
+    {{- range .Values.ingress.hosts }}
     - hosts:
-        {{- range .hosts }}
-        - {{ . | quote }}
-        {{- end }}
-      secretName: {{ .secretName }}
+        - {{ .host | quote }}
+      secretName: {{ include "aedv.fullname" $ }}-tls
     {{- end }}
   {{- end }}
   rules:
