@@ -1,13 +1,13 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: {{ include "aedv.fullname" . }}
+  name: {{ include "aedv.fullname" . }}-web
   namespace: {{ .Values.namespace }}
   labels:
     {{- include "aedv.labels" . | nindent 4 }}
 spec:
   {{- if not .Values.autoscaling.enabled }}
-  replicas: {{ .Values.replicaCount }}
+  replicas: {{ .Values.web_instances }}
   {{- end }}
   selector:
     matchLabels:
@@ -34,6 +34,10 @@ spec:
         - name: {{ include "aedv.fullname" . }}-config
           secret:
             secretName: {{ include "aedv.fullname" . }}-config
+        - name: {{ include "aedv.fullname" . }}-datadir
+          emptyDir: {}
+        - name: {{ include "aedv.fullname" . }}-logdir
+          emptyDir: {}
       containers:
         - name: {{ .Chart.Name }}
           securityContext:
@@ -58,6 +62,10 @@ spec:
           volumeMounts:
             - name: {{ include "aedv.fullname" . }}-config
               mountPath: "/etc/apache-superset"
+            - name: {{ include "aedv.fullname" . }}-datadir
+              mountPath: "/var/lib/apache-superset"
+            - name: {{ include "aedv.fullname" . }}-logdir
+              mountPath: "/var/log/apache-superset"
           env:
             - name: SUPERSET_SECRET_KEY
               valueFrom:

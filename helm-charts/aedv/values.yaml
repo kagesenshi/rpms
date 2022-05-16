@@ -32,8 +32,11 @@ serviceAccount:
 
 podAnnotations: {}
 
-podSecurityContext: {}
+podSecurityContext: 
   # fsGroup: 2000
+  runAsUser: 1000
+  runAsGroup: 1000
+  fsGroup: 1000
 
 securityContext: {}
   # capabilities:
@@ -80,7 +83,7 @@ resources: {}
 
 autoscaling:
   enabled: true
-  minReplicas: 1
+  minReplicas: 2
   maxReplicas: 100
   targetCPUUtilizationPercentage: 80
   # targetMemoryUtilizationPercentage: 80
@@ -101,3 +104,13 @@ superset:
   celeryd_debug_level: 'DEBUG'
   worker_instances: 3
   web_instances: 1
+
+smtp:
+  enabled: false
+  host: ""
+  port: "25"
+  username: ""
+  password: ""
+  from: ""
+  use_ssl: ""
+  use_tls: ""

@@ -105,10 +105,22 @@ class CeleryConfig:  # pylint: disable=too-few-public-methods
         "email_reports.schedule_hourly": {
             "task": "email_reports.schedule_hourly",
             "schedule": crontab(minute=1, hour="*"),
-        }
+        },
+        "reports.scheduler": {
+            "task": "reports.scheduler",
+            "schedule": crontab(minute="*", hour="*"),
+        },
+        "reports.prune_log": {
+            "task": "reports.prune_log",
+            "schedule": crontab(minute=0, hour=0),
+        },
     }
 
 CELERY_CONFIG = CeleryConfig
+
+RESULTS_BACKEND = RedisCache(
+    host="{{ include "aedv.fullname" . }}-redis.{{ .Values.namespace }}.svc.cluster.local", 
+    port={{ .Values.redis_service.port }}, key_prefix='superset_results')
 
 THUMBNAIL_CACHE_CONFIG = {
     'CACHE_TYPE': 'redis',
@@ -120,6 +132,32 @@ THUMBNAIL_CACHE_CONFIG = {
     'CACHE_REDIS_URL': "redis://{{ include "aedv.fullname" . }}-redis.{{ .Values.namespace }}.svc.cluster.local:{{ .Values.redis_service.port }}/1",
     {{- end }}
 }
+
+{{ if .Values.smtp.enabled }}
+# smtp server configuration
+EMAIL_NOTIFICATIONS = True  # all the emails are sent using dryrun
+SMTP_HOST = {{ .Values.smtp.host | quote }}
+{{ if .Values.smtp.use_tls }}
+SMTP_STARTTLS = True
+{{ else }}
+SMTP_STARTTLS = False
+{{ end }}
+{{ if .Values.smtp.use_ssl }}
+SMTP_SSL = True
+{{ else }}
+SMTP_SSL = False
+{{ end }}
+SMTP_USER = {{ .Values.smtp.username | quote }}
+SMTP_PORT = {{ .Values.smtp.port }}
+SMTP_PASSWORD = {{ .Values.smtp.password | quote }}
+SMTP_MAIL_FROM = {{ .Values.smtp.from | quote }}
+{{ end }}
+
+PREFERRED_DATABASES = [
+    "PostgreSQL",
+    "Presto",
+    "MySQL",
+]
 
 WEBDRIVER_BASEURL = {{ quote .Values.superset.base_url }}
 WEBDRIVER_TYPE = "chrome"
@@ -139,6 +177,9 @@ WEBDRIVER_CONFIGURATION = {
    "service_log_path": "/var/log/apache-superset/chromedriver",
    "options": webdrv_opts
 }
+
+UPLOAD_FOLDER = '/var/lib/apache-superset/uploads'
+UPLOAD_FOLDER = '/var/lib/apache-superset/'
 {{- end }}
 
 

@@ -1,5 +1,7 @@
 FROM fedora:35
 
+LABEL org.opencontainers.image.version=20220516
+
 RUN dnf update -y && \
     dnf install 'dnf-command(copr)' -y && \
     dnf install iputils glibc-langpack-en net-tools nmap bind-utils -y && \
