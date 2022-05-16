@@ -82,7 +82,7 @@ ${RPM_BUILD_ROOT}/opt/%{name}/bin/pip install "apache-airflow[celery,async,postg
 # create resource dirs
 mkdir -p ${RPM_BUILD_ROOT}/%{_bindir}/
 mkdir -p ${RPM_BUILD_ROOT}/var/log/%{name}/
-mkdir -p ${RPM_BUILD_ROOT}/var/lib/%{name}/
+mkdir -p ${RPM_BUILD_ROOT}/%{_sharedstatedir}/%{name}/
 mkdir -p ${RPM_BUILD_ROOT}/%{_sysconfdir}/%{name}
 mkdir -p ${RPM_BUILD_ROOT}/%{_sysconfdir}/logrotate.d/
 mkdir -p ${RPM_BUILD_ROOT}/%{_sysconfdir}/sysconfig/
@@ -90,7 +90,7 @@ mkdir -p ${RPM_BUILD_ROOT}/%{_unitdir}
 
 # link to airflow home
 ln -s ../../var/log/%{name} ${RPM_BUILD_ROOT}/%{_sysconfdir}/%{name}/logs
-ln -s ../../var/lib/%{name} ${RPM_BUILD_ROOT}/%{_sysconfdir}/%{name}/state
+ln -s ../../%{_sharedstatedir}/%{name} ${RPM_BUILD_ROOT}/%{_sysconfdir}/%{name}/state
 
 
 # create environmentfile
@@ -190,7 +190,7 @@ Environment=PYTHONUNBUFFERED=1
 Environment=LC_ALL=en_US.utf8
 Environment=LANG=en_US.utf8
 EnvironmentFile=/etc/sysconfig/%{name}
-WorkingDirectory=/var/lib/%{name}/
+WorkingDirectory=%{_sharedstatedir}/%{name}/
 ExecStart=/opt/%{name}/bin/airflow scheduler
 Restart=on-failure
 RestartSec=5s
@@ -226,7 +226,7 @@ rm -rf $RPM_BUILD_ROOT
 %pre common
 /usr/bin/getent group %{group_name} >/dev/null || /usr/sbin/groupadd -r %{group_name}
 /usr/bin/getent passwd %{user_name} >/dev/null || /usr/sbin/useradd -r \
-     -g %{group_name} -d /opt/%{name}/ -s /sbin/nologin %{user_name}
+     -g %{group_name} -d %{_sharedstatedir}/%{name}/ -s /sbin/nologin %{user_name}
 
 %post common
 /opt/%{name}/bin/python -m compileall -q /opt/%{name}/ > /dev/null 2>&1 
@@ -261,7 +261,7 @@ rm -rf $RPM_BUILD_ROOT
 %attr(-,root,root) %{_unitdir}/%{name}-scheduler.service
 %attr(-,root,root) %{_unitdir}/%{name}-worker.service
 %attr(755,%{user_name},%{group_name}) /var/log/%{name}
-%attr(755,%{user_name},%{group_name}) /var/lib/%{name}
+%attr(755,%{user_name},%{group_name}) %{_sharedstatedir}/%{name}
 
 %attr(-,root,root) %{_sysconfdir}/logrotate.d/%{name}
 
