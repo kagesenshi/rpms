@@ -3,7 +3,6 @@ apiVersion: autoscaling/v2beta2
 kind: HorizontalPodAutoscaler
 metadata:
   name: {{ include "aedv.fullname" . }}-worker
-  namespace: {{ .Values.namespace }}
   labels:
     {{- include "aedv.labels" . | nindent 4 }}
 spec:

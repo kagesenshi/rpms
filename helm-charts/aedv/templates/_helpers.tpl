@@ -84,7 +84,7 @@ class CeleryConfig:  # pylint: disable=too-few-public-methods
     {{ if .Values.superset.broker_url -}}
     BROKER_URL = {{ quote .Values.superset.broker_url }}
     {{- else -}}
-    BROKER_URL = "redis://{{ include "aedv.fullname" . }}-redis.{{ .Values.namespace }}.svc.cluster.local:{{ .Values.redis_service.port }}/0"
+    BROKER_URL = "redis://{{ include "aedv.fullname" . }}-redis:{{ .Values.redis_service.port }}/0"
     {{- end }}
     CELERY_IMPORTS = ("superset.sql_lab", "superset.tasks",
                       "superset.tasks.thumbnails")
@@ -119,7 +119,7 @@ class CeleryConfig:  # pylint: disable=too-few-public-methods
 CELERY_CONFIG = CeleryConfig
 
 RESULTS_BACKEND = RedisCache(
-    host="{{ include "aedv.fullname" . }}-redis.{{ .Values.namespace }}.svc.cluster.local", 
+    host="{{ include "aedv.fullname" . }}-redis", 
     port={{ .Values.redis_service.port }}, key_prefix='superset_results')
 
 THUMBNAIL_CACHE_CONFIG = {
@@ -129,7 +129,7 @@ THUMBNAIL_CACHE_CONFIG = {
     {{ if .Values.superset.cache_redis_url -}}
     'CACHE_REDIS_URL': {{ quote .Values.superset.cache_redis_url }},
     {{- else -}}
-    'CACHE_REDIS_URL': "redis://{{ include "aedv.fullname" . }}-redis.{{ .Values.namespace }}.svc.cluster.local:{{ .Values.redis_service.port }}/1",
+    'CACHE_REDIS_URL': "redis://{{ include "aedv.fullname" . }}-redis:{{ .Values.redis_service.port }}/1",
     {{- end }}
 }
 

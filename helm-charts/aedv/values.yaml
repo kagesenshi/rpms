@@ -2,10 +2,6 @@
 # This is a YAML-formatted file.
 # Declare variables to be passed into your templates.
 
-namespace: ''
-
-replicaCount: 1
-
 image:
   repository: registry.gitlab.com/abyres/releases/aedv
   pullPolicy: Always
