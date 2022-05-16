@@ -8,7 +8,7 @@
 
 Name:       apache-superset
 Version:    1.4.2
-Release:    12%{?dist}
+Release:    13%{?dist}
 Summary:    Data visualization and dashboard
 
 License:    Apache2
@@ -315,6 +315,10 @@ rm -rf $RPM_BUILD_ROOT
 /opt/%{name}/lib/python%{python_version}/site-packages/superset/static/assets/images/superset-logo-horiz.png
 
 %changelog
+* Mon May 16 2022 Izhar Firdaus <kagesenshi.87@gmail.com> 1.4.2-13
+- set home dir to var/lib (kagesenshi.87@gmail.com)
+- added mysql-connector-c into deps (kagesenshi.87@gmail.com)
+
 * Sat Apr 23 2022 Izhar Firdaus <kagesenshi.87@gmail.com> 1.4.2-12
 - ensure binaries are really not stripped (kagesenshi.87@gmail.com)
 
