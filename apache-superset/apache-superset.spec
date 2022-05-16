@@ -75,7 +75,7 @@ ${RPM_BUILD_ROOT}/opt/%{name}/bin/pip install gevent
 # create resource dirs
 mkdir -p ${RPM_BUILD_ROOT}/usr/bin/
 mkdir -p ${RPM_BUILD_ROOT}/var/log/%{name}/
-mkdir -p ${RPM_BUILD_ROOT}/var/lib/%{name}/
+mkdir -p ${RPM_BUILD_ROOT}/%{_sharedstatedir}/%{name}/
 mkdir -p ${RPM_BUILD_ROOT}/etc/logrotate.d/
 mkdir -p ${RPM_BUILD_ROOT}/etc/sysconfig/
 mkdir -p ${RPM_BUILD_ROOT}/etc/%{name}/
@@ -109,7 +109,7 @@ FEATURE_FLAGS = {
 
 SECRET_KEY = "\2\1thisismyscretkey\1\2\\e\\y\\y\\h"
 SQLALCHEMY_DATABASE_URI="postgresql://postgres:postgres@localhost:5432/%{name}"
-DATA_DIR = "/var/lib/%{name}"
+DATA_DIR = "/%{_sharedstatedir}/%{name}"
 class CeleryConfig:  # pylint: disable=too-few-public-methods
     BROKER_URL = "redis://localhost:6379/2"
     CELERY_IMPORTS = ("superset.sql_lab", "superset.tasks",
@@ -234,7 +234,7 @@ Environment=PYTHONUNBUFFERED=1
 Environment=LC_ALL=en_US.utf8
 Environment=LANG=en_US.utf8
 EnvironmentFile=/etc/sysconfig/%{name}
-WorkingDirectory=/var/lib/%{name}/
+WorkingDirectory=%{_sharedstatedir}/%{name}/
 ExecStart=/opt/%{name}/bin/celery beat --app=superset.tasks.celery_app:app 
 Restart=on-failure
 RestartSec=5s
@@ -269,7 +269,7 @@ rm -rf $RPM_BUILD_ROOT
 %pre common
 /usr/bin/getent group %{group_name} >/dev/null || /usr/sbin/groupadd -r %{group_name}
 /usr/bin/getent passwd %{user_name} >/dev/null || /usr/sbin/useradd -r \
-     -g %{group_name} -d /opt/%{name}/ -s /sbin/nologin %{user_name}
+     -g %{group_name} -d /%{_sharedstatedir}/%{name}/ -s /sbin/nologin %{user_name}
 
 %post common
 /opt/%{name}/venv/bin/python -m compileall -q /opt/%{name}/ > /dev/null 2>&1 
@@ -306,7 +306,7 @@ rm -rf $RPM_BUILD_ROOT
 %attr(-,root,root) /usr/lib/systemd/system/%{name}-scheduler.service
 %attr(-,root,root) /usr/lib/systemd/system/%{name}-worker.service
 %attr(755,%{user_name},%{group_name}) /var/log/%{name}
-%attr(755,%{user_name},%{group_name}) /var/lib/%{name}
+%attr(755,%{user_name},%{group_name}) %{_sharedstatedir}/%{name}
 %attr(-,root,root) /etc/logrotate.d/%{name}
 
 %files logos
