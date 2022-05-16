@@ -6,7 +6,9 @@ metadata:
   labels:
     {{- include "aedv.labels" . | nindent 4 }}
 spec:
-  replicas: {{ .Values.superset.worker_instances }}
+  {{- if not .Values.autoscaling.enabled }}
+  replicas: {{ .Values.worker_instances }}
+  {{- end }}
   selector:
     matchLabels:
       {{- include "aedv.selectorLabels" . | nindent 6 }}
