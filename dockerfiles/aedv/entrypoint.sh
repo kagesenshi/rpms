@@ -15,6 +15,10 @@ elif [ "$1" == "worker" ];then
         --app=superset.tasks.celery_app:app --pool=prefork -O fair -c ${CELERY_WORKERS:-4}
 elif [ "$1" == "scheduler" ];then
     /opt/apache-superset/bin/celery beat --app=superset.tasks.celery_app:app
+elif [ "$1" == "first-init" ];then
+    /usr/bin/apache-superset db upgrade
+    /usr/bin/apache-superset fab create-admin --username admin --firstname admin --lastname user --email admin@localhost.local --password admin
+    /usr/bin/apache-superset init
 else
     /usr/bin/apache-superset "$@"
 fi
