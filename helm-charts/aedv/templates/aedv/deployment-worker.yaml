@@ -58,7 +58,13 @@ spec:
                   name: {{ include "aedv.fullname" . }}-secrets
                   key: secret-key
             - name: CELERY_WORKERS
-              value: "1"
+              value: "2"
+            - name: SUPERSET_PREVIOUS_SECRET_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "aedv.fullname" . }}-secrets
+                  key: previous-secret-key
+
           securityContext:
             capabilities:
               add: ["NET_BIND_SERVICE", "NET_ADMIN"]

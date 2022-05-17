@@ -78,6 +78,9 @@ FEATURE_FLAGS = {
 }
 
 SECRET_KEY = os.environ.get('SUPERSET_SECRET_KEY')
+if os.environ.get('SUPERSET_PREVIOUS_SECRET_KEY'):
+    PREVIOUS_SECRET_KEY = os.environ.get('SUPERSET_PREVIOUS_SECRET_KEY')
+
 SQLALCHEMY_DATABASE_URI={{ quote .Values.superset.db_uri }}
 DATA_DIR = "/var/lib/apache-superset"
 class CeleryConfig:  # pylint: disable=too-few-public-methods
@@ -88,7 +91,11 @@ class CeleryConfig:  # pylint: disable=too-few-public-methods
     {{- end }}
     CELERY_IMPORTS = ("superset.sql_lab", "superset.tasks",
                       "superset.tasks.thumbnails")
+    {{ if .Values.superset.celery_result_backend -}}
     CELERY_RESULT_BACKEND = {{ quote .Values.superset.celery_result_backend }}
+    {{- else -}}
+    CELERY_RESULT_BACKEND = "redis://{{ include "aedv.fullname" . }}-redis:{{ .Values.redis_service.port }}/3"
+    {{- end }}
     CELERYD_LOG_LEVEL = {{ quote .Values.superset.celeryd_debug_level }}
     CELERYD_PREFETCH_MULTIPLIER = 10
     CELERY_ACKS_LATE = True
@@ -159,7 +166,7 @@ PREFERRED_DATABASES = [
     "MySQL",
 ]
 
-WEBDRIVER_BASEURL = {{ quote .Values.superset.base_url }}
+WEBDRIVER_BASEURL = "http{{ if .Values.ingress.tls }}s{{ end }}//{{ .Values.ingress.host }}/"
 WEBDRIVER_TYPE = "chrome"
 WEBDRIVER_OPTION_ARGS = [
     "--headless",

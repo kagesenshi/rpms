@@ -1,0 +1,40 @@
+questions:
+    - variable: ingress.host
+      label: "API Ingress Host"
+      description: "Ingress hostname to access minio API"
+      default: "minio.k8s.lan"
+      type: string
+      required: true
+      group: "Core"
+    - variable: ingress.console_host
+      label: "Console Ingress Host"
+      description: "Ingress hostname to access minio console"
+      default: "minio-console.k8s.lan"
+      type: string
+      required: true
+      group: "Core"
+    - variable: replicaCount
+      label: "Replica Count"
+      description: "Total number of MinIO instances"
+      type: int
+      min: 4
+      max: 100
+      required: true
+      group: "Core"
+    - variable: minio.root_user
+      label: "Minio Root User"
+      default: "admin"
+      type: string
+      required: true
+      group: "Core"
+      min_length: 3
+      max_length: 128
+    - variable: minio.root_password
+      label: "Minio Root Password"
+      default: ""
+      type: password
+      required: true
+      min_length: 8
+      max_length: 128
+      group: "Core"
+

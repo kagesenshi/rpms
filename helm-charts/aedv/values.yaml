@@ -19,12 +19,12 @@ fullnameOverride: ""
 
 serviceAccount:
   # Specifies whether a service account should be created
-  create: true
+  create: false
   # Annotations to add to the service account
   annotations: {}
   # The name of the service account to use.
   # If not set and create is true, a name is generated using the fullname template
-  name: "aedv"
+  name: ""
 
 podAnnotations: {}
 
@@ -55,14 +55,11 @@ redis_service:
 ingress:
   enabled: true
   className: ""
-  annotations: 
-    kubernetes.io/ingress.class: nginx
-    # kubernetes.io/tls-acme: "true"
-  hosts:
-    - host: superset.rancher.home.kagesenshi.org 
-      paths:
-        - path: /
-          pathType: ImplementationSpecific
+  annotations: {}
+  host: superset.k8s.lan
+  paths:
+    - path: /
+      pathType: ImplementationSpecific
   tls: true
 
 resources: {}
@@ -78,10 +75,15 @@ resources: {}
   #   memory: 128Mi
 
 autoscaling:
-  enabled: true
-  minReplicas: 2
-  maxReplicas: 100
-  targetCPUUtilizationPercentage: 80
+  enabled: false
+  web:
+    minReplicas: 2
+    maxReplicas: 100
+    targetCPUUtilizationPercentage: 80
+  worker:
+    minReplicas: 2
+    maxReplicas: 100
+    targetCPUUtilizationPercentage: 80
   # targetMemoryUtilizationPercentage: 80
 
 nodeSelector: {}
@@ -91,15 +93,15 @@ tolerations: []
 affinity: {}
 
 superset: 
-  secret_key: "\x02\x01thisismyscretkey\x01\x02\\e\\y\\y\\h"
-  base_url: 'https://superset.rancher.home.kagesenshi.org/'
-  db_uri: 'mysql://root:pass@10.210.14.53/apache_superset'
+  secret_key: "CHANGEME"
+  previous_secret_key: ""
+  db_uri: 'mysql://root:pass@mysql.lan/apache_superset'
   broker_url: ''
   cache_redis_url: ''
-  celery_result_backend: 'db+mysql://root:pass@10.210.14.53/apache_superset_cache'
+  celery_result_backend: ''
   celeryd_debug_level: 'DEBUG'
-  worker_instances: 3
-  web_instances: 1
+  worker_instances: 2
+  web_instances: 2
 
 smtp:
   enabled: false
@@ -108,5 +110,5 @@ smtp:
   username: ""
   password: ""
   from: ""
-  use_ssl: ""
-  use_tls: ""
+  use_ssl: false
+  use_tls: false

@@ -28,20 +28,18 @@ spec:
   {{- end }}
   {{- if .Values.ingress.tls }}
   tls:
-    {{- range .Values.ingress.tls }}
+    {{- with .Values.ingress }}
     - hosts:
-        {{- range .hosts }}
-        - {{ . | quote }}
-        {{- end }}
-      secretName: {{ .secretName }}
+        - {{ .host | quote }}
+      secretName: {{ include "minio.fullname" $ }}-tls
     {{- end }}
   {{- end }}
   rules:
-    {{- range .Values.ingress.console_hosts }}
-    - host: {{ .host | quote }}
+    {{- with .Values.ingress }}
+    - host: {{ .console_host | quote }}
       http:
         paths:
-          {{- range .paths }}
+          {{- range .console_paths }}
           - path: {{ .path }}
             {{- if and .pathType (semverCompare ">=1.18-0" $.Capabilities.KubeVersion.GitVersion) }}
             pathType: {{ .pathType }}

@@ -71,6 +71,11 @@ spec:
                 secretKeyRef:
                   name: {{ include "aedv.fullname" . }}-secrets
                   key: secret-key
+            - name: SUPERSET_PREVIOUS_SECRET_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "aedv.fullname" . }}-secrets
+                  key: previous-secret-key
 
       {{- with .Values.nodeSelector }}
       nodeSelector:

@@ -28,14 +28,14 @@ spec:
   {{- end }}
   {{- if .Values.ingress.tls }}
   tls:
-    {{- range .Values.ingress.hosts }}
+    {{- with .Values.ingress }}
     - hosts:
         - {{ .host | quote }}
       secretName: {{ include "aedv.fullname" $ }}-tls
     {{- end }}
   {{- end }}
   rules:
-    {{- range .Values.ingress.hosts }}
+    {{- with .Values.ingress }}
     - host: {{ .host | quote }}
       http:
         paths:

@@ -26,15 +26,6 @@ spec:
       serviceAccountName: {{ include "minio.serviceAccountName" . }}
       securityContext:
         {{- toYaml .Values.podSecurityContext | nindent 8 }}
-      volumes:
-        - name: {{ include "minio.fullname" . }}-datadir0
-          emptyDir: {}
-        - name: {{ include "minio.fullname" . }}-datadir1
-          emptyDir: {}
-        - name: {{ include "minio.fullname" . }}-datadir2
-          emptyDir: {}
-        - name: {{ include "minio.fullname" . }}-datadir3
-          emptyDir: {}
       containers:
         - name: {{ .Chart.Name }}
           securityContext:
@@ -62,12 +53,6 @@ spec:
           volumeMounts:
             - name: {{ include "minio.fullname" . }}-datadir0
               mountPath: "/data0"
-            - name: {{ include "minio.fullname" . }}-datadir1
-              mountPath: "/data1"
-            - name: {{ include "minio.fullname" . }}-datadir2
-              mountPath: "/data2"
-            - name: {{ include "minio.fullname" . }}-datadir3
-              mountPath: "/data3"
           env:
             - name: MINIO_ROOT_USER
               valueFrom:
@@ -80,17 +65,25 @@ spec:
                   name: {{ include "minio.fullname" . }}-secrets
                   key: root_password
             - name: MINIO_BROWSER_REDIRECT_URL
-              value: {{ .Values.minio.browser_redirect_url }}
+              value: "http{{ if .Values.ingress.tls }}s{{ end }}://{{ .Values.ingress.console_host }}/"
 
 
       {{- with .Values.nodeSelector }}
       nodeSelector:
         {{- toYaml . | nindent 8 }}
       {{- end }}
-      {{- with .Values.affinity }}
       affinity:
-        {{- toYaml . | nindent 8 }}
-      {{- end }}
+        podAntiAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+            - weight: 100
+              podAffinityTerm:
+                labelSelector:
+                  matchExpressions:
+                    - key: app.kubernetes.io/name
+                      operator: In
+                      values:
+                        - {{ include "minio.name" . }}
+                topologyKey: "kubernetes.io/hostname"
       {{- with .Values.tolerations }}
       tolerations:
         {{- toYaml . | nindent 8 }}
@@ -104,30 +97,3 @@ spec:
         resources:
           requests:
             storage: 1G
-    - metadata:
-        name: {{ include "minio.fullname" . }}-datadir1
-      spec:
-        accessModes:
-          - ReadWriteOnce
-        resources:
-          requests:
-            storage: 1G
-    - metadata:
-        name: {{ include "minio.fullname" . }}-datadir2
-      spec:
-        accessModes:
-          - ReadWriteOnce
-        resources:
-          requests:
-            storage: 1G
-    - metadata:
-        name: {{ include "minio.fullname" . }}-datadir3
-      spec:
-        accessModes:
-          - ReadWriteOnce
-        resources:
-          requests:
-            storage: 1G
-
-
-

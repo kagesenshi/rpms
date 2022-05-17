@@ -51,17 +51,15 @@ ingress:
   annotations: {}
     # kubernetes.io/ingress.class: nginx
     # kubernetes.io/tls-acme: "true"
-  hosts:
-    - host: minio.k8s.lan
-      paths:
-        - path: /
-          pathType: ImplementationSpecific
-  console_hosts:
-    - host: minio-console.k8s.lan
-      paths:
-        - path: /
-          pathType: ImplementationSpecific
-  tls: []
+  host: minio.k8s.lan
+  paths:
+    - path: /
+      pathType: ImplementationSpecific
+  console_host: minio-console.k8s.lan
+  console_paths:
+    - path: /
+      pathType: ImplementationSpecific
+  tls: true
   #  - secretName: chart-example-tls
   #    hosts:
   #      - chart-example.local
@@ -84,7 +82,7 @@ tolerations: []
 
 affinity: {}
 
+
 minio:
   root_user: admin
   root_password: miniopassword
-  browser_redirect_url: http://minio-console.k8s.lan/
