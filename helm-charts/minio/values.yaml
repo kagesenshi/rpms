@@ -82,7 +82,9 @@ tolerations: []
 
 affinity: {}
 
+storageClass: ''
 
 minio:
   root_user: admin
   root_password: miniopassword
+  instance_storage: 1Gi

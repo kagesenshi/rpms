@@ -37,4 +37,15 @@ questions:
       min_length: 8
       max_length: 128
       group: "Core"
-
+    - variable: storageClass
+      label: "Storage Class"
+      default: ""
+      type: storageclass
+      required: false
+      group: "Core"
+    - variable: minio.instance_storage
+      label: "Storage size per instance"
+      default: "1Gi"
+      type: string
+      required: true
+      group: "Core"
