@@ -32,7 +32,8 @@ spec:
           secret:
             secretName: {{ include "aedwf.fullname" . }}-config
         - name: {{ include "aedwf.fullname" . }}-datadir
-          emptyDir: {}
+          persistentVolumeClaim:
+            claimName: {{ include "aedwf.fullname" . }}-datadir            
         - name: {{ include "aedwf.fullname" . }}-logdir
           emptyDir: {}
       containers:

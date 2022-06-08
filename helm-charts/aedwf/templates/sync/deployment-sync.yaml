@@ -1,17 +1,14 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: {{ include "aedwf.fullname" . }}-web
+  name: {{ include "aedwf.fullname" . }}-gitsync
   labels:
     {{- include "aedwf.labels" . | nindent 4 }}
 spec:
-  {{- if not .Values.autoscaling.enabled }}
-  replicas: {{ .Values.web_instances }}
-  {{- end }}
+  replicas: 1
   selector:
     matchLabels:
       {{- include "aedwf.selectorLabels" . | nindent 6 }}
-      component: web
   template:
     metadata:
       {{- with .Values.podAnnotations }}
@@ -20,7 +17,6 @@ spec:
       {{- end }}
       labels:
         {{- include "aedwf.selectorLabels" . | nindent 8 }}
-        component: web
     spec:
       {{- with .Values.imagePullSecrets }}
       imagePullSecrets:
@@ -42,21 +38,13 @@ spec:
         - name: {{ .Chart.Name }}
           securityContext:
             {{- toYaml .Values.securityContext | nindent 12 }}
-          image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
-          imagePullPolicy: {{ .Values.image.pullPolicy }}
-          args: ["start"]
-          ports:
-            - name: http
-              containerPort: 8080
-              protocol: TCP
-          livenessProbe:
-            httpGet:
-              path: /
-              port: http
-          readinessProbe:
-            httpGet:
-              path: /
-              port: http
+          image: "{{ .Values.gitsync_image.repository }}:{{ .Values.gitsync_image.tag }}"
+          imagePullPolicy: {{ .Values.gitsync_image.pullPolicy }}
+          args: ["--repo={{ .Values.airflow.dag_git_repository }}",
+                 "--branch={{ .Values.airflow.dag_git_branch }}",
+                 "--root=/var/lib/apache-airflow",
+                 "--dest=git", 
+                 "--wait={{ .Values.airflow.dag_git_sync_wait | default 60 }}"]
           resources:
             {{- toYaml .Values.resources | nindent 12 }}
           volumeMounts:
@@ -72,6 +60,7 @@ spec:
                 secretKeyRef:
                   name: {{ include "aedwf.fullname" . }}-secrets
                   key: fernet-key
+
 
       {{- with .Values.nodeSelector }}
       nodeSelector:

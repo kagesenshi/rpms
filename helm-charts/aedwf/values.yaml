@@ -15,7 +15,10 @@ redis_image:
   pullPolicy: Always
   tag: "latest"
 
-
+gitsync_image:
+  repository: k8s.gcr.io/git-sync
+  pullPolicy: Always
+  tag: "v3.0.1"
 
 imagePullSecrets: []
 nameOverride: ""
@@ -32,8 +35,10 @@ serviceAccount:
 
 podAnnotations: {}
 
-podSecurityContext: {}
-  # fsGroup: 2000
+podSecurityContext:
+  runAsUser: 1000
+  runAsGroup: 1000
+  fsGroup: 1000
 
 securityContext: {}
   # capabilities:
@@ -41,7 +46,6 @@ securityContext: {}
   #   - ALL
   # readOnlyRootFilesystem: true
   # runAsNonRoot: true
-  # runAsUser: 1000
 
 service:
   type: ClusterIP
@@ -97,4 +101,5 @@ airflow:
   default_timezone: Asia/Kuala_Lumpur
   db_uri: 'mysql://root:pass@mysql.lan/apache_airflow'
   fernet_key: VSmUkY-KnNky8pwMKGEcr-TEIw0cc-N7yTle2D8ojtk=
-
+  dag_git_repository: https://github.com/kagesenshi/radiate.git
+  dag_git_branch: master
