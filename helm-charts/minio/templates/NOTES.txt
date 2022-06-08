@@ -1,6 +1,7 @@
 1. Get the application URL by running these commands:
 {{- if .Values.ingress.enabled }}
-{{- with $host := .Values.ingress.hosts }}
+{{- with .Values.ingress.hosts }}
+  {{ $host := . }}
   {{- range .paths }}
   http{{ if $.Values.ingress.tls }}s{{ end }}://{{ $host.host }}{{ .path }}
   {{- end }}

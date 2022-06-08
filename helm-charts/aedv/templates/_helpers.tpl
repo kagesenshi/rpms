@@ -166,7 +166,7 @@ PREFERRED_DATABASES = [
     "MySQL",
 ]
 
-WEBDRIVER_BASEURL = "http{{ if .Values.ingress.tls }}s{{ end }}//{{ .Values.ingress.host }}/"
+WEBDRIVER_BASEURL = "http{{ if .Values.ingress.tls }}s{{ end }}://{{ .Values.ingress.host }}/"
 WEBDRIVER_TYPE = "chrome"
 WEBDRIVER_OPTION_ARGS = [
     "--headless",
