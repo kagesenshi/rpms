@@ -1,0 +1,16 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "aedwf.fullname" . }}-redis
+  labels:
+    {{- include "aedwf.labels" . | nindent 4 }}
+spec:
+  type: {{ .Values.service.type }}
+  ports:
+    - port: {{ .Values.redis_service.port }}
+      targetPort: {{ .Values.redis_service.targetPort }}
+      protocol: TCP
+      name: redis
+  selector:
+    {{- include "aedwf.selectorLabels" . | nindent 4 }}
+    component: redis
