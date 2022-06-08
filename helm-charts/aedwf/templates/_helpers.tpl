@@ -67,7 +67,7 @@ Create the name of the service account to use
 */}}
 {{- define "airflow-config" -}}
 [core]
-dags_folder = /var/lib/apache-airflow/git/dags/
+dags_folder = /var/lib/apache-airflow/git/project/dags/
 default_timezone = {{ .Values.airflow.default_timezone }}
 executor = CeleryExecutor
 sql_alchemy_conn = {{ .Values.airflow.db_uri }}
@@ -84,7 +84,7 @@ dags_are_paused_at_creation = {{ .Values.airflow.dags_paused_at_creation | defau
 max_active_runs_per_dag = {{ .Values.airflow.max_active_runs_per_dag | default "16" }}
 load_examples = False
 load_default_connections = False
-plugins_folder = /var/lib/apache-airflow/git/plugins/
+plugins_folder = /var/lib/apache-airflow/git/project/plugins/
 execute_tasks_new_python_interpreter = True
 donot_pickle = False
 dag_file_processor_timeout = 50
