@@ -1,0 +1,184 @@
+questions:
+  - variable: ingress.host
+    label: "Ingress Host"
+    description: "Ingress hostname to access airflow"
+    default: "airflow.k8s.lan"
+    type: string
+    required: true
+    group: "Core"
+  - variable: airflow.fernet_key
+    label: "Fernet Key"
+    description: "Fernet encryption key to encrypt passwords \n`python -c 'from cryptography.fernet import Fernet;print(Fernet.generate_key())'`"
+    required: true
+    group: "Core"
+  - variable": airflow.db_uri
+    label: "Database URI"
+    description: "Connection URI to backing database (SQLAlchemy URI scheme)"
+    default: "mysql://root:pass@host:port/airflow"
+    type: string
+    required: true
+    group: "Core"
+  - variable": airflow.dag_git_repository
+    label: "Git Repo URL"
+    description: "URL to Git repository containing dag and plugin directory"
+    type: string
+    required: true
+    group: "Core"
+  - variable": airflow.dag_git_branch
+    label: "Git Branch"
+    description: "Git branch to checkout"
+    type: string
+    default: "master"
+    required: true
+    group: "Core"
+  - variable": airflow.default_timezone
+    label: "Default Timezone"
+    description: "Default timezone"
+    default: "Asia/Kuala_Lumpur"
+    type: string
+    required: true
+    group: "Core"
+  - variable": storageClass
+    label: "Storage Class"
+    description: "StorageClass for use for creation of persistence volume"
+    type: storageclass
+    required: false
+    group: "Core"
+  - variable: smtp.enabled
+    label: "Enable SMTP"
+    description: "Enable SMTP"
+    default: "false"
+    type: boolean
+    required: false
+    show_subquestions_if: true
+    group: "SMTP"
+    subquestions:
+      - variable: smtp.host
+        label: "SMTP Host"
+        description: ""
+        default: ""
+        type: string
+        required: false
+        group: "SMTP"
+      - variable: smtp.port
+        label: "SMTP Port"
+        description: ""
+        default: "25"
+        type: int
+        required: false
+        group: "SMTP"
+      - variable: smtp.username
+        label: "SMTP Username"
+        description: ""
+        default: ""
+        type: string
+        required: false
+        group: "SMTP"
+      - variable: smtp.password
+        label: "SMTP Username"
+        description: ""
+        default: ""
+        type: password
+        required: false
+        group: "SMTP"
+      - variable: smtp.from
+        label: "SMTP From Address"
+        description: ""
+        default: "no-reply@k8s.lan"
+        type: string
+        required: false
+        group: "SMTP"
+      - variable: smtp.use_ssl
+        label: "Use SSL"
+        description: ""
+        default: "false"
+        type: boolean
+        required: false
+      - variable: smtp.use_tls
+        label: "Use TLS"
+        description: ""
+        default: "false"
+        type: boolean
+        required: false
+      - variable: smtp.retry_limit
+        label: "Retry Limit"
+        description: ""
+        default: "5"
+        type: int
+        required: false
+
+  - variable: autoscaling.enabled
+    label: "Enabled"
+    default: "false"
+    description: "Enable Auto Scaling"
+    type: boolean
+    required: false
+    show_subquestions_if: true
+    group: "Scaling"
+    subquestions:
+      - variable: autoscaling.web.minReplicas
+        label: "Minimum Replicas (Web)"
+        default: "2"
+        description: "Minimum number of web workers"
+        type: int
+        min: 1
+        max: 10
+        required: true
+      - variable: autoscaling.web.maxReplicas
+        label: "Maximum Replicas (Web)"
+        default: "100"
+        description: "Maximum number of web workers"
+        type: int
+        min: 1
+        max: 100
+        required: true
+      - variable: autoscaling.worker.minReplicas
+        label: "Minimum Replicas (Celery)"
+        default: "2"
+        description: "Minimum number of celery workers"
+        type: int
+        min: 1
+        max: 10
+        required: true
+      - variable: autoscaling.worker.maxReplicas
+        label: "Maximum Replicas (Celery)"
+        default: "100"
+        description: "Maximum number of celery workers"
+        type: int
+        min: 1
+        max: 100
+        required: true
+      - variable: resources.requests.cpu
+        label: "Container CPU Request"
+        default: "100m"
+      - variable: resources.limits.cpu
+        label: "Container CPU Limit"
+        default: "1000m"
+      - variable: resources.requests.memory
+        label: "Container Memory Request"
+        default: "1Gi"
+      - variable: resources.limits.memory
+        label: "Container Memory Limit"
+        default: "2Gi"
+
+
+  - variable: web_instances
+    label: "Web Instances"
+    default: "2"
+    description: "Number of web worker instances"
+    type:  int
+    min: 1
+    max: 100
+    show_if: autoscaling.enabled=false
+    required: true
+    group: "Scaling"
+  - variable: worker_instances
+    label: "Celery Worker Instances"
+    default: "2"
+    description: "Number of celery worker instances"
+    type:  int
+    min: 1
+    max: 100
+    show_if: autoscaling.enabled=false
+    required: true
+    group: "Scaling"

@@ -132,7 +132,7 @@ questions:
           label: "Container Memory Limit"
           default: "2Gi"
 
-    - variable: superset.web_instances
+    - variable: web_instances
       label: "Web Instances"
       default: "2"
       description: "Number of web worker instances"
@@ -142,7 +142,7 @@ questions:
       show_if: autoscaling.enabled=false
       required: true
       group: "Scaling"
-    - variable: superset.worker_instances
+    - variable: worker_instances
       label: "Celery Worker Instances"
       default: "2"
       description: "Number of celery worker instances"

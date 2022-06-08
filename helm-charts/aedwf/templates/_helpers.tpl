@@ -153,8 +153,27 @@ worker_precheck = False
 [scheduler]
 child_process_log_directory = /var/log/apache-airflow/scheduler
 
+{{ if .Values.smtp.enabled }}
+[smtp]
+smtp_host = {{ .Values.smtp.host }}
+smtp_port = {{ .Values.smtp.port }}
+smtp_user = {{ .Values.smtp.user }}
+smtp_password = {{ .Values.smtp.password }}
+smtp_mail_from = {{ .Values.smtp.from }}
+{{- if .Values.smtp.use_ssl }}
+smtp_ssl = True
+{{- else -}}
+smtp_ssl = False
 {{- end }}
-
+{{- if .Values.smtp.use_tls }}
+smtp_starttls = True
+{{- else -}}
+smtp_starttls = False
+{{- end }}
+{{- end }}
+smtp_timeout = 30
+smtp_retry_limit = {{ .Values.smtp.retry_limit | default "5" }}
+{{ end }}
 
 {{/* 
 Redis configuration

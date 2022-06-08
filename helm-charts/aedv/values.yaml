@@ -86,6 +86,9 @@ autoscaling:
     targetCPUUtilizationPercentage: 80
   # targetMemoryUtilizationPercentage: 80
 
+worker_instances: 2
+web_instances: 2
+
 nodeSelector: {}
 
 tolerations: []
@@ -100,8 +103,6 @@ superset:
   cache_redis_url: ''
   celery_result_backend: ''
   celeryd_debug_level: 'DEBUG'
-  worker_instances: 2
-  web_instances: 2
 
 smtp:
   enabled: false

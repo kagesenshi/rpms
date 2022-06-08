@@ -62,12 +62,11 @@ ingress:
   annotations: {}
     # kubernetes.io/ingress.class: nginx
     # kubernetes.io/tls-acme: "true"
-  hosts:
-    - host: aedwf.k8s.lan
-      paths:
-        - path: /
-          pathType: ImplementationSpecific
-  tls: []
+  host: aedwf.k8s.lan
+  paths:
+    - path: /
+      pathType: ImplementationSpecific
+  tls: true
   #  - secretName: chart-example-tls
   #    hosts:
   #      - chart-example.local
@@ -91,6 +90,9 @@ autoscaling:
   targetCPUUtilizationPercentage: 80
   # targetMemoryUtilizationPercentage: 80
 
+web_instances: 2
+worker_instances: 2
+
 nodeSelector: {}
 
 tolerations: []
@@ -103,3 +105,6 @@ airflow:
   fernet_key: 
   dag_git_repository: 
   dag_git_branch: master
+
+smtp:
+  enabled: false
