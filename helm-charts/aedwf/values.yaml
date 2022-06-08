@@ -100,6 +100,6 @@ affinity: {}
 airflow:
   default_timezone: Asia/Kuala_Lumpur
   db_uri: 'mysql://root:pass@mysql.lan/apache_airflow'
-  fernet_key: VSmUkY-KnNky8pwMKGEcr-TEIw0cc-N7yTle2D8ojtk=
-  dag_git_repository: https://github.com/kagesenshi/radiate.git
+  fernet_key: 
+  dag_git_repository: 
   dag_git_branch: master
