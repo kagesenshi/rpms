@@ -31,7 +31,7 @@ spec:
     {{- with .Values.ingress }}
     - hosts:
         - {{ .host | quote }}
-      secretName: {{ include "aedwf.fullname" }}-tls
+      secretName: {{ include "aedwf.fullname" $ }}-tls
     {{- end }}
   {{- end }}
   rules:

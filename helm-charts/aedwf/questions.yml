@@ -8,45 +8,46 @@ questions:
     group: "Core"
   - variable: airflow.fernet_key
     label: "Fernet Key"
-    description: "Fernet encryption key to encrypt passwords \n`python -c 'from cryptography.fernet import Fernet;print(Fernet.generate_key())'`"
+    description: "Fernet encryption key to encrypt passwords. Get one using `python -c 'from cryptography.fernet import Fernet;print(Fernet.generate_key())'`"
     required: true
     group: "Core"
-  - variable": airflow.db_uri
+  - variable: airflow.db_uri
     label: "Database URI"
     description: "Connection URI to backing database (SQLAlchemy URI scheme)"
     default: "mysql://root:pass@host:port/airflow"
     type: string
     required: true
     group: "Core"
-  - variable": airflow.dag_git_repository
+  - variable: airflow.dag_git_repository
     label: "Git Repo URL"
     description: "URL to Git repository containing dag and plugin directory"
     type: string
     required: true
     group: "Core"
-  - variable": airflow.dag_git_branch
+  - variable: airflow.dag_git_branch
     label: "Git Branch"
     description: "Git branch to checkout"
     type: string
     default: "master"
     required: true
     group: "Core"
-  - variable": airflow.default_timezone
+  - variable: airflow.default_timezone
     label: "Default Timezone"
-    description: "Default timezone"
+    description: "Default timezone, in IANA format"
     default: "Asia/Kuala_Lumpur"
     type: string
     required: true
     group: "Core"
-  - variable": storageClass
+  - variable: storageClass
     label: "Storage Class"
     description: "StorageClass for use for creation of persistence volume"
     type: storageclass
+    default: ""
     required: false
     group: "Core"
   - variable: smtp.enabled
     label: "Enable SMTP"
-    description: "Enable SMTP"
+    description: "Enable sending emails"
     default: "false"
     type: boolean
     required: false
@@ -108,9 +109,9 @@ questions:
         required: false
 
   - variable: autoscaling.enabled
-    label: "Enabled"
+    label: "Enable Auto Scaling"
     default: "false"
-    description: "Enable Auto Scaling"
+    description: "Enable auto scaling"
     type: boolean
     required: false
     show_subquestions_if: true

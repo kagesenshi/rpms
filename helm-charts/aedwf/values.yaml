@@ -99,6 +99,8 @@ tolerations: []
 
 affinity: {}
 
+storageClass: 
+
 airflow:
   default_timezone: Asia/Kuala_Lumpur
   db_uri: 'mysql://root:pass@mysql.lan/apache_airflow'
@@ -108,3 +110,10 @@ airflow:
 
 smtp:
   enabled: false
+  host: ""
+  port: "25"
+  username: ""
+  password: ""
+  from: ""
+  use_ssl: false
+  use_tls: false

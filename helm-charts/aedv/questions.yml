@@ -21,8 +21,8 @@ questions:
       required: true
       group: "Core"
     - variable: smtp.enabled
-      label: "Enabled"
-      description: "Enable SMTP"
+      label: "Enable SMTP"
+      description: "Enable sending emails"
       default: "false"
       type: boolean
       required: false
@@ -79,9 +79,9 @@ questions:
           required: false
           group: "SMTP"
     - variable: autoscaling.enabled
-      label: "Enabled"
+      label: "Enable Auto Scaling"
       default: "false"
-      description: "Enable Auto Scaling"
+      description: "Enable auto scaling"
       type: boolean
       required: false
       show_subquestions_if: true
