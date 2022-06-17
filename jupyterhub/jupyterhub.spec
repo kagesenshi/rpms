@@ -57,7 +57,7 @@ mkdir -p %{buildroot}/%{_unitdir}/
 cp -r * ${RPM_BUILD_ROOT}/opt/%{name}/
 cd ${RPM_BUILD_ROOT}/opt/%{name}/
 python%{python_version} -m venv ${RPM_BUILD_ROOT}/opt/%{name}/
-${RPM_BUILD_ROOT}/opt/%{name}/bin/pip install . psycopg2-binary pymssql "jupyterlab==%{jupyterlab_version}" jupyter-server-proxy \
+${RPM_BUILD_ROOT}/opt/%{name}/bin/pip install jupyterhub==%{version} psycopg2-binary pymssql "jupyterlab==%{jupyterlab_version}" jupyter-server-proxy \
     jupyterlab-git jupyterlab_latex jupyterlab-pullrequests jupyterlab-fasta \
     jupyterlab-geojson jupyterlab-katex  jupyterlab-mathjax3 jupyterlab-vega2 \
     jupyterlab-vega3 jupyterlab_widgets
@@ -113,7 +113,7 @@ EOF
 find ${RPM_BUILD_ROOT} -regex '.*\.pyc$' -exec rm '{}' ';'
 find ${RPM_BUILD_ROOT} -regex '.*\.pyo$' -exec rm '{}' ';'
 
-%py3_shebang_fix $RPM_BUILD_ROOT/opt/%{name}/
+%py3_shebang_fix $RPM_BUILD_ROOT/opt/%{name}/bin/
 
 export QA_RPATHS=$(( 0x0002 ))
 
