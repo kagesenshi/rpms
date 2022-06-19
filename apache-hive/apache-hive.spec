@@ -31,6 +31,7 @@ URL: http://hive.apache.org
 Source0: %{name}-%{version}.tar.gz
 Source1: https://archive.apache.org/dist/hive/hive-%{hive_version}/%{hive_package}.tar.gz
 Requires: java-%{java_version}-openjdk-headless
+Requires: apache-hadoop >= 3.0.0
 
 %description
 Big data processing with Apache Hive
