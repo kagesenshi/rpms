@@ -1,0 +1,17 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "spark3.fullname" . }}-thrift
+  labels:
+    {{- include "spark3.labels" . | nindent 4 }}
+    component: thrift-service
+spec:
+  type: {{ .Values.service.type }}
+  ports:
+    - port: 10000
+      targetPort: hiveserver2
+      protocol: TCP
+      name: hiveserver2
+  selector:
+    {{- include "spark3.selectorLabels" . | nindent 4 }}
+    component: thrift

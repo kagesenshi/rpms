@@ -1,0 +1,74 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "spark3.fullname" . }}-worker
+  labels:
+    {{- include "spark3.labels" . | nindent 4 }}
+    component: worker
+spec:
+  {{- if not .Values.autoscaling.enabled }}
+  replicas: {{ .Values.replicaCount }}
+  {{- end }}
+  selector:
+    matchLabels:
+      {{- include "spark3.selectorLabels" . | nindent 6 }}
+      component: worker
+  template:
+    metadata:
+      {{- with .Values.podAnnotations }}
+      annotations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      labels:
+        {{- include "spark3.selectorLabels" . | nindent 8 }}
+        component: worker
+    spec:
+      {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      serviceAccountName: {{ include "spark3.serviceAccountName" . }}
+      securityContext:
+        {{- toYaml .Values.podSecurityContext | nindent 8 }}
+      volumes:
+        {{- include "spark3.volumes" . | nindent 8 }}
+      containers:
+        - name: {{ .Chart.Name }}
+          securityContext:
+            {{- toYaml .Values.securityContext | nindent 12 }}
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          args: ["/usr/sbin/spark3-slave", 'spark://{{ include "spark3.fullname" . }}-master:7077', '-p', '{{ .Values.spark.worker_port | default "33620" }}']
+          ports:
+            - name: worker
+              containerPort: {{ .Values.spark.worker_port | default "33620" }}
+              protocol: TCP
+          livenessProbe:
+            tcpSocket:
+              port: {{ .Values.spark.worker_port | default "33620" }}
+            initialDelaySeconds: 15
+            periodSeconds: 10
+          readinessProbe:
+            tcpSocket: 
+              port: {{ .Values.spark.worker_port | default "33620" }}
+            initialDelaySeconds: 15
+            periodSeconds: 10
+          volumeMounts:
+            {{- include "spark3.volume-mounts" . | nindent 12 }}
+          env:
+            {{- include "spark3.env" . | nindent 12 }}
+            {{- include "spark3.client-env" . | nindent 12 }}
+          resources:
+            {{- toYaml .Values.resources | nindent 12 }}
+      {{- with .Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
