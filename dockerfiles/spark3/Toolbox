@@ -1,0 +1,30 @@
+# vi: ft=dockerfile
+
+FROM registry.gitlab.com/abyres/releases/spark3
+
+ENV NAME=spark3-toolbox VERSION=20220617
+LABEL com.github.containers.toolbox="true" \
+      com.redhat.component="$NAME" \
+      name="$NAME" \
+      version="$VERSION" \
+      usage="This image is meant to be used with the toolbox command" \
+      summary="Base image for creating Spark3 toolbox containers" \
+      maintainer="Izhar Firdaus <izhar@fedoraproject.org>"
+
+#COPY README.md /
+
+RUN sed -i '/tsflags=nodocs/d' /etc/dnf/dnf.conf
+RUN dnf -y swap coreutils-single coreutils-full && dnf clean all
+
+COPY missing-docs /
+RUN dnf -y reinstall $(</missing-docs) && dnf clean all
+RUN rm /missing-docs
+
+COPY extra-packages /
+RUN dnf -y install $(</extra-packages) && dnf clean all
+RUN rm /extra-packages
+
+COPY spark-defaults.conf /etc/spark3/spark-defaults.conf
+RUN sed -i 's|%IMAGE%|registry.gitlab.com/abyres/releases/spark3|g' /etc/spark3/spark-defaults.conf
+
+ENTRYPOINT []
