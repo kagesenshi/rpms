@@ -4,6 +4,7 @@ metadata:
   name: {{ include "aedwf.fullname" . }}-scheduler
   labels:
     {{- include "aedwf.labels" . | nindent 4 }}
+    component: scheduler
 spec:
   replicas: 1
   selector:
@@ -17,6 +18,7 @@ spec:
       {{- end }}
       labels:
         {{- include "aedwf.selectorLabels" . | nindent 8 }}
+        component: scheduler
     spec:
       {{- with .Values.imagePullSecrets }}
       imagePullSecrets:

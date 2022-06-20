@@ -4,6 +4,7 @@ metadata:
   name: {{ include "aedwf.fullname" . }}-web
   labels:
     {{- include "aedwf.labels" . | nindent 4 }}
+    component: web
 spec:
   {{- if not .Values.autoscaling.enabled }}
   replicas: {{ .Values.web_instances }}
