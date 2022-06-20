@@ -20,5 +20,5 @@ elif [ "$1" == "first-init" ];then
     /usr/bin/apache-superset fab create-admin --username admin --firstname admin --lastname user --email admin@localhost.local --password admin
     /usr/bin/apache-superset init
 else
-    /usr/bin/apache-superset "$@"
+    /usr/bin/apache-superset "${@:2}"
 fi
