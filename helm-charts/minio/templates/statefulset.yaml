@@ -1,3 +1,4 @@
+{{- include "require" . -}}
 apiVersion: apps/v1
 kind: StatefulSet
 metadata:
@@ -32,7 +33,11 @@ spec:
             {{- toYaml .Values.securityContext | nindent 12 }}
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
           imagePullPolicy: {{ .Values.image.pullPolicy }}
+          {{ if gt (int .Values.replicaCount) 1 -}}
           args: ['http://{{ include "minio.fullname" . }}-{0...{{ sub .Values.replicaCount 1 }}}.{{ include "minio.fullname" . }}:9000/data0']
+          {{- else -}}
+          args: ["/data0"]
+          {{- end }}
           ports:
             - name: http
               containerPort: 9000

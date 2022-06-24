@@ -1,3 +1,4 @@
+{{- include "require" . -}}
 {{- if .Values.ingress.enabled -}}
 {{- $fullName := include "minio.fullname" . -}}
 {{- $svcPort := .Values.service.console_port -}}
