@@ -43,7 +43,7 @@ service:
 ingress:
   enabled: true
   className: ""
-  annotations: {}
+  annotations: 
     nginx.ingress.kubernetes.io/proxy-body-size: "0"
   host:
   paths:
