@@ -16,7 +16,11 @@ RUN set -ex && \
 WORKDIR /var/lib/pgsql/
 ENV PGDATA=/var/lib/pgsql/
 ADD entrypoint.sh /opt/entrypoint.sh
-RUN chmod +x /opt/entrypoint.sh
+ADD createdb_with_user.sh /usr/bin/
+ADD pg_hba.conf /etc/pg_hba.conf
+RUN chown postgres:postgres /etc/pg_hba.conf && \
+    chmod a+rx /usr/bin/createdb_with_user.sh && \
+    chmod +x /opt/entrypoint.sh
 USER postgres
 
 ENTRYPOINT [ "/opt/entrypoint.sh" ]
