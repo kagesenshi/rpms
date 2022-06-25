@@ -91,4 +91,8 @@ tolerations: []
 affinity: {}
 
 spark: 
-   hive_metastore_uri: thrift://hive-metastore:9083
+  hive_metastore_uri:
+  s3a_endpoint:
+  s3a_access_key:
+  s3a_secret_key:
+

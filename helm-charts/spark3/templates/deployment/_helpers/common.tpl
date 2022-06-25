@@ -9,6 +9,8 @@
 {{- define "spark3.volume-mounts" }}
 - name: {{ include "spark3.fullname" . }}-config
   mountPath: "/etc/spark3/"
+- name: {{ include "spark3.fullname" . }}-config
+  mountPath: "/opt/apache/spark3/conf/"
 - name: {{ include "spark3.fullname" . }}-datadir
   mountPath: "/opt/apache/spark3/work-dir"
 

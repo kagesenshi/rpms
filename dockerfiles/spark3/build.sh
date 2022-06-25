@@ -1,5 +1,7 @@
 #!/bin/bash
 
+set -e
+
 REPO="registry.gitlab.com/abyres/releases/spark3"
 TOOLBOX_REPO="registry.gitlab.com/abyres/releases/spark3-toolbox"
 TAG="latest"
