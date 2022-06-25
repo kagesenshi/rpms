@@ -1,0 +1,71 @@
+{{- include "require" . -}}
+apiVersion: v1
+kind: Pod
+metadata:
+  name: {{ include "registry.fullname" . }}
+  labels:
+    {{- include "registry.labels" . | nindent 4 }}
+spec:
+  {{- with .Values.imagePullSecrets }}
+  imagePullSecrets:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+  serviceAccountName: {{ include "registry.serviceAccountName" . }}
+  securityContext:
+    {{- toYaml .Values.podSecurityContext | nindent 4 }}
+  volumes:
+    {{- include "registry.volumes" . | nindent 4 }}
+  initContainers:
+    - name: {{ .Chart.Name }}-create-htpasswd
+      image: "{{ .Values.htpasswd_image.repository }}:{{ .Values.htpasswd_image.tag | default .Chart.AppVersion }}"
+      imagePullPolicy: {{ .Values.htpasswd_image.pullPolicy }}
+      command: ["/usr/bin/touch", "/mnt/auth/htpasswd"]
+      volumeMounts:
+        {{- include "registry.volumeMounts" . | nindent 8 }}
+    - name: {{ .Chart.Name }}-add-user
+      image: "{{ .Values.htpasswd_image.repository }}:{{ .Values.htpasswd_image.tag | default .Chart.AppVersion }}"
+      imagePullPolicy: {{ .Values.htpasswd_image.pullPolicy }}
+      command: ["/usr/bin/htpasswd", "-Bb", "/mnt/auth/htpasswd", {{ .Values.registry.user | quote }}, {{ .Values.registry.password | quote }}]
+      volumeMounts:
+        {{- include "registry.volumeMounts" . | nindent 8 }}
+  containers:
+    - name: {{ .Chart.Name }}
+      securityContext:
+        {{- toYaml .Values.securityContext | nindent 8 }}
+      image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
+      imagePullPolicy: {{ .Values.image.pullPolicy }}
+      volumeMounts:
+        {{- include "registry.volumeMounts" . | nindent 8 }}
+      ports:
+        - name: http
+          containerPort: 5000
+          protocol: TCP
+      livenessProbe:
+        httpGet:
+          path: /
+          port: http
+      readinessProbe:
+        httpGet:
+          path: /
+          port: http
+      env:
+        - name: REGISTRY_AUTH
+          value: htpasswd
+        - name: REGISTRY_AUTH_HTPASSWD_PATH
+          value: /mnt/auth/htpasswd
+        - name: REGISTRY_AUTH_HTPASSWD_REALM
+          value: Registry Realm
+      resources:
+        {{- toYaml .Values.resources | nindent 8 }}
+  {{- with .Values.nodeSelector }}
+  nodeSelector:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+  {{- with .Values.affinity }}
+  affinity:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+  {{- with .Values.tolerations }}
+  tolerations:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
