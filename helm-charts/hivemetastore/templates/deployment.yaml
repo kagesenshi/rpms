@@ -1,16 +1,17 @@
+{{- include "require" . -}}
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: {{ include "hive-metastore.fullname" . }}
+  name: {{ include "hivemetastore.fullname" . }}
   labels:
-    {{- include "hive-metastore.labels" . | nindent 4 }}
+    {{- include "hivemetastore.labels" . | nindent 4 }}
 spec:
   {{- if not .Values.autoscaling.enabled }}
   replicas: {{ .Values.replicaCount }}
   {{- end }}
   selector:
     matchLabels:
-      {{- include "hive-metastore.selectorLabels" . | nindent 6 }}
+      {{- include "hivemetastore.selectorLabels" . | nindent 6 }}
   template:
     metadata:
       {{- with .Values.podAnnotations }}
@@ -18,20 +19,20 @@ spec:
         {{- toYaml . | nindent 8 }}
       {{- end }}
       labels:
-        {{- include "hive-metastore.selectorLabels" . | nindent 8 }}
+        {{- include "hivemetastore.selectorLabels" . | nindent 8 }}
     spec:
       {{- with .Values.imagePullSecrets }}
       imagePullSecrets:
         {{- toYaml . | nindent 8 }}
       {{- end }}
-      serviceAccountName: {{ include "hive-metastore.serviceAccountName" . }}
+      serviceAccountName: {{ include "hivemetastore.serviceAccountName" . }}
       securityContext:
         {{- toYaml .Values.podSecurityContext | nindent 8 }}
       volumes:
-        - name: {{ include "hive-metastore.fullname" . }}-config
+        - name: {{ include "hivemetastore.fullname" . }}-config
           secret:
-            secretName: {{ include "hive-metastore.fullname" . }}-config
-        - name: {{ include "hive-metastore.fullname" . }}-datadir
+            secretName: {{ include "hivemetastore.fullname" . }}-config
+        - name: {{ include "hivemetastore.fullname" . }}-datadir
           emptyDir: {}
 
       containers:
@@ -57,9 +58,9 @@ spec:
             initialDelaySeconds: 15
             periodSeconds: 10
           volumeMounts:
-            - name: {{ include "hive-metastore.fullname" . }}-config
+            - name: {{ include "hivemetastore.fullname" . }}-config
               mountPath: "/etc/hive/"
-            - name: {{ include "hive-metastore.fullname" . }}-datadir
+            - name: {{ include "hivemetastore.fullname" . }}-datadir
               mountPath: "/opt/apache/hive/work-dir"
 
           resources:

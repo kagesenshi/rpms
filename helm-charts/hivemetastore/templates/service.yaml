@@ -1,9 +1,9 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: {{ include "hive-metastore.fullname" . }}
+  name: {{ include "hivemetastore.fullname" . }}
   labels:
-    {{- include "hive-metastore.labels" . | nindent 4 }}
+    {{- include "hivemetastore.labels" . | nindent 4 }}
 spec:
   type: {{ .Values.service.type }}
   ports:
@@ -12,4 +12,4 @@ spec:
       protocol: TCP
       name: metastore
   selector:
-    {{- include "hive-metastore.selectorLabels" . | nindent 4 }}
+    {{- include "hivemetastore.selectorLabels" . | nindent 4 }}

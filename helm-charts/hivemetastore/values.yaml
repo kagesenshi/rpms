@@ -1,4 +1,4 @@
-# Default values for hive-metastore.
+# Default values for hivemetastore.
 # This is a YAML-formatted file.
 # Declare variables to be passed into your templates.
 
@@ -40,22 +40,6 @@ service:
   type: ClusterIP
   port: 9083
 
-ingress:
-  enabled: false
-  className: ""
-  annotations: {}
-    # kubernetes.io/ingress.class: nginx
-    # kubernetes.io/tls-acme: "true"
-  hosts:
-    - host: chart-example.local
-      paths:
-        - path: /
-          pathType: ImplementationSpecific
-  tls: []
-  #  - secretName: chart-example-tls
-  #    hosts:
-  #      - chart-example.local
-
 resources: {}
   # We usually recommend not to specify default resources and to leave this as a conscious
   # choice for the user. This also increases chances charts run on environments with little
@@ -83,8 +67,10 @@ affinity: {}
 
 hive:
   metastore_port: 9083
-  metastore_db_url: jdbc:mysql://mysql.lan/spark3_hive_metastore?createDatabaseIfNotExist=true&amp;permitMysqlScheme
-  metastore_db_driver: org.mariadb.jdbc.Driver
-  metastore_db_user: root
-  metastore_db_password: pass
+  #  metastore_db_url: jdbc:mysql://mysql.lan/spark3_hive_metastore?createDatabaseIfNotExist=true&amp;permitMysqlScheme
+  metastore_db_type:
+  metastore_db_url: 
+  metastore_db_driver: 
+  metastore_db_user: 
+  metastore_db_password: 
 
