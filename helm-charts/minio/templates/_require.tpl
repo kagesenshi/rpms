@@ -1,5 +1,5 @@
 {{- define "require" -}}
-    {{- if .Values.ingress -}}
+    {{- if .Values.ingress.enabled -}}
         {{- with .Values.ingress -}}
             {{- $host := .host | required "ingress.host is required" -}}
             {{- $console_host := .console_host | required "ingress.console_host is required" -}}
