@@ -8,8 +8,8 @@ spec:
   type: {{ .Values.service.type }}
   ports:
     - port: {{ .Values.service.port }}
-      targetPort: http
+      targetPort: pgsql
       protocol: TCP
-      name: http
+      name: pgsql
   selector:
     {{- include "citus.selectorLabels" . | nindent 4 }}

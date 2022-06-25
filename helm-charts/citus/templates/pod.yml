@@ -3,7 +3,7 @@ kind: Pod
 metadata:
   name: {{ include "citus.fullname" . }}
   labels:
-    {{- include "citus.labels" . | nindent 4 }}
+    {{- include "citus.selectorLabels" . | nindent 4 }}
 spec:
   {{- with .Values.imagePullSecrets }}
   imagePullSecrets:
