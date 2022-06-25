@@ -55,12 +55,13 @@ redis_service:
 ingress:
   enabled: true
   className: ""
-  annotations: {}
-  host: superset.k8s.lan
+  annotations: 
+    nginx.ingress.kubernetes.io/proxy-body-size: "1g"
+  host:
   paths:
     - path: /
       pathType: ImplementationSpecific
-  tls: true
+  tls: false
 
 resources: {}
   # We usually recommend not to specify default resources and to leave this as a conscious
@@ -96,17 +97,17 @@ tolerations: []
 affinity: {}
 
 superset: 
-  secret_key: "CHANGEME"
+  secret_key: 
   previous_secret_key: ""
-  db_uri: 'mysql://root:pass@mysql.lan/apache_superset'
+  db_uri: 
   broker_url: ''
   cache_redis_url: ''
   celery_result_backend: ''
-  celeryd_debug_level: 'DEBUG'
+  celeryd_debug_level: 'INFO'
 
 smtp:
   enabled: false
-  host: ""
+  host: 
   port: "25"
   username: ""
   password: ""
