@@ -1,6 +1,6 @@
 apiVersion: v2
 name: aedwf
-description: A Helm chart for Kubernetes
+description: AE Data Workflow, Powered By Apache Airflow
 
 # A chart can be either an 'application' or a 'library' chart.
 #

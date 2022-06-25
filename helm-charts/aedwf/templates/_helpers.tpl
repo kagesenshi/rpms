@@ -95,6 +95,17 @@ unit_test_mode = False
 enable_xcom_pickling = False
 killed_task_cleanup_time = 150
 
+[webserver]
+{{- if .Values.ingress.tls }}
+base_url = https://{{ .Values.ingress.host }}
+{{- else }}
+base_url = http://{{ .Values.ingress.host }}
+{{- end }}
+default_ui_timezone = {{ .Values.airflow.default_timezone }}
+web_server_host = 0.0.0.0
+web_server_port = 8080
+secret_key = {{ .Values.airflow.secret_key }}
+
 [logging]
 base_log_folder = /var/log/apache-airflow/
 {{ if .Values.airflow.remote_logging_enabled }}

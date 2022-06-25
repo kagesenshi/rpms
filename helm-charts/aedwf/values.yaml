@@ -62,7 +62,7 @@ ingress:
   annotations: {}
     # kubernetes.io/ingress.class: nginx
     # kubernetes.io/tls-acme: "true"
-  host: aedwf.k8s.lan
+  host: 
   paths:
     - path: /
       pathType: ImplementationSpecific
@@ -102,9 +102,10 @@ affinity: {}
 storageClass: 
 
 airflow:
-  default_timezone: Asia/Kuala_Lumpur
-  db_uri: 'mysql://root:pass@mysql.lan/apache_airflow'
+  default_timezone:
+  db_uri:
   fernet_key: 
+  secret_key: 
   dag_git_repository: 
   dag_git_branch: master
 
