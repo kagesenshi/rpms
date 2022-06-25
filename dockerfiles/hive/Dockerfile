@@ -33,9 +33,9 @@ RUN set -ex && \
     dnf install mariadb-java-client.noarch postgresql-jdbc -y && \
     dnf clean all
 
-ENV HIVE_CONF_DIR /etc/hive
-ENV HADOOP_HOME /opt/apache/hadoop/
-ENV JAVA_HOME /usr/lib/jvm/jre-1.8.0/
+ENV HIVE_CONF_DIR=/etc/hive
+ENV HADOOP_HOME=/opt/apache/hadoop/
+ENV JAVA_HOME=/usr/lib/jvm/jre-1.8.0/
 
 RUN rm /opt/apache/hive/lib/guava-*.jar && \
     cp /opt/apache/hadoop/share/hadoop/hdfs/lib/guava-*.jar /opt/apache/hive/lib/ && \
