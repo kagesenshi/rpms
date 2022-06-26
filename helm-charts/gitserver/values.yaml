@@ -8,7 +8,7 @@ image:
   repository: registry.gitlab.com/abyres/releases/gitserver
   pullPolicy: Always
   # Overrides the image tag whose default is the chart appVersion.
-  tag: "latest"
+  tag: "2.31.1-1"
 
 imagePullSecrets: []
 nameOverride: ""
