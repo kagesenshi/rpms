@@ -6,12 +6,12 @@ image:
   repository: registry.gitlab.com/abyres/releases/aedv
   pullPolicy: Always
   # Overrides the image tag whose default is the chart appVersion.
-  tag: "latest"
+  tag: "1.4.2-1"
 
 redis_image:
   repository: registry.gitlab.com/abyres/releases/redis
   pullPolicy: Always
-  tag: "latest"
+  tag: "5.0.3-1"
 
 imagePullSecrets: []
 nameOverride: ""

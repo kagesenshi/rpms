@@ -32,7 +32,7 @@ spec:
     {{- with .Values.ingress }}
     - hosts:
         - {{ .host | quote }}
-      secretName: {{ include "aedv.fullname" $ }}-tls
+      secretName: {{ .secretName }}
     {{- end }}
   {{- end }}
   rules:
