@@ -8,7 +8,7 @@ image:
   repository: registry.gitlab.com/abyres/releases/hive
   pullPolicy: Always
   # Overrides the image tag whose default is the chart appVersion.
-  tag: "3.1.2-1"
+  tag: "3.1.2-2"
 
 imagePullSecrets: []
 nameOverride: ""
@@ -74,3 +74,7 @@ hive:
   metastore_db_user: 
   metastore_db_password: 
 
+s3a:
+  endpoint:
+  access_key:
+  secret_key:

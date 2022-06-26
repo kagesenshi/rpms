@@ -1,5 +1,20 @@
 {{- include "require" . -}}
 apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "spark3.fullname" . }}-master
+  labels:
+    {{- include "spark3.labels" . | nindent 4 }}
+    component: master
+spec:
+  clusterIP: None
+  selector:
+    {{- include "spark3.selectorLabels" . | nindent 4 }}
+    component: master
+
+---
+
+apiVersion: v1
 kind: Pod
 metadata:
   name: {{ include "spark3.fullname" . }}-master
@@ -16,6 +31,9 @@ spec:
     {{- toYaml .Values.podSecurityContext | nindent 4 }}
   volumes:
     {{- include "spark3.volumes" . | nindent 4 }}
+  hostname: master
+  subdomain: {{ include "spark3.fullname" . }}
+  setHostnameAsFQDN: true
   containers:
     - name: {{ .Chart.Name }}
       securityContext:

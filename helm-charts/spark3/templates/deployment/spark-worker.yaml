@@ -33,13 +33,14 @@ spec:
         {{- toYaml .Values.podSecurityContext | nindent 8 }}
       volumes:
         {{- include "spark3.volumes" . | nindent 8 }}
+      setHostnameAsFQDN: true
       containers:
         - name: {{ .Chart.Name }}
           securityContext:
             {{- toYaml .Values.securityContext | nindent 12 }}
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
           imagePullPolicy: {{ .Values.image.pullPolicy }}
-          args: ["/usr/sbin/spark3-slave", 'spark://{{ include "spark3.fullname" . }}-master:7077', '-p', '{{ .Values.spark.worker_port | default "33620" }}']
+          args: ["/usr/sbin/spark3-slave", 'spark://{{ include "spark3.fullname" . }}-master:7077', '-p', '{{ .Values.spark.worker_port | default "33620" }}', '-c', {{ quote .Values.spark.executor_cores }}, '-m', {{ quote .Values.spark.executor_memory }}]
           ports:
             - name: worker
               containerPort: {{ .Values.spark.worker_port | default "33620" }}
@@ -60,7 +61,10 @@ spec:
             {{- include "spark3.env" . | nindent 12 }}
             {{- include "spark3.client-env" . | nindent 12 }}
           resources:
-            {{- toYaml .Values.resources | nindent 12 }}
+            limits:
+              cpu: {{ quote .Values.spark.executor_cores }}
+            requests:
+              cpu: {{ quote .Values.spark.executor_cores }}
       {{- with .Values.nodeSelector }}
       nodeSelector:
         {{- toYaml . | nindent 8 }}
