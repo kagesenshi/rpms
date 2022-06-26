@@ -74,11 +74,13 @@ Create the name of the service account to use
 {{- end }}
 
 {{- define "gitserver.env" -}}
+{{- if .Values.git.ssh_public_keys }}
 - name: GIT_SSH_PUBKEYS
   valueFrom:
     secretKeyRef:
       name: {{ include "gitserver.fullname" . }}-secret
       key: ssh_public_keys
+{{- end }}
 - name: GITWEB_USER
   valueFrom:
     secretKeyRef:
