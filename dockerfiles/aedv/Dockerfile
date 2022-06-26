@@ -1,21 +1,15 @@
-FROM fedora:35
+FROM registry.gitlab.com/abyres/releases/fedora:35-1
 
-LABEL org.opencontainers.image.version=20220516
+LABEL org.opencontainers.image.version=1.4.2-1
 
 RUN dnf update -y && \
-    dnf install 'dnf-command(copr)' -y && \
-    dnf install iputils glibc-langpack-en net-tools nmap bind-utils -y && \
     dnf copr enable izhar/data-engineering -y && \
-    dnf clean all 
-
-RUN dnf copr enable izhar/aet -y && \
+    dnf copr enable izhar/aet -y && \
     dnf install mariadb-connector-c apache-superset -y && \
     dnf swap apache-superset-logos aedv-logos -y && \
     dnf clean all
 
-ADD google-chrome.repo /etc/yum.repos.d/google-chrome.repo
-
-RUN dnf install google-chrome-stable -y && \
+RUN dnf install chromium -y && \
     dnf clean all 
 
 ADD entrypoint.sh /usr/bin/entrypoint.sh

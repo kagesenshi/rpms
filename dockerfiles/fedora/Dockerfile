@@ -1,8 +1,8 @@
-FROM centos:stream8
+FROM fedora:35
 
 ADD dnf.conf /etc/dnf/dnf.conf
 
-RUN dnf install dnf-plugins-core epel-release -y && \
+RUN dnf install dnf-plugins-core -y && \
     dnf install -y bash iputils glibc-langpack-en net-tools \
         nmap bind-utils hostname tini nss pam wget \
         procps-ng vim-enhanced && \
@@ -13,4 +13,3 @@ RUN curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/s
 
 ENV LC_ALL=en_US.utf8 \
     LANG=en_US.utf8
-

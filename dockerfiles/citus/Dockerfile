@@ -1,4 +1,4 @@
-FROM registry.gitlab.com/abyres/releases/centos8:latest
+FROM registry.gitlab.com/abyres/releases/centos8:8-1
 
 RUN /usr/sbin/groupadd -r postgres --gid 1000 && \
      /usr/sbin/useradd -r -g postgres --uid 1000 \

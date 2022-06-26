@@ -1,4 +1,4 @@
-FROM registry.gitlab.com/abyres/releases/centos8:latest
+FROM registry.gitlab.com/abyres/releases/centos8:8-1
 
 RUN set -ex && \
     dnf copr enable izhar/data-engineering -y && \
@@ -22,10 +22,8 @@ ENV SPARK_HOME=/opt/apache/spark3 \
     SPARK_CONF_DIR=/etc/spark3/ \
     HADOOP_HOME=/opt/apache/hadoop/ \
     JAVA_HOME=/usr/lib/jvm/jre-1.8.0/ \
-    PATH="/opt/apache/spark3/bin:/opt/apache/hadoop/bin:${PATH}"
-
-
-    
+    PATH="/opt/apache/spark3/bin:/opt/apache/hadoop/bin:${PATH}" \
+    SPARK_DIST_CLASSPATH="/opt/apache/hadoop//etc/hadoop:/opt/apache/hadoop//share/hadoop/common/lib/*:/opt/apache/hadoop//share/hadoop/common/*:/opt/apache/hadoop//share/hadoop/hdfs:/opt/apache/hadoop//share/hadoop/hdfs/lib/*:/opt/apache/hadoop//share/hadoop/hdfs/*:/opt/apache/hadoop//share/hadoop/mapreduce/lib/*:/opt/apache/hadoop//share/hadoop/mapreduce/*:/opt/apache/hadoop//share/hadoop/yarn:/opt/apache/hadoop//share/hadoop/yarn/lib/*:/opt/apache/hadoop//share/hadoop/yarn/*:/opt/apache/hadoop/share/hadoop/tools/lib/*"
 
 USER sparkuser
 RUN /opt/apache/spark3/bin/spark-submit \
@@ -34,6 +32,8 @@ RUN /opt/apache/spark3/bin/spark-submit \
 
 USER root
 RUN cp /home/sparkuser/.ivy2/jars/* /opt/apache/spark3/jars/
+ADD https://repo1.maven.org/maven2/org/apache/spark/spark-hadoop-cloud_2.12/3.2.0/spark-hadoop-cloud_2.12-3.2.0.jar /opt/apache/spark3/jars/
+RUN chmod a+r /opt/apache/spark3/jars/*
 USER sparkuser
 
 WORKDIR /opt/apache/spark3/work-dir

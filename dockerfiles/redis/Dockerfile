@@ -1,8 +1,4 @@
-FROM quay.io/centos/centos:stream9
-
-RUN dnf update -y && \
-    dnf install iputils net-tools nmap bind-utils glibc-langpack-en -y && \
-    dnf clean all 
+FROM registry.gitlab.com/abyres/releases/centos8:8-1
 
 RUN dnf install redis -y && \
     dnf clean all

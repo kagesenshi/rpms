@@ -23,9 +23,27 @@ def _c(color, t):
     c = getattr(bcolors, color.upper())
     return "%s%s%s" % (c, t, bcolors.ENDC)
 
+class Tag(object):
+    def __init__(self, major, minor, patch):
+        self.major = major
+        self.minor = minor 
+        self.patch = patch
+    
+    @classmethod
+    def parse(cls, tag):
+        t = tag.split('.')
+        if len(t) == 3:
+            return cls(t[0],t[1],t[2])
+        elif len(t) == 2:
+            return cls(t[0],t[1],None)
+        elif len(t) == 1:
+            return cls(t[0],None,None)
+        raise AssertionError('Unable to parse %s' % tag)
+
 parser = argparse.ArgumentParser()
 parser.add_argument('-p','--push', default=False, action='store_true')
 parser.add_argument('-c','--containerfile', default=None)
+parser.add_argument('-r','--release', default=False, action='store_true')
 parser.add_argument('--cmd', required=False, default='docker')
 parser.add_argument('directory')
 
@@ -54,40 +72,61 @@ with open('repo.yml', 'r') as f:
     conf = yaml.safe_load(f)
 
 repo = conf['repo']
-tag = conf['tag']
+tag = str(conf['tag'])
+conf.setdefault('build', 1)
+build = conf['build']
 last_updated = conf.get('last_updated', None)
-
 current_hash = str(hashlib.md5(open(containerfile,'rb').read()).hexdigest())
 
-if not last_updated:
-    current_hash = last_updated
-    conf['last_updated'] = current_hash
 
-stag = semver.VersionInfo.parse(tag)
 
-if last_updated != current_hash:
-    conf['last_updated'] = current_hash
-    stag = stag.bump_patch()
+tags = []
 
-patchtag = '%s:%s.%s.%s' % (repo, stag.major, stag.minor, stag.patch)
-minortag = '%s:%s.%s' % (repo, stag.major, stag.minor)
-majortag = '%s:%s' % (repo, stag.major)
-latesttag = '%s:latest' % (repo)
+stag = Tag.parse(tag)
+
+if args.release:
+    if not last_updated:
+        last_updated = current_hash
+        conf['last_updated'] = last_updated
+    
+    if last_updated != current_hash:
+        conf['last_updated'] = current_hash
+        build += 1
+        conf['build'] = build
+
+    tags.append('%s:latest' % repo)
+    if stag.patch is not None:
+        tags.append('%s:%s.%s.%s-%s' % (repo, stag.major, stag.minor, stag.patch, build))
+        tags.append('%s:%s.%s.%s' % (repo, stag.major, stag.minor, stag.patch))
+        tags.append('%s:%s.%s' % (repo, stag.major, stag.minor))
+        tags.append('%s:%s' % (repo, stag.major))
+    elif stag.minor is not None:
+        tags.append('%s:%s.%s-%s' % (repo, stag.major, stag.minor, build))
+        tags.append('%s:%s.%s' % (repo, stag.major, stag.minor))
+        tags.append('%s:%s' % (repo, stag.major))
+    else:
+        tags.append('%s:%s-%s' % (repo, stag.major, build))
+        tags.append('%s:%s' % (repo, stag.major))
+else:
+    tags.append('%s:development' % repo)
 
 print(_c('okblue', "+ Building %s" % repo))
-cmd = [args.cmd, 'build', 
-        '-t', latesttag, '-t', patchtag,  
-        '-t', minortag, '-t', majortag, 
-        '-f', containerfile, '.']
+cmd = [args.cmd, 'build', '-f', containerfile]
+for t in tags:
+    cmd += ['-t', t]
+cmd.append('.')
 
 out = subprocess.Popen(cmd).wait()
+if out != 0:
+    raise ChildProcessError(' '.join(cmd))
 
 if args.push:
-    for t in [latesttag, patchtag, minortag, majortag]:
+    for t in tags:
         print(_c('okblue', '+ Pushing %s' % t))
         cmd = [args.cmd, 'push', t]
         out = subprocess.Popen(cmd).wait()
+        if out != 0:
+            raise ChildProcessError(' '.join(cmd))
 
-conf['tag'] = str(stag)
 with open('repo.yml', 'w') as f:
     yaml.safe_dump(conf, f)

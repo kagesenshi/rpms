@@ -1,13 +1,8 @@
-FROM fedora:35
+FROM registry.gitlab.com/abyres/releases/spark3:3.2.0-1
 
-LABEL org.opencontainers.image.version=20220516
+LABEL org.opencontainers.image.version=2.2.5-1
 
-RUN dnf update -y && \
-    dnf install 'dnf-command(copr)' -y && \
-    dnf install iputils glibc-langpack-en net-tools nmap bind-utils -y && \
-    dnf copr enable izhar/data-engineering -y && \
-    dnf clean all 
-
+USER root
 RUN dnf copr enable izhar/aet -y && \
     dnf install mariadb-connector-c apache-airflow -y && \
     dnf swap apache-airflow-logos aedwf-logos -y && \
@@ -15,6 +10,8 @@ RUN dnf copr enable izhar/aet -y && \
 
 ADD entrypoint.sh /usr/bin/entrypoint.sh
 RUN chmod a+x /usr/bin/entrypoint.sh
+
+RUN userdel sparkuser
 RUN /usr/sbin/groupadd -r airflow --gid 1000 && \
      /usr/sbin/useradd -r -g airflow --uid 1000 \
      -s /sbin/nologin airflow

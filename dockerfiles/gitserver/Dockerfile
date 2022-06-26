@@ -1,4 +1,4 @@
-FROM registry.gitlab.com/abyres/releases/centos8:latest
+FROM registry.gitlab.com/abyres/releases/centos8:8-1
 
 RUN dnf install git git-lfs git-subtree git-instaweb openssh-server gitweb -y && \
     dnf clean all
