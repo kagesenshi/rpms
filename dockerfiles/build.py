@@ -77,18 +77,16 @@ conf.setdefault('build', 1)
 build = conf['build']
 last_updated = conf.get('last_updated', None)
 current_hash = str(hashlib.md5(open(containerfile,'rb').read()).hexdigest())
-
-
+if not last_updated:
+    last_updated = current_hash
+    conf['last_updated'] = last_updated
 
 tags = []
 
 stag = Tag.parse(tag)
 
 if args.release:
-    if not last_updated:
-        last_updated = current_hash
-        conf['last_updated'] = last_updated
-    
+
     if last_updated != current_hash:
         conf['last_updated'] = current_hash
         build += 1
