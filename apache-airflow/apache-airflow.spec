@@ -15,7 +15,7 @@ License:    Apache2
 URL:        http://airflow.apache.org
 AutoProv: no
 AutoReq: no
-Source0:    https://dlcdn.apache.org/airflow/%{version}/%{name}-%{version}-source.tar.gz
+Source0: %{name}-%{version}.tar.gz
 BuildRequires:  python%{python_version} 
 BuildRequires: pkgconfig(python-%{python_version}) >= %{python_version}
 BuildRequires: postgresql-devel mysql-devel
@@ -61,7 +61,7 @@ Logo files for Apache Airflow
 
 %prep
 rm -rf %{_builddir}/%{name}/
-%setup -q -b 0 
+%setup -q 
 
 %build
 rm -rf $RPM_BUILD_ROOT
