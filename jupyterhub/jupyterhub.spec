@@ -59,7 +59,7 @@ cp -r * ${RPM_BUILD_ROOT}/opt/%{name}/
 cd ${RPM_BUILD_ROOT}/opt/%{name}/
 python%{python_version} -m venv ${RPM_BUILD_ROOT}/opt/%{name}/
 ${RPM_BUILD_ROOT}/opt/%{name}/bin/pip install jupyterhub==%{version} psycopg2-binary pymssql "jupyterlab==%{jupyterlab_version}" jupyter-server-proxy \
-    jupyterlab-git jupyterlab_latex jupyterlab-pullrequests jupyterlab-fasta \
+    jupyterlab-git jupyterlab_latex jupyterlab-fasta \
     jupyterlab-geojson jupyterlab-katex  jupyterlab-mathjax3 jupyterlab-vega2 \
     jupyterlab-vega3 jupyterlab_widgets sudospawner
 pushd ${RPM_BUILD_ROOT}/%{_sysconfdir}/%{name}
