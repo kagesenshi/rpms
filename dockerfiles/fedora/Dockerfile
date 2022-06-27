@@ -1,8 +1,9 @@
-FROM fedora:35
+FROM fedora:36
 
 ADD dnf.conf /etc/dnf/dnf.conf
 
 RUN dnf install dnf-plugins-core -y && \
+    dnf update -y && \
     dnf install -y bash iputils glibc-langpack-en net-tools \
         nmap bind-utils hostname tini nss pam wget \
         procps-ng vim-enhanced && \
