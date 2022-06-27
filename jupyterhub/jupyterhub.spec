@@ -27,6 +27,7 @@ BuildRequires: desktop-file-utils
 Requires: python%{python_version}
 Requires: pkgconfig(python-%{python_version}) == %{python_version}
 Requires:   postgresql-libs postgresql 
+Requires: nodejs
 Requires(pre): /usr/sbin/useradd, /usr/bin/getent
 Requires(postun): /usr/sbin/userdel
 Requires: /usr/bin/xelatex /usr/bin/mf /usr/bin/bibtex
@@ -60,7 +61,7 @@ python%{python_version} -m venv ${RPM_BUILD_ROOT}/opt/%{name}/
 ${RPM_BUILD_ROOT}/opt/%{name}/bin/pip install jupyterhub==%{version} psycopg2-binary pymssql "jupyterlab==%{jupyterlab_version}" jupyter-server-proxy \
     jupyterlab-git jupyterlab_latex jupyterlab-pullrequests jupyterlab-fasta \
     jupyterlab-geojson jupyterlab-katex  jupyterlab-mathjax3 jupyterlab-vega2 \
-    jupyterlab-vega3 jupyterlab_widgets
+    jupyterlab-vega3 jupyterlab_widgets sudospawner
 pushd ${RPM_BUILD_ROOT}/%{_sysconfdir}/%{name}
    ${RPM_BUILD_ROOT}/opt/%{name}/bin/jupyterhub --generate-config
 popd
