@@ -1,0 +1,19 @@
+{
+    "argv": [
+        "/opt/apache/spark3-python/bin/python",
+        "-m",
+        "ipykernel_launcher",
+        "-f",
+        "{connection_file}"
+    ],
+    "display_name": "PySpark",
+    "language": "python",
+    "env": {
+        "SPARK_HOME": "/opt/apache/spark3",
+        "SPARK_CONF_DIR": "/etc/spark3/",
+        "HADOOP_HOME": "/opt/apache/hadoop/",
+        "JAVA_HOME": "/usr/lib/jvm/jre-1.8.0/",
+        "PYSPARK_PYTHON": "/opt/apache/spark3-python/bin/python",
+        "PYSPARK_DRIVER_PYTHON": "/opt/apache/spark3-python/bin/python"
+    }
+}
