@@ -1,0 +1,93 @@
+{{- include "require" . -}}
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "jupyterhub.fullname" . }}
+  labels:
+    {{- include "jupyterhub.labels" . | nindent 4 }}
+spec:
+  clusterIP: None
+  selector:
+    {{- include "jupyterhub.selectorLabels" . | nindent 4 }}
+
+---
+
+apiVersion: v1
+kind: Pod 
+metadata:
+  name: {{ include "jupyterhub.fullname" . }}
+  labels:
+    {{- include "jupyterhub.labels" . | nindent 4 }}
+spec:
+  hostname: {{ include "jupyterhub.fullname" . }}
+  setHostnameAsFQDN: true
+  {{- with .Values.imagePullSecrets }}
+  imagePullSecrets:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+  serviceAccountName: {{ include "jupyterhub.serviceAccountName" . }}
+  securityContext:
+    {{- toYaml .Values.podSecurityContext | nindent 4 }}
+  volumes:
+    - name: {{ include "jupyterhub.fullname" . }}-config
+      secret:
+        secretName: {{ include "jupyterhub.fullname" . }}-config
+    - name: {{ include "jupyterhub.fullname" . }}-spark-config
+      secret:
+        secretName: {{ .Values.spark.secret_name }}
+    - name: {{ include "jupyterhub.fullname" . }}-datadir
+      emptyDir: {}
+
+  containers:
+    - name: {{ .Chart.Name }}
+      securityContext:
+        {{- toYaml .Values.securityContext | nindent 8 }}
+      image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
+      imagePullPolicy: {{ .Values.image.pullPolicy }}
+      {{- if .Values.jupyter.enable_hub }}
+      args: ['hub']
+      {{- else }}
+      args: ['lab']
+      {{- end }}
+      env:
+        {{- if .Values.jupyter.token }}
+        - name: JUPYTER_LAB_TOKEN
+          valueFrom:
+            secret: {{ include "jupyterhub.fullname" . }}-secret
+            key: auth-token
+        {{- end }}
+      ports:
+        - name: http
+          containerPort: 8000
+          protocol: TCP
+      livenessProbe:
+        httpGet:
+          path: /
+          port: http
+      readinessProbe:
+        httpGet:
+          path: /
+          port: http
+      volumeMounts:
+        - name: {{ include "jupyterhub.fullname" . }}-config
+          mountPath: "/etc/jupyterhub/"
+        - name: {{ include "jupyterhub.fullname" . }}-spark-config
+          mountPath: "/etc/spark3/"
+        - name: {{ include "jupyterhub.fullname" . }}-spark-config
+          mountPath: "/opt/apache/spark3/conf/"
+        - name: {{ include "jupyterhub.fullname" . }}-datadir
+          mountPath: "/var/lib/jupyterhub"
+      resources:
+        {{- toYaml .Values.resources | nindent 8 }}
+  {{- with .Values.nodeSelector }}
+  nodeSelector:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+  {{- with .Values.affinity }}
+  affinity:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+  {{- with .Values.tolerations }}
+  tolerations:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
