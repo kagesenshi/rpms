@@ -1,4 +1,4 @@
-FROM registry.gitlab.com/abyres/releases/centos8:8-1
+FROM registry.gitlab.com/abyres/releases/fedora:36
 
 RUN set -ex && \
     dnf copr enable izhar/data-engineering -y && \
@@ -23,6 +23,7 @@ ENV SPARK_HOME=/opt/apache/spark3 \
     HADOOP_HOME=/opt/apache/hadoop/ \
     JAVA_HOME=/usr/lib/jvm/jre-1.8.0/ \
     PATH="/opt/apache/spark3/bin:/opt/apache/hadoop/bin:${PATH}" \
+    PYSPARK_PYTHON=/opt/apache/spark3-python/bin/python \
     SPARK_DIST_CLASSPATH="/opt/apache/hadoop//etc/hadoop:/opt/apache/hadoop//share/hadoop/common/lib/*:/opt/apache/hadoop//share/hadoop/common/*:/opt/apache/hadoop//share/hadoop/hdfs:/opt/apache/hadoop//share/hadoop/hdfs/lib/*:/opt/apache/hadoop//share/hadoop/hdfs/*:/opt/apache/hadoop//share/hadoop/mapreduce/lib/*:/opt/apache/hadoop//share/hadoop/mapreduce/*:/opt/apache/hadoop//share/hadoop/yarn:/opt/apache/hadoop//share/hadoop/yarn/lib/*:/opt/apache/hadoop//share/hadoop/yarn/*:/opt/apache/hadoop/share/hadoop/tools/lib/*"
 
 USER sparkuser
