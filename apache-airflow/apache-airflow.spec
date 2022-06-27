@@ -27,6 +27,9 @@ BuildRequires: systemd-rpm-macros
 BuildRequires: krb5-devel openldap-devel
 BuildRequires: systemd-rpm-macros python-rpm-macros
 BuildRequires: /usr/bin/pathfix.py
+%if 0%{?fedora} >= 36
+BuildRequires: openldap-libldap_r
+%endif
 #BuildRequires: npm yarnpkg
 Requires: %{name}-common = %{version}-%{release}
 
@@ -36,6 +39,9 @@ Requires: python%{python_version}
 Requires: pkgconfig(python-%{python_version}) == %{python_version}
 Requires: postgresql-libs postgresql 
 Requires: libffi krb5-libs openldap-clients openldap
+%if 0%{?fedora} >= 36
+Requires: openldap-libldap_r
+%endif
 Requires(pre): /usr/sbin/useradd, /usr/bin/getent
 Requires(postun): /usr/sbin/userdel
 Provides: %{name} = %{version}-%{release}
@@ -74,7 +80,7 @@ export DONT_STRIP=1
 mkdir -p ${RPM_BUILD_ROOT}/opt/%{name}/
 #cp -r * ${RPM_BUILD_ROOT}/opt/%{name}/
 python%{python_version} -m venv ${RPM_BUILD_ROOT}/opt/%{name}/
-${RPM_BUILD_ROOT}/opt/%{name}/bin/pip install "apache-airflow[celery,async,postgres,mysql,odbc,apache.druid,apache.spark,apache.webhdfs,rabbitmq,redis,ftp,grpc,http,imap,jdbc,kerberos,ldap,papermill,sftp,sqlite,ssh]" --constraint https://raw.githubusercontent.com/apache/airflow/constraints-%{version}/constraints-%{python_version}.txt
+${RPM_BUILD_ROOT}/opt/%{name}/bin/pip install "apache-airflow[celery,async,postgres,mysql,odbc,apache.druid,apache.spark,apache.webhdfs,rabbitmq,redis,ftp,grpc,http,imap,jdbc,papermill,kerberos,ldap,sftp,sqlite,ssh]" --constraint https://raw.githubusercontent.com/apache/airflow/constraints-%{version}/constraints-%{python_version}.txt
 #pushd ${RPM_BUILD_ROOT}/opt/%{name}/lib/python%{python_version}/site-packages/airflow/www/
 #   ./compile_assets.sh
 #popd
