@@ -57,6 +57,8 @@ wait_for hivemetastore
 
 helm install spark3 ${REPO}/spark3 \
     --set spark.hive_metastore_uri=thrift://hivemetastore:9083 \
+    --set spark.deploy_thrift=true \
+    --set ingress.thrift_host=sparksql.k3s.lan \
     --set s3a.endpoint=http://minio:9000 \
     --set s3a.access_key=minio \
     --set s3a.secret_key=miniopassword 
