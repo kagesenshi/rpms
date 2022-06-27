@@ -69,7 +69,8 @@ mkdir -p %{buildroot}/%{_sharedstatedir}/%{spark}/warehouse/
 mkdir -p %{buildroot}/%{_datadir}/%{name}/
 
 /usr/bin/python%{python_version} -m venv %{buildroot}/%{venv}
-%{buildroot}/%{venv}/bin/pip install numpy scikit-learn pandas dask
+%{buildroot}/%{venv}/bin/pip install numpy scikit-learn pandas dask ipykernel
+%{buildroot}/%{venv}/bin/pip install %{buildroot}/opt/%{vendor}/%{spark_package}/python/
 
 cp -r %{spark_package}/* %{buildroot}/opt/%{vendor}/%{spark_package}
 cp -r %{spark_package}/conf/* %{buildroot}/%{_sysconfdir}/%{spark}
