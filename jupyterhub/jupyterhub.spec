@@ -6,7 +6,7 @@
 
 Name:       jupyterhub
 Version:    2.0.2
-Release:    3%{?dist}
+Release:    4%{?dist}
 Summary:    Multi-user jupyter hub
 
 License:    GPLv3+
@@ -146,5 +146,8 @@ rm -rf $RPM_BUILD_ROOT
 %config %{_sysconfdir}/sysconfig/%{name}
 
 %changelog
+* Mon Jun 27 2022 Izhar Firdaus <kagesenshi.87@gmail.com> 2.0.2-4
+- new package built with tito
+
 * Sun Jan 16 2022 Izhar Firdaus - 2.0.2
 - initial package
