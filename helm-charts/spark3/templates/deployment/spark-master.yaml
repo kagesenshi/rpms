@@ -1,4 +1,5 @@
 {{- include "require" . -}}
+{{- if .Values.spark.deploy_cluster -}}
 apiVersion: v1
 kind: Service
 metadata:
@@ -31,8 +32,7 @@ spec:
     {{- toYaml .Values.podSecurityContext | nindent 4 }}
   volumes:
     {{- include "spark3.volumes" . | nindent 4 }}
-  hostname: master
-  subdomain: {{ include "spark3.fullname" . }}
+  hostname: {{ include "spark3.fullname" . }}-master
   setHostnameAsFQDN: true
   containers:
     - name: {{ .Chart.Name }}
@@ -76,3 +76,6 @@ spec:
   tolerations:
     {{- toYaml . | nindent 4 }}
   {{- end }}
+
+
+{{- end }}

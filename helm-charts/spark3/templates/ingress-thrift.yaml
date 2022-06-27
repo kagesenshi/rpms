@@ -1,5 +1,5 @@
 {{- if .Values.ingress.enabled -}}
-{{- if .Values.spark.deploy_cluster -}}
+{{- if .Values.spark.deploy_thrift -}}
 
 {{- $fullName := include "spark3.fullname" . -}}
 {{- $svcPort := .Values.service.port -}}
@@ -17,7 +17,7 @@ apiVersion: extensions/v1beta1
 {{- end }}
 kind: Ingress
 metadata:
-  name: {{ $fullName }}
+  name: {{ $fullName }}-hs2
   labels:
     {{- include "spark3.labels" . | nindent 4 }}
   {{- with .Values.ingress.annotations }}
@@ -38,10 +38,10 @@ spec:
   {{- end }}
   rules:
     {{- with .Values.ingress }}
-    - host: {{ .host | quote }}
+    - host: {{ .thrift_host | quote }}
       http:
         paths:
-          {{- range .paths }}
+          {{- range .thrift_paths }}
           - path: {{ .path }}
             {{- if and .pathType (semverCompare ">=1.18-0" $.Capabilities.KubeVersion.GitVersion) }}
             pathType: {{ .pathType }}
@@ -49,11 +49,11 @@ spec:
             backend:
               {{- if semverCompare ">=1.19-0" $.Capabilities.KubeVersion.GitVersion }}
               service:
-                name: {{ $fullName }}-ingress
+                name: {{ $fullName }}-hs2
                 port:
                   number: {{ $svcPort }}
               {{- else }}
-              serviceName: {{ $fullName }}-ingress
+              serviceName: {{ $fullName }}-hs2
               servicePort: {{ $svcPort }}
               {{- end }}
           {{- end }}

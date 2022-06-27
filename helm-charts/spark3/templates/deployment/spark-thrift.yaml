@@ -1,4 +1,5 @@
 {{- include "require" . -}}
+{{- if .Values.spark.deploy_thrift -}}
 apiVersion: v1
 kind: Service
 metadata:
@@ -30,8 +31,7 @@ spec:
     {{- toYaml .Values.podSecurityContext | nindent 4 }}
   volumes:
     {{- include "spark3.volumes" . | nindent 4 }}
-  hostname: thrift
-  subdomain: {{ include "spark3.fullname" . }}
+  hostname: {{ include "spark3.fullname" . }}-thrift
   setHostnameAsFQDN: true
   containers:
     - name: {{ .Chart.Name }}
@@ -39,11 +39,15 @@ spec:
         {{- toYaml .Values.securityContext | nindent 8 }}
       image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
       imagePullPolicy: {{ .Values.image.pullPolicy }}
-      args: ["/usr/sbin/spark3-thrift", "--conf", 'spark.kubernetes.driver.pod.name={{ include "spark3.fullname" . }}-thrift',
-            '--conf', 'spark.executor.instances={{ .Values.spark.thrift_executor_instances }}']
+      args: ["/usr/sbin/spark3-thrift", 
+             "--conf", 'spark.kubernetes.driver.pod.name={{ include "spark3.fullname" . }}-thrift',
+             "--conf", 'spark.kubernetes.executor.podNamePrefix={{ include "spark3.fullname" . }}-thrift']
       ports:
         - name: hiveserver2
           containerPort: 10000
+          protocol: TCP
+        - name: http
+          containerPort: 4040
           protocol: TCP
       livenessProbe:
         tcpSocket:
@@ -74,3 +78,4 @@ spec:
   tolerations:
     {{- toYaml . | nindent 4 }}
   {{- end }}
+{{- end }}

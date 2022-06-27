@@ -1,7 +1,8 @@
+{{- if .Values.spark.deploy_cluster -}}
 apiVersion: v1
 kind: Service
 metadata:
-  name: {{ include "spark3.fullname" . }}-master-head
+  name: {{ include "spark3.fullname" . }}-ingress
   labels:
     {{- include "spark3.labels" . | nindent 4 }}
     component: master-service
@@ -12,10 +13,12 @@ spec:
       targetPort: spark
       protocol: TCP
       name: spark
-    - port: 8088
+    - port: 80
       targetPort: http
       protocol: TCP
       name: http
   selector:
     {{- include "spark3.selectorLabels" . | nindent 4 }}
     component: master
+
+{{- end }}

@@ -8,7 +8,7 @@ image:
   repository: registry.gitlab.com/abyres/releases/spark3
   pullPolicy: Always
   # Overrides the image tag whose default is the chart appVersion.
-  tag: "3.2.0-2"
+  tag: "3.2.0-3"
 
 imagePullSecrets: []
 nameOverride: ""
@@ -53,6 +53,10 @@ ingress:
   paths:
     - path: /
       pathType: ImplementationSpecific
+  thrift_host: 
+  thrift_paths:
+    - path: /
+      pathType: ImplementationSpecific
   tls: []
   #  - secretName: chart-example-tls
   #    hosts:
@@ -86,8 +90,11 @@ affinity: {}
 spark: 
   hive_metastore_uri:
   executor_cores: 1
-  executor_memory: 4g
-  thrift_executor_instances: 1
+  executor_memory: 2g
+  executor_instances: 1
+  deploy_cluster: false
+  deploy_thrift: false
+  memory_overhead_factor: 0.4
 
 s3a:
   endpoint:

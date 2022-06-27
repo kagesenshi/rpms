@@ -1,7 +1,14 @@
 {{- define "require" -}}
+    {{- $deploy_cluster := .Values.spark.deploy_cluster -}}
+    {{- $deploy_thrift := .Values.spark.deploy_thrift -}}
     {{- if .Values.ingress.enabled -}}
         {{- with .Values.ingress -}}
-            {{- $host := .host | required "ingress.host is required" -}}
+            {{- if $deploy_cluster -}}
+                {{- $host := .host | required "ingress.host is required" -}}
+            {{- end -}}
+            {{- if $deploy_thrift -}}
+                {{- $host := .thrift_host | required "ingress.thrift_host is required" -}}
+            {{- end -}}           
         {{- end -}}
     {{- end -}}
 

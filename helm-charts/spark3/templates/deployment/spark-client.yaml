@@ -30,8 +30,7 @@ spec:
     {{- toYaml .Values.podSecurityContext | nindent 4 }}
   volumes:
     {{- include "spark3.volumes" . | nindent 4 }}
-  hostname: client
-  subdomain: {{ include "spark3.fullname" . }}
+  hostname: {{ include "spark3.fullname" . }}-client
   setHostnameAsFQDN: true
   containers:
     - name: {{ .Chart.Name }}
