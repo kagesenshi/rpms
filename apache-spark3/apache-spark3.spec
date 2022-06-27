@@ -21,7 +21,7 @@
 
 Name: %{vendor}-spark%{spark_major}
 Version: %{spark_version}
-Release: 1%{?dist}
+Release: 2%{?dist}
 Summary: Apache Spark
 Requires(pre): shadow-utils
 BuildRequires: systemd-rpm-macros python-rpm-macros
@@ -354,6 +354,8 @@ exit 0
 
 
 %changelog
+* Mon Jun 27 2022 Izhar Firdaus <kagesenshi.87@gmail.com> 3.2.0-2
+- added ipykernel and pyspark library (kagesenshi.87@gmail.com)
 * Mon Apr 25 2022 Izhar Firdaus <kagesenshi.87@gmail.com> 3.2.0-1
 - update to use tito
 
