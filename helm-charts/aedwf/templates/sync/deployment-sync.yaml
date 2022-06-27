@@ -60,6 +60,16 @@ spec:
                 secretKeyRef:
                   name: {{ include "aedwf.fullname" . }}-secrets
                   key: fernet-key
+            - name: GIT_SYNC_USERNAME
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "aedwf.fullname" . }}-secrets
+                  key: git-username
+            - name: GIT_SYNC_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "aedwf.fullname" . }}-secrets
+                  key: git-password
 
 
       {{- with .Values.nodeSelector }}

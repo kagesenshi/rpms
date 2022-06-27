@@ -17,4 +17,5 @@
             {{- $smtp_from := .from | required "smtp.from is required" -}}
         {{- end -}}
     {{- end -}}
+    {{- $spark_secret_name := .Values.spark.secret_name | required "spark.secret_name is required" -}}
 {{- end -}}

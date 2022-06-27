@@ -29,14 +29,8 @@ spec:
       securityContext:
         {{- toYaml .Values.podSecurityContext | nindent 8 }}
       volumes:
-        - name: {{ include "aedwf.fullname" . }}-config
-          secret:
-            secretName: {{ include "aedwf.fullname" . }}-config
-        - name: {{ include "aedwf.fullname" . }}-datadir
-          persistentVolumeClaim:
-            claimName: {{ include "aedwf.fullname" . }}-datadir
-        - name: {{ include "aedwf.fullname" . }}-logdir
-          emptyDir: {}
+        {{- include "aedwf.volumes" . | nindent 8 }}
+
       containers:
         - name: {{ .Chart.Name }}
           securityContext:
@@ -47,19 +41,9 @@ spec:
           resources:
             {{- toYaml .Values.resources | nindent 12 }}
           volumeMounts:
-            - name: {{ include "aedwf.fullname" . }}-config
-              mountPath: "/etc/apache-airflow"
-            - name: {{ include "aedwf.fullname" . }}-datadir
-              mountPath: "/var/lib/apache-airflow"
-            - name: {{ include "aedwf.fullname" . }}-logdir
-              mountPath: "/var/log/apache-airflow"
+            {{- include "aedwf.volumeMounts" . | nindent 12 }}
           env:
-            - name: AIRFLOW__CORE__FERNET_KEY
-              valueFrom:
-                secretKeyRef:
-                  name: {{ include "aedwf.fullname" . }}-secrets
-                  key: fernet-key
-
+            {{- include "aedwf.env" . | nindent 12 }}
 
       {{- with .Values.nodeSelector }}
       nodeSelector:

@@ -1,0 +1,18 @@
+{{/* 
+Redis sentinel configuration
+*/}}
+{{- define "redis-sentinel-config" -}}
+port 26379
+daemonize no
+pidfile /var/run/redis-sentinel.pid
+logfile ""
+dir /tmp
+sentinel monitor mymaster 127.0.0.1 6379 2
+sentinel down-after-milliseconds mymaster 30000
+sentinel parallel-syncs mymaster 1
+sentinel failover-timeout mymaster 180000
+sentinel deny-scripts-reconfig yes
+logfile /var/log/redis/sentinel.log
+{{ end }}
+
+
