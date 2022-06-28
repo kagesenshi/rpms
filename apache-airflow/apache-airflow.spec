@@ -80,7 +80,15 @@ export DONT_STRIP=1
 mkdir -p ${RPM_BUILD_ROOT}/opt/%{name}/
 #cp -r * ${RPM_BUILD_ROOT}/opt/%{name}/
 python%{python_version} -m venv ${RPM_BUILD_ROOT}/opt/%{name}/
-${RPM_BUILD_ROOT}/opt/%{name}/bin/pip install "apache-airflow[celery,async,postgres,mysql,odbc,apache.druid,apache.spark,apache.webhdfs,rabbitmq,redis,ftp,grpc,http,imap,jdbc,papermill,kerberos,ldap,sftp,sqlite,ssh]" --constraint https://raw.githubusercontent.com/apache/airflow/constraints-%{version}/constraints-%{python_version}.txt
+${RPM_BUILD_ROOT}/opt/%{name}/bin/pip install "apache-airflow[celery,async,postgres,mysql,odbc,apache.druid,apache.spark,apache.webhdfs,rabbitmq,redis,ftp,grpc,http,imap,jdbc,papermill,kerberos,ldap,sftp,sqlite,ssh,amazon]" \
+    apache-airflow-providers-amazon \
+    apache-airflow-providers-airbyte[http] \
+    apache-airflow-providers-alibaba \
+    apache-airflow-providers-neo4j \
+    apache-airflow-providers-trino \
+    apache-airflow-providers-dbt-cloud \
+    dag-factory \
+    --constraint https://raw.githubusercontent.com/apache/airflow/constraints-%{version}/constraints-%{python_version}.txt
 #pushd ${RPM_BUILD_ROOT}/opt/%{name}/lib/python%{python_version}/site-packages/airflow/www/
 #   ./compile_assets.sh
 #popd
