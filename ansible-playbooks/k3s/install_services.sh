@@ -86,13 +86,14 @@ kubectl exec -t citus -- createdb_with_user.sh \
 
 helm install aedwf ${REPO}/aedwf \
     --set ingress.host=airflow.k3s.lan \
-    --set airflow.fernet_key="XzeMih6Uqa_CQCkWOPTL_f4yY5wJ92JUTwfX6Z6BYQM" \
+    --set airflow.fernet_key="qwpdaZfaRLxXLZ5uWeScLJcF-eOuZtuP0h_6sDSz3yw=" \
     --set airflow.secret_key="helloworld" \
     --set airflow.default_timezone="Asia/Kuala_Lumpur" \
-    --set airflow.dag_git_repository="http://git.k3s.lan/repo/myproject.git" \
+    --set airflow.dag_git_repository="http://gitserver/repo/myproject.git" \
     --set airflow.dag_git_username="git" \
     --set airflow.dag_git_password="password" \
     --set airflow.db_uri="postgresql+psycopg2://aedwf:aedwf@citus/aedwf" \
-    --set spark.secret_name=spark3-config 
+    --set spark.secret_name=spark3-config \
+    --set airflow.secret_name=aedwf-config 
 
 wait_for aedwf
