@@ -105,6 +105,7 @@ default_ui_timezone = {{ .Values.airflow.default_timezone }}
 web_server_host = 0.0.0.0
 web_server_port = 8080
 secret_key = {{ .Values.airflow.secret_key }}
+enable_proxy_fix = True
 
 [logging]
 base_log_folder = /var/log/apache-airflow/

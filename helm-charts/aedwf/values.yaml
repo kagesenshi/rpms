@@ -8,7 +8,7 @@ image:
   repository: registry.gitlab.com/abyres/releases/aedwf
   pullPolicy: Always
   # Overrides the image tag whose default is the chart appVersion.
-  tag: "2.2.5-3"
+  tag: "2.2.5-4"
 
 redis_image:
   repository: registry.gitlab.com/abyres/releases/redis
@@ -90,7 +90,7 @@ autoscaling:
   targetCPUUtilizationPercentage: 80
   # targetMemoryUtilizationPercentage: 80
 
-web_instances: 2
+web_instances: 1
 worker_instances: 2
 
 nodeSelector: {}
