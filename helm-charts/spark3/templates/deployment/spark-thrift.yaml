@@ -52,12 +52,12 @@ spec:
       livenessProbe:
         tcpSocket:
           port: 10000
-        initialDelaySeconds: 15
+        initialDelaySeconds: 60
         periodSeconds: 10
       readinessProbe:
         tcpSocket: 
           port: 10000
-        initialDelaySeconds: 15
+        initialDelaySeconds: 60
         periodSeconds: 10
       volumeMounts:
         {{- include "spark3.volume-mounts" . | nindent 8 }}
