@@ -9,4 +9,6 @@ elif [ "$1" == "hub" ];then
     jupyterhub
 elif [ "$1" == "lab" ];then
     /opt/jupyterhub/bin/jupyter lab --ip 0.0.0.0 --port 8000 --NotebookApp.token="${TOKEN}"
+else
+    "$@"
 fi

@@ -86,3 +86,6 @@ jupyter:
 
 spark:
   secret_name: 
+
+airflow:
+  secret_name:

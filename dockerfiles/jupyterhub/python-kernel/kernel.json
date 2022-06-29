@@ -1,6 +1,6 @@
 {
  "argv": [
-  "/opt/apache/spark3-python/bin/python",
+  "/opt/venv/bin/python",
   "-m",
   "ipykernel_launcher",
   "-f",
