@@ -14,13 +14,14 @@ spec:
 ---
 
 apiVersion: apps/v1
-kind: Deployment
+kind: StatefulSet
 metadata:
   name: {{ include "aedwf.fullname" . }}-worker
   labels:
     {{- include "aedwf.labels" . | nindent 4 }}
     component: worker
 spec:
+  serviceName: {{ include "aedwf.fullname" . }}-worker
   {{- if not .Values.autoscaling.enabled }}
   replicas: {{ .Values.worker_instances }}
   {{- end }}
@@ -38,6 +39,7 @@ spec:
         {{- include "aedwf.selectorLabels" . | nindent 8 }}
         component: worker
     spec:
+      setHostnameAsFQDN: true
       {{- with .Values.imagePullSecrets }}
       imagePullSecrets:
         {{- toYaml . | nindent 8 }}
