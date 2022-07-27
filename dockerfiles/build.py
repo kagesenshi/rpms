@@ -125,6 +125,8 @@ if args.push:
         out = subprocess.Popen(cmd).wait()
         if out != 0:
             raise ChildProcessError(' '.join(cmd))
+    for t in tags:
+        print(_c('okgreen', 'Pushed %s' % t))
 
 with open('repo.yml', 'w') as f:
     yaml.safe_dump(conf, f)
