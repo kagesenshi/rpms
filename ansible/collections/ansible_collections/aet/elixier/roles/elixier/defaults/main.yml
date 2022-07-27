@@ -1,0 +1,7 @@
+---
+# defaults file for aecdp
+#
+repo_name: abyres
+repo_url: https://releases.abyres.net/helm
+ingress_domain: k3s.abyres.lan
+release_namespace: datalake

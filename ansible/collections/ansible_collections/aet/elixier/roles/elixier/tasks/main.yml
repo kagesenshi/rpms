@@ -1,0 +1,243 @@
+---
+# tasks file for aecdp
+- name: install python interpreter
+  dnf: 
+    name: 
+      - python3
+      - python3-devel
+
+- name: create virtualenv
+  command: python3 -m venv /opt/ansible_virtualenv/
+  args:
+    creates: /opt/ansible_virtualenv/bin/pip 
+
+- name: setup virtualenv libraries
+  pip:
+    name:
+      - boto3
+      - botocore
+      - kubernetes
+    executable: /opt/ansible_virtualenv/bin/pip
+
+- name: install repo
+  kubernetes.core.helm_repository:
+    name: "{{ repo_name }}"
+    repo_url: "{{ repo_url }}"
+
+- name: install registry
+  kubernetes.core.helm:
+    name: registry
+    chart_ref: "{{ repo_name }}/registry"
+    release_namespace: "{{ release_namespace }}"
+    create_namespace: true
+    wait: true
+    timeout: 10m
+    values:
+      ingress:
+        host: "registry.{{ ingress_domain }}"
+      registry:
+        user: user
+        password: password
+
+- name: install minio
+  kubernetes.core.helm:
+    name: minio
+    chart_ref: "{{ repo_name }}/minio"
+    release_namespace: "{{ release_namespace }}"
+    create_namespace: true
+    wait: true
+    timeout: 10m
+    values:
+      ingress:
+        host: "minio.{{ ingress_domain }}"
+        console_host: "minio-console.{{ ingress_domain }}"
+      minio:
+        root_user: minio
+        root_password: miniopassword
+        instance_storage: 1Gi
+
+- name: install citus
+  kubernetes.core.helm:
+    name: citus
+    chart_ref: "{{ repo_name }}/citus"
+    release_namespace: "{{ release_namespace }}"
+    create_namespace: true
+    wait: true
+    timeout: 10m
+
+- name: install gitserver
+  kubernetes.core.helm:
+    name: gitserver
+    chart_ref: "{{ repo_name }}/gitserver"
+    release_namespace: "{{ release_namespace }}"
+    create_namespace: true
+    wait: true
+    timeout: 10m
+    values:
+      ingress:
+        host: "git.{{ ingress_domain }}"
+      git:
+        gitweb_password: password
+
+- name: create buckets
+  amazon.aws.s3_bucket:
+    name: "{{ item }}"
+    s3_url: "https://minio.{{ ingress_domain }}"
+    aws_access_key: minio
+    aws_secret_key: miniopassword
+    validate_certs: no
+  with_items:
+    - spark
+  vars:
+    ansible_python_interpreter: /opt/ansible_virtualenv/bin/python
+
+- name: create directories
+  amazon.aws.s3_object:
+    object: "{{ item }}"
+    bucket: spark
+    mode: create
+    s3_url: "https://minio.{{ ingress_domain }}"
+    aws_access_key: minio
+    aws_secret_key: miniopassword
+    validate_certs: no
+  with_items:
+    - event_log/
+    - warehouse/
+  vars:
+    ansible_python_interpreter: /opt/ansible_virtualenv/bin/python
+
+
+- name: create metastore database
+  kubernetes.core.k8s_exec:
+    namespace: "{{ release_namespace }}"
+    pod: citus
+    command: createdb_with_user.sh -d metastore -u metastore -p metastore
+  vars:
+    ansible_python_interpreter: /opt/ansible_virtualenv/bin/python
+
+
+- name: install metastore
+  kubernetes.core.helm:
+    name: hivemetastore
+    chart_ref: "{{ repo_name }}/hivemetastore"
+    release_namespace: "{{ release_namespace }}"
+    create_namespace: true
+    wait: true
+    timeout: 10m
+    values:
+      hive:
+        metastore_db_url: jdbc:postgresql://citus/metastore
+        metastore_db_driver: org.postgresql.Driver
+        metastore_db_user: metastore
+        metastore_db_password: metastore
+        metastore_db_type: postgres
+        metastore_warehouse_dir: s3a://spark/tablespace/
+      s3a:
+        endpoint: http://minio:9000
+        access_key: minio
+        secret_key: miniopassword
+
+
+- name: install spark
+  kubernetes.core.helm:
+    name: spark3
+    chart_ref: "{{ repo_name }}/spark3"
+    release_namespace: "{{ release_namespace }}"
+    create_namespace: true
+    wait: true
+    timeout: 10m
+    values:
+      spark:
+        hive_metastore_uri: thrift://hivemetastore:9083
+        deploy_thrift: true
+        k8s_namespace: "{{ release_namespace }}"
+      ingress:
+        thrift_host: "sparksql.{{ ingress_domain }}"
+      s3a:
+        endpoint: http://minio:9000
+        access_key: minio
+        secret_key: miniopassword
+
+
+
+- name: create superset database
+  kubernetes.core.k8s_exec:
+    namespace: "{{ release_namespace }}"
+    pod: citus
+    command: createdb_with_user.sh -d aedv -u aedv -p aedv
+  vars:
+    ansible_python_interpreter: /opt/ansible_virtualenv/bin/python
+
+
+
+- name: install superset
+  kubernetes.core.helm:
+    name: aedv
+    chart_ref: "{{ repo_name }}/aedv"
+    release_namespace: "{{ release_namespace }}"
+    create_namespace: true
+    wait: true
+    timeout: 10m
+    values:
+      ingress:
+        host: "superset.{{ ingress_domain }}"
+      superset:
+        secret_key: secretkey
+        db_uri: postgresql+psycopg2://aedv:aedv@citus/aedv
+
+- name: create git repo
+  kubernetes.core.k8s_exec:
+    namespace: "{{ release_namespace }}"
+    pod: gitserver
+    command: newrepo myproject
+  vars:
+    ansible_python_interpreter: /opt/ansible_virtualenv/bin/python
+
+
+
+
+- name: create airflow database
+  kubernetes.core.k8s_exec:
+    namespace: "{{ release_namespace }}"
+    pod: citus
+    command: createdb_with_user.sh -d aedwf -u aedwf -p aedwf
+  vars:
+    ansible_python_interpreter: /opt/ansible_virtualenv/bin/python
+
+- name: install airflow
+  kubernetes.core.helm:
+    name: aedwf
+    chart_ref: "{{ repo_name }}/aedwf"
+    release_namespace: "{{ release_namespace }}"
+    create_namespace: true
+    wait: true
+    timeout: 10m
+    values:
+      ingress:
+        host: "airflow.{{ ingress_domain }}"
+      airflow:
+        fernet_key: XzeMih6Uqa_CQCkWOPTL_f4yY5wJ92JUTwfX6Z6BYQM
+        secret_key: secretkey
+        default_timezone: "Asia/Kuala_Lumpur"
+        dag_git_repository: "http://git.{{ ingress_domain }}/repo/myproject.git"
+        dag_git_username: "git"
+        dag_git_password: "password"
+        db_uri: postgresql+psycopg2://aedwf:aedwf@citus/aedwf
+      spark:
+        secret_name: spark3-config
+
+- name: install jupyter
+  kubernetes.core.helm:
+    name: jupyterhub
+    chart_ref: "{{ repo_name }}/jupyterhub"
+    release_namespace: "{{ release_namespace }}"
+    create_namespace: true
+    wait: true
+    timeout: 10m
+    values:
+      ingress:
+        host: "jupyter.{{ ingress_domain }}"
+      spark:
+        secret_name: spark3-config
+      airflow:
+        secret_name: aedwf-config

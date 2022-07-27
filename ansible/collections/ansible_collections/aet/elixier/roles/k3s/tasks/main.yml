@@ -1,0 +1,116 @@
+- name: disable services
+  systemd:
+    name: "{{ item }}"
+    state: stopped
+    enabled: no
+  with_items:
+    - firewalld
+
+- name: download k3s installer
+  get_url:
+    url: https://get.k3s.io
+    dest: /usr/local/bin/k3s-install.sh
+    mode: '0755'
+
+- name: install core components
+  dnf:
+    name: 
+      - dnsmasq
+      - git
+      - wget
+      - squid
+    state: present
+
+- name: create group
+  group:
+    name: k3s
+
+- name: create user
+  user:
+    name: k3s
+    shell: /bin/bash
+    groups: k3s,wheel
+
+- name: install k3s
+  command: /usr/local/bin/k3s-install.sh --no-deploy traefik
+  args:
+    creates: /usr/local/bin/k3s
+
+- name: wait for manifest dir
+  wait_for:
+    path: /var/lib/rancher/k3s/server/manifests/
+    state: present
+    delay: 10
+
+- name: get ingress
+  get_url:
+    url: https://raw.githubusercontent.com/kubernetes/ingress-nginx/controller-v1.3.0/deploy/static/provider/baremetal/deploy.yaml
+    dest: /var/lib/rancher/k3s/server/manifests/ingress-nginx.yml
+
+
+- name: wait for ingress to be ready
+  command: kubectl wait -n ingress-nginx --for=condition=ready pod --timeout=300s -l app.kubernetes.io/name=ingress-nginx,app.kubernetes.io/component=controller
+  retries: 3
+  delay: 10
+  register: result
+  until: result.rc == 0
+
+- name: upload ingress default patch
+  copy:
+    src: ingress-default.yml
+    dest: /root/ingress-default.yml
+
+- name: patch ingress
+  command: kubectl patch ingressclass nginx --patch-file /root/ingress-default.yml
+
+- name: copy loadbalancer
+  copy:
+    src: loadbalancer.yml
+    dest: /var/lib/rancher/k3s/server/manifests/loadbalancer.yml
+
+- name: register kubeconfig
+  copy:
+    content: "export KUBECONFIG=/etc/rancher/k3s/k3s.yaml"
+    dest: /etc/profile.d/kubeconfig.sh
+
+- name: download helm
+  get_url: 
+    url: https://get.helm.sh/helm-v3.9.0-linux-amd64.tar.gz
+    dest: /root/helm.tar.gz
+
+- name: extract helm
+  unarchive: 
+    src: /root/helm.tar.gz
+    dest: /root/
+    creates: /root/linux-amd64
+    remote_src: yes
+
+- name: install helm
+  command: /usr/bin/install /root/linux-amd64/helm /usr/local/bin/helm
+  args:
+    creates: /usr/local/bin/helm
+
+- name: download minio client
+  get_url:
+    url: https://dl.min.io/client/mc/release/linux-amd64/mc
+    dest: /root/mc
+
+- name: install minio client
+  command: /usr/bin/install /root/mc /usr/local/bin/mc
+  args:
+    creates: /usr/local/bin/mc
+
+- name: install dnsmasq config
+  template:
+    src: dnsmasq.tmpl
+    dest: /etc/dnsmasq.d/k3s.conf
+
+- name: start services
+  systemd:
+    name: "{{ item }}"
+    state: restarted
+    enabled: yes
+  with_items:
+    - dnsmasq
+    - squid
+
