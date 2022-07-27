@@ -27,8 +27,6 @@
   value: /opt/apache/spark3-python/bin/python
 - name: SPARK_WORKER_DIR
   value: /opt/apache/spark3/work-dir/worker
-- name: HIVE_SERVER2_TRANSPORT_MODE
-  value: http
 
 {{- end }}
 
