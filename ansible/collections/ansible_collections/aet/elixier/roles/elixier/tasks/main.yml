@@ -31,13 +31,13 @@
     release_namespace: "{{ release_namespace }}"
     create_namespace: true
     wait: true
-    timeout: 10m
+    timeout: "{{ helm_timeout }}"
     values:
       ingress:
         host: "registry.{{ ingress_domain }}"
       registry:
-        user: user
-        password: password
+        user: "{{ registry_user }}"
+        password: "{{ registry_password }}"
 
 - name: install minio
   kubernetes.core.helm:
@@ -46,15 +46,15 @@
     release_namespace: "{{ release_namespace }}"
     create_namespace: true
     wait: true
-    timeout: 10m
+    timeout: "{{ helm_timeout }}"
     values:
       ingress:
         host: "minio.{{ ingress_domain }}"
         console_host: "minio-console.{{ ingress_domain }}"
       minio:
-        root_user: minio
-        root_password: miniopassword
-        instance_storage: 1Gi
+        root_user: "{{ minio_user }}"
+        root_password: "{{ minio_password }}"
+        instance_storage: "{{ minio_storage_size }}"
 
 - name: install citus
   kubernetes.core.helm:
@@ -63,7 +63,7 @@
     release_namespace: "{{ release_namespace }}"
     create_namespace: true
     wait: true
-    timeout: 10m
+    timeout: "{{ helm_timeout }}"
 
 - name: install gitserver
   kubernetes.core.helm:
@@ -72,19 +72,19 @@
     release_namespace: "{{ release_namespace }}"
     create_namespace: true
     wait: true
-    timeout: 10m
+    timeout: "{{ helm_timeout }}"
     values:
       ingress:
         host: "git.{{ ingress_domain }}"
       git:
-        gitweb_password: password
+        gitweb_password: "{{ gitweb_password }}"
 
 - name: create buckets
   amazon.aws.s3_bucket:
     name: "{{ item }}"
     s3_url: "https://minio.{{ ingress_domain }}"
-    aws_access_key: minio
-    aws_secret_key: miniopassword
+    aws_access_key: "{{ minio_user }}"
+    aws_secret_key: "{{ minio_password }}"
     validate_certs: no
   with_items:
     - spark
@@ -97,8 +97,8 @@
     bucket: spark
     mode: create
     s3_url: "https://minio.{{ ingress_domain }}"
-    aws_access_key: minio
-    aws_secret_key: miniopassword
+    aws_access_key: "{{ minio_user }}"
+    aws_secret_key: "{{ minio_password }}"
     validate_certs: no
   with_items:
     - event_log/
@@ -111,7 +111,7 @@
   kubernetes.core.k8s_exec:
     namespace: "{{ release_namespace }}"
     pod: citus
-    command: createdb_with_user.sh -d metastore -u metastore -p metastore
+    command: "createdb_with_user.sh -d {{ metastore_db_name }} -u {{ metastore_db_user }} -p {{ metastore_db_password }}"
   vars:
     ansible_python_interpreter: /opt/ansible_virtualenv/bin/python
 
@@ -123,19 +123,19 @@
     release_namespace: "{{ release_namespace }}"
     create_namespace: true
     wait: true
-    timeout: 10m
+    timeout: "{{ helm_timeout }}"
     values:
       hive:
-        metastore_db_url: jdbc:postgresql://citus/metastore
+        metastore_db_url: "jdbc:postgresql://citus/{{ metastore_db_name }}"
         metastore_db_driver: org.postgresql.Driver
-        metastore_db_user: metastore
-        metastore_db_password: metastore
+        metastore_db_user: "{{ metastore_db_user }}"
+        metastore_db_password: "{{ metastore_db_password }}"
         metastore_db_type: postgres
         metastore_warehouse_dir: s3a://spark/tablespace/
       s3a:
         endpoint: http://minio:9000
-        access_key: minio
-        secret_key: miniopassword
+        access_key: "{{ minio_user }}"
+        secret_key: "{{ minio_password }}"
 
 
 - name: install spark
@@ -145,7 +145,7 @@
     release_namespace: "{{ release_namespace }}"
     create_namespace: true
     wait: true
-    timeout: 10m
+    timeout: "{{ helm_timeout }}"
     values:
       spark:
         hive_metastore_uri: thrift://hivemetastore:9083
@@ -155,19 +155,17 @@
         thrift_host: "sparksql.{{ ingress_domain }}"
       s3a:
         endpoint: http://minio:9000
-        access_key: minio
-        secret_key: miniopassword
-
+        access_key: "{{ minio_user }}"
+        secret_key: "{{ minio_password }}"
 
 
 - name: create superset database
   kubernetes.core.k8s_exec:
     namespace: "{{ release_namespace }}"
     pod: citus
-    command: createdb_with_user.sh -d aedv -u aedv -p aedv
+    command: "createdb_with_user.sh -d {{ aedv_db_name }} -u {{ aedv_db_user }} -p {{ aedv_db_password }}"
   vars:
     ansible_python_interpreter: /opt/ansible_virtualenv/bin/python
-
 
 
 - name: install superset
@@ -177,13 +175,13 @@
     release_namespace: "{{ release_namespace }}"
     create_namespace: true
     wait: true
-    timeout: 10m
+    timeout: "{{ helm_timeout }}"
     values:
       ingress:
         host: "superset.{{ ingress_domain }}"
       superset:
         secret_key: secretkey
-        db_uri: postgresql+psycopg2://aedv:aedv@citus/aedv
+        db_uri: "postgresql+psycopg2://{{ aedv_db_user }}:{{ aedv_db_password }}@{{ aedv_db_host }}:{{ aedv_db_port }}/{{ aedv_db_name }}"
 
 - name: create git repo
   kubernetes.core.k8s_exec:
@@ -193,14 +191,12 @@
   vars:
     ansible_python_interpreter: /opt/ansible_virtualenv/bin/python
 
-
-
-
 - name: create airflow database
   kubernetes.core.k8s_exec:
     namespace: "{{ release_namespace }}"
     pod: citus
-    command: createdb_with_user.sh -d aedwf -u aedwf -p aedwf
+    command: "createdb_with_user.sh -d {{ aedwf_db_name }} -u {{ aedwf_db_user }} -p {{ aedwf_db_password }}"
+
   vars:
     ansible_python_interpreter: /opt/ansible_virtualenv/bin/python
 
@@ -211,18 +207,18 @@
     release_namespace: "{{ release_namespace }}"
     create_namespace: true
     wait: true
-    timeout: 10m
+    timeout: "{{ helm_timeout }}"
     values:
       ingress:
         host: "airflow.{{ ingress_domain }}"
       airflow:
-        fernet_key: XzeMih6Uqa_CQCkWOPTL_f4yY5wJ92JUTwfX6Z6BYQM
-        secret_key: secretkey
-        default_timezone: "Asia/Kuala_Lumpur"
-        dag_git_repository: "http://git.{{ ingress_domain }}/repo/myproject.git"
+        fernet_key: "{{ fernet_key }}"
+        secret_key: "{{ secret_key }}"
+        default_timezone: "{{ timezone }}"
+        dag_git_repository: "http://gitserver/repo/myproject.git"
         dag_git_username: "git"
-        dag_git_password: "password"
-        db_uri: postgresql+psycopg2://aedwf:aedwf@citus/aedwf
+        dag_git_password: "{{ gitweb_password }}"
+        db_uri: "postgresql+psycopg2://{{ aedwf_db_user }}:{{ aedwf_db_password }}@{{ aedwf_db_host }}:{{ aedwf_db_port }}/{{ aedwf_db_name }}"
       spark:
         secret_name: spark3-config
 
@@ -233,7 +229,7 @@
     release_namespace: "{{ release_namespace }}"
     create_namespace: true
     wait: true
-    timeout: 10m
+    timeout: "{{ helm_timeout }}"
     values:
       ingress:
         host: "jupyter.{{ ingress_domain }}"

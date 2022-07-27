@@ -5,3 +5,46 @@ repo_name: abyres
 repo_url: https://releases.abyres.net/helm
 ingress_domain: k3s.abyres.lan
 release_namespace: datalake
+helm_timeout: 10m
+timezone: Asia/Kuala_Lumpur
+
+
+
+# internal container registry
+registry_user: user
+registry_password: password
+
+# metastore
+metastore_db_name: metastore
+metastore_db_user: metastore
+metastore_db_password: metastore
+
+# minio
+minio_user: minio
+minio_password: miniopassword
+minio_storage_size: 1Gi
+
+# gitweb
+gitweb_password: password
+
+# airflow
+aedwf_db_name: aedwf
+aedwf_db_user: aedwf
+aedwf_db_password: aedwf
+aedwf_db_host: citus
+aedwf_db_port: 5432
+
+# superset
+aedv_db_name: aedv
+aedv_db_user: aedv
+aedv_db_password: aedv
+aedv_db_host: citus
+aedv_db_port: 5432
+
+# airflow fernet key
+fernet_key: XzeMih6Uqa_CQCkWOPTL_f4yY5wJ92JUTwfX6Z6BYQM
+
+# cookie secret key
+secret_key: WawaystyamAudulrotchothAtPef9
+
+
