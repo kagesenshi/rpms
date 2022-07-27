@@ -10,6 +10,7 @@ spark.dynamicAllocation.shuffleTracking.enabled true
 spark.dynamicAllocation.minExecutors    0
 spark.executor.instances         {{ .Values.spark.executor_instances }}
 
+spark.hadoop.fs.defaultFS        s3a://{{ .Values.spark.bucket | default "spark" }}/
 spark.hadoop.fs.s3a.endpoint     {{ .Values.s3a.endpoint }}
 spark.hadoop.fs.s3a.access.key   {{ .Values.s3a.access_key }}
 spark.hadoop.fs.s3a.secret.key   {{ .Values.s3a.secret_key }}
@@ -26,8 +27,7 @@ spark.kubernetes.executor.volumes.emptyDir.{{ include "spark3.fullname" . }}-dat
 
 spark.sql.catalogImplementation  hive
 spark.sql.warehouse.dir          s3a://{{ .Values.spark.bucket | default "spark" }}/tablespace/
-spark.sql.extensions             io.delta.sql.DeltaSparkSessionExtension
-spark.sql.catalog.spark_catalog  org.apache.spark.sql.delta.catalog.DeltaCatalog
+
 spark.sql.sources.commitProtocolClass org.apache.spark.internal.io.cloud.PathOutputCommitProtocol
 spark.sql.parquet.output.committer.class     org.apache.spark.internal.io.cloud.BindingParquetOutputCommitter
 
@@ -41,5 +41,9 @@ spark.executor.memory {{ .Values.spark.executor_memory }}
 
 spark.kubernetes.executor.podNamePrefix	{{ include "spark3.fullname" . }}
 spark.kubernetes.memoryOverheadFactor   {{ .Values.spark.memory_overhead_factor }}
+
+spark.sql.extensions=org.apache.iceberg.spark.extensions.IcebergSparkSessionExtensions
+spark.sql.catalog.spark_catalog=org.apache.iceberg.spark.SparkSessionCatalog
+spark.sql.catalog.spark_catalog.type=hive
 
 {{- end }}
