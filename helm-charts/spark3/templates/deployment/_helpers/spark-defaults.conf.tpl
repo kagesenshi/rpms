@@ -1,5 +1,6 @@
 {{- define "spark-defaults" -}}
-spark.master                     k8s://https://kubernetes
+spark.master                     {{ .Values.spark.master | default "k8s://https://kubernetes.default" }}
+spark.kubernetes.namespace       {{ .Values.spark.k8s_namespace | default "default" }}
 spark.history.provider           org.apache.hadoop.fs.s3a.S3AFileSystem
 spark.history.fs.logDirectory    s3a://{{ .Values.spark.bucket | default "spark" }}/event_log/
 spark.eventLog.enabled           true
