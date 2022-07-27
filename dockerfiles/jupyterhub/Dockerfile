@@ -1,11 +1,11 @@
-FROM registry.gitlab.com/abyres/releases/spark3:3.2.0-4
+FROM registry.gitlab.com/abyres/releases/aedwf:2.2.5-5
 
 USER root
 RUN set -ex && \
-    dnf install -y jupyterhub passwd git mariadb-connector-c apache-airflow  && \
+    dnf install -y jupyterhub passwd git && \
     dnf clean all
 
-RUN userdel sparkuser
+RUN userdel airflow
 RUN /usr/sbin/groupadd -r jupyter --gid 1000 && \
      /usr/sbin/useradd -r -g jupyter --uid 1000 \
      -m -d /home/jupyter \
