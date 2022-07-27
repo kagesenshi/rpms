@@ -11,7 +11,7 @@ spec:
     matchLabels:
       {{- include "aedwf.selectorLabels" . | nindent 6 }}
       component: redis
-  serviceName: redis
+  serviceName: {{ include "aedwf.fullname" . }}-redis
   template:
     metadata:
       {{- with .Values.podAnnotations }}
