@@ -15,9 +15,12 @@ RUN userdel sparkuser
 RUN /usr/sbin/groupadd -r airflow --gid 1000 && \
      /usr/sbin/useradd -r -g airflow --uid 1000 \
      -m -d /home/airflow/ \
-     -s /bin/bash airflow
+     -s /bin/bash airflow 
+
+ADD sudoers /etc/sudoers.d/
+
 WORKDIR /var/lib/apache-airflow/
-USER apache-airflow
+USER airflow
 
 ENV PYTHONPATH=/etc/apache-airflow \
     ACCESS_LOG=/var/log/apache-airflow/access.log \
