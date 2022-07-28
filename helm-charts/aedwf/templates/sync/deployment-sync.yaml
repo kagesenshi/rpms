@@ -70,6 +70,13 @@ spec:
                 secretKeyRef:
                   name: {{ include "aedwf.fullname" . }}-secrets
                   key: git-password
+            - name: GIT_SYNC_BRANCH
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "aedwf.fullname" . }}-secrets
+                  key: git-branch
+
+
 
 
       {{- with .Values.nodeSelector }}
