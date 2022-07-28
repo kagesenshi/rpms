@@ -19,6 +19,8 @@
       - git
       - wget
       - squid
+      - tar
+      - unzip
     state: present
 
 - name: create group

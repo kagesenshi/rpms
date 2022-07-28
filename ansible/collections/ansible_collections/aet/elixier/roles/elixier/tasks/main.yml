@@ -5,6 +5,7 @@
     name: 
       - python3
       - python3-devel
+      - python3-pyyaml
 
 - name: create virtualenv
   command: python3 -m venv /opt/ansible_virtualenv/
@@ -17,12 +18,20 @@
       - boto3
       - botocore
       - kubernetes
+      - pyyaml
     executable: /opt/ansible_virtualenv/bin/pip
 
 - name: install repo
   kubernetes.core.helm_repository:
     name: "{{ repo_name }}"
     repo_url: "{{ repo_url }}"
+
+- name: update repo
+  kubernetes.core.helm:
+    name: dummy
+    namespace: kube-system
+    state: absent
+    update_repo_cache: true
 
 - name: install registry
   kubernetes.core.helm:
@@ -102,7 +111,7 @@
     validate_certs: no
   with_items:
     - event_log/
-    - warehouse/
+    - tablespace/
   vars:
     ansible_python_interpreter: /opt/ansible_virtualenv/bin/python
 
@@ -157,6 +166,8 @@
         endpoint: http://minio:9000
         access_key: "{{ minio_user }}"
         secret_key: "{{ minio_password }}"
+      image:
+        tag: "{{ spark_image_tag | default(omit) }}"
 
 
 - name: create superset database
