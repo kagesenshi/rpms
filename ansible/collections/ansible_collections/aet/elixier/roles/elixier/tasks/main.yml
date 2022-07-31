@@ -86,7 +86,7 @@
       ingress:
         host: "git.{{ ingress_domain }}"
       git:
-        gitweb_password: "{{ gitweb_password }}"
+        gitweb_password: "{{ dag_git_password }}"
 
 - name: create buckets
   amazon.aws.s3_bucket:
@@ -135,7 +135,7 @@
     timeout: "{{ helm_timeout }}"
     values:
       hive:
-        metastore_db_url: "jdbc:postgresql://citus/{{ metastore_db_name }}"
+        metastore_db_url: "jdbc:postgresql://{{ metastore_db_host }}:{{ metastore_db_port }}/{{ metastore_db_name }}"
         metastore_db_driver: org.postgresql.Driver
         metastore_db_user: "{{ metastore_db_user }}"
         metastore_db_password: "{{ metastore_db_password }}"
@@ -226,9 +226,10 @@
         fernet_key: "{{ fernet_key }}"
         secret_key: "{{ secret_key }}"
         default_timezone: "{{ timezone }}"
-        dag_git_repository: "http://gitserver/repo/myproject.git"
-        dag_git_username: "git"
-        dag_git_password: "{{ gitweb_password }}"
+        dag_git_repository: "{{ dag_git_repository }}"
+        dag_git_username: "{{ dag_git_username }}"
+        dag_git_password: "{{ dag_git_password }}"
+        dag_git_branch: "{{ dag_git_branch }}"
         db_uri: "postgresql+psycopg2://{{ aedwf_db_user }}:{{ aedwf_db_password }}@{{ aedwf_db_host }}:{{ aedwf_db_port }}/{{ aedwf_db_name }}"
       spark:
         secret_name: spark3-config

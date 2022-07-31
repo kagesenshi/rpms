@@ -8,7 +8,8 @@ release_namespace: datalake
 helm_timeout: 10m
 timezone: Asia/Kuala_Lumpur
 
-
+dag_git_repository: http://gitserver/repo/myproject.git
+dag_git_username: git
 
 # internal container registry
 registry_user: user
@@ -18,6 +19,8 @@ registry_password: password
 metastore_db_name: metastore
 metastore_db_user: metastore
 metastore_db_password: metastore
+metastore_db_host: citus
+metastore_db_port: 5432
 
 # minio
 minio_user: minio
@@ -25,7 +28,7 @@ minio_password: miniopassword
 minio_storage_size: 1Gi
 
 # gitweb
-gitweb_password: password
+dag_git_password: password
 
 # airflow
 aedwf_db_name: aedwf
