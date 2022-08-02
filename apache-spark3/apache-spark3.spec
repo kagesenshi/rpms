@@ -21,7 +21,7 @@
 
 Name: %{vendor}-spark%{spark_major}
 Version: %{spark_version}
-Release: 3%{?dist}
+Release: 4%{?dist}
 Summary: Apache Spark
 Requires(pre): shadow-utils
 BuildRequires: systemd-rpm-macros python-rpm-macros
@@ -354,6 +354,9 @@ exit 0
 
 
 %changelog
+* Tue Aug 02 2022 Izhar Firdaus <kagesenshi.87@gmail.com> 3.2.0-4
+- fix path of spark3/python (kagesenshi.87@gmail.com)
+
 * Tue Aug 02 2022 Izhar Firdaus <kagesenshi.87@gmail.com> 3.2.0-3
 - added mariadb and mssql drivers (kagesenshi.87@gmail.com)
 
