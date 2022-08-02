@@ -70,7 +70,8 @@ mkdir -p %{buildroot}/%{_datadir}/%{name}/
 
 /usr/bin/python%{python_version} -m venv %{buildroot}/%{venv}
 %{buildroot}/%{venv}/bin/pip install numpy scikit-learn pandas dask ipykernel
-%{buildroot}/%{venv}/bin/pip install %{spark_package}/python/
+%{buildroot}/%{venv}/bin/python %{spark_package}/python/setup.py sdist
+%{buildroot}/%{venv}/bin/pip install %{spark_package}/dist/*.tar.gz
 
 cp -r %{spark_package}/* %{buildroot}/opt/%{vendor}/%{spark_package}
 cp -r %{spark_package}/conf/* %{buildroot}/%{_sysconfdir}/%{spark}
