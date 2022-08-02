@@ -6,7 +6,7 @@ metadata:
     {{- include "aedwf.labels" . | nindent 4 }}
 spec:
   accessModes:
-    - ReadWriteOnce
+    - ReadWriteMany
   storageClassName: {{ .Values.storageClass }}
   resources:
     requests:

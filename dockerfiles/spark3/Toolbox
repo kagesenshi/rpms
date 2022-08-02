@@ -1,6 +1,6 @@
 # vi: ft=dockerfile
 
-FROM registry.gitlab.com/abyres/releases/spark3
+FROM registry.gitlab.com/abyres/releases/spark3:development
 
 ENV NAME=spark3-toolbox VERSION=20220617
 LABEL com.github.containers.toolbox="true" \

@@ -1,6 +1,4 @@
-FROM registry.gitlab.com/abyres/releases/spark3:3.2.0-4
-
-LABEL org.opencontainers.image.version=2.2.5-1
+FROM registry.gitlab.com/abyres/releases/spark3:3.2.0-7
 
 USER root
 RUN dnf copr enable izhar/aet -y  && \

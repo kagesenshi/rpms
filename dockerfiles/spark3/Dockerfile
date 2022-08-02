@@ -35,7 +35,7 @@ USER root
 RUN chown -R sparkuser:sparkuser /opt/apache/spark3/jars/
 USER sparkuser
 RUN /opt/apache/spark3/bin/spark-submit \
-    --packages io.delta:delta-core_2.12:1.2.1,graphframes:graphframes:0.8.2-spark3.2-s_2.12 \
+    --packages graphframes:graphframes:0.8.2-spark3.2-s_2.12,org.apache.iceberg:iceberg-spark-runtime-3.2_2.12:0.14.0 \
     /opt/noop.py && \
     cp /home/sparkuser/.ivy2/jars/* /opt/apache/spark3/jars/ && \
     rm -rf /home/sparkuser/.ivy2/jars/
@@ -43,7 +43,7 @@ RUN /opt/apache/spark3/bin/spark-submit \
 USER root
 ADD https://repo1.maven.org/maven2/org/apache/spark/spark-hadoop-cloud_2.12/3.2.0/spark-hadoop-cloud_2.12-3.2.0.jar /opt/apache/spark3/jars/
 RUN chown -R root:root /opt/apache/spark3/jars/ && chmod a+r -R /opt/apache/spark3/jars/
-
+RUN /opt/apache/spark3-python/bin/pip install spark-dataloader==0.1.3
 USER sparkuser
 
 WORKDIR /opt/apache/spark3/work-dir

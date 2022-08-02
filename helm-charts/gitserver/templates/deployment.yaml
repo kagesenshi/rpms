@@ -1,11 +1,12 @@
 {{- include "require" . -}}
 apiVersion: apps/v1
-kind: Deployment
+kind: StatefulSet
 metadata:
   name: {{ include "gitserver.fullname" . }}-web
   labels:
     {{- include "gitserver.labels" . | nindent 4 }}
 spec:
+  serviceName: {{ include "gitserver.fullname" . }}-web
   replicas: 1
   selector:
     matchLabels:

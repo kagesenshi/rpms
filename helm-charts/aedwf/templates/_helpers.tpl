@@ -94,6 +94,7 @@ security =
 unit_test_mode = False
 enable_xcom_pickling = False
 killed_task_cleanup_time = 150
+fernet_key = {{ .Values.airflow.secret_key }}
 
 [webserver]
 {{- if .Values.ingress.tls }}
