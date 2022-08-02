@@ -73,7 +73,7 @@ mkdir -p %{buildroot}/%{_datadir}/%{name}/
 pushd %{spark_package}/python/
 %{buildroot}/%{venv}/bin/python setup.py sdist
 popd
-%{buildroot}/%{venv}/bin/pip install %{spark_package}/dist/*.tar.gz
+%{buildroot}/%{venv}/bin/pip install %{spark_package}/python/dist/pyspark-%{spark_version}.tar.gz
 
 cp -r %{spark_package}/* %{buildroot}/opt/%{vendor}/%{spark_package}
 cp -r %{spark_package}/conf/* %{buildroot}/%{_sysconfdir}/%{spark}
