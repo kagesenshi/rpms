@@ -6,8 +6,8 @@ metadata:
     {{- include "aedwf.labels" . | nindent 4 }}
 spec:
   accessModes:
-    - ReadWriteMany
-  storageClassName: {{ .Values.storageClass }}
+    - {{ .Values.storageAccessMode | default "ReadWriteMany" }}
+  storageClassName: {{ .Values.storageClass | default "" }}
   resources:
     requests:
       storage: 1G

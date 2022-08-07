@@ -1,6 +1,6 @@
 {{- include "require" . -}}
 apiVersion: apps/v1
-kind: Deployment
+kind: StatefulSet
 metadata:
   name: {{ include "aedwf.fullname" . }}-scheduler
   labels:
@@ -8,6 +8,8 @@ metadata:
     component: scheduler
 spec:
   replicas: 1
+  serviceName: {{ include "aedwf.fullname" . }}-scheduler
+  
   selector:
     matchLabels:
       {{- include "aedwf.selectorLabels" . | nindent 6 }}
@@ -30,7 +32,23 @@ spec:
         {{- toYaml .Values.podSecurityContext | nindent 8 }}
       volumes:
         {{- include "aedwf.volumes" . | nindent 8 }}
-
+      initContainers:
+        - name: {{ .Chart.Name }}-init
+          securityContext:
+            {{- toYaml .Values.securityContext | nindent 12 }}
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          args: ["first-init"]
+          resources:
+            {{- toYaml .Values.resources | nindent 12 }}
+          volumeMounts:
+            {{- include "aedwf.volumeMounts" . | nindent 12 }}
+          env:
+            - name: AIRFLOW__CORE__FERNET_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "aedwf.fullname" . }}-secrets
+                  key: fernet-key
       containers:
         - name: {{ .Chart.Name }}
           securityContext:
