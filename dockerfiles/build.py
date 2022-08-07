@@ -44,6 +44,7 @@ parser = argparse.ArgumentParser()
 parser.add_argument('-p','--push', default=False, action='store_true')
 parser.add_argument('-c','--containerfile', default=None)
 parser.add_argument('-r','--release', default=False, action='store_true')
+parser.add_argument('-R','--force-release', default=False, action='store_true')
 parser.add_argument('--cmd', required=False, default='docker')
 parser.add_argument('directory')
 
@@ -85,9 +86,9 @@ tags = []
 
 stag = Tag.parse(tag)
 
-if args.release:
+if args.release or args.force_release:
 
-    if last_updated != current_hash:
+    if (last_updated != current_hash) or args.force_release:
         conf['last_updated'] = current_hash
         build += 1
         conf['build'] = build
