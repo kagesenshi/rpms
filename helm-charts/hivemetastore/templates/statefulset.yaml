@@ -29,6 +29,7 @@ spec:
       serviceAccountName: {{ include "hivemetastore.serviceAccountName" . }}
       securityContext:
         {{- toYaml .Values.podSecurityContext | nindent 8 }}
+      setHostnameAsFQDN: true
       volumes:
         - name: {{ include "hivemetastore.fullname" . }}-config
           secret:
