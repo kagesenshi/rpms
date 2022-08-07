@@ -1,12 +1,14 @@
 {{- include "require" . -}}
 apiVersion: apps/v1
-kind: Deployment
+kind: StatefulSet
 metadata:
   name: {{ include "aedv.fullname" . }}-scheduler
   labels:
     {{- include "aedv.labels" . | nindent 4 }}
 spec:
   replicas: 1
+  serviceName: {{ include "aedv.fullname" . }}-scheduler
+
   selector:
     matchLabels:
       {{- include "aedv.selectorLabels" . | nindent 6 }}
@@ -34,6 +36,28 @@ spec:
           emptyDir: {}
         - name: {{ include "aedv.fullname" . }}-logdir
           emptyDir: {}
+      initContainers:
+        - name: {{ .Chart.Name }}-init
+          securityContext:
+            {{- toYaml .Values.securityContext | nindent 12 }}
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          args: ["first-init"]
+          resources:
+            {{- toYaml .Values.resources | nindent 12 }}
+          volumeMounts:
+            - name: {{ include "aedv.fullname" . }}-config
+              mountPath: "/etc/apache-superset"
+            - name: {{ include "aedv.fullname" . }}-datadir
+              mountPath: "/var/lib/apache-superset"
+            - name: {{ include "aedv.fullname" . }}-logdir
+              mountPath: "/var/log/apache-superset"
+          env:
+            - name: SUPERSET_SECRET_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "aedv.fullname" . }}-secrets
+                  key: secret-key
       containers:
         - name: {{ .Chart.Name }}
           securityContext:
