@@ -1,11 +1,12 @@
 {{- include "require" . -}}
 apiVersion: apps/v1
-kind: Deployment
+kind: StatefulSet
 metadata:
   name: {{ include "hivemetastore.fullname" . }}
   labels:
     {{- include "hivemetastore.labels" . | nindent 4 }}
 spec:
+  serviceName: {{ include "hivemetastore.fullname" . }}
   {{- if not .Values.autoscaling.enabled }}
   replicas: {{ .Values.replicaCount }}
   {{- end }}
@@ -34,7 +35,23 @@ spec:
             secretName: {{ include "hivemetastore.fullname" . }}-config
         - name: {{ include "hivemetastore.fullname" . }}-datadir
           emptyDir: {}
-
+      initContainers:
+        - name: {{ .Chart.Name }}-init
+          securityContext:
+            {{- toYaml .Values.securityContext | nindent 12 }}
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          env:
+            - name: DB_TYPE
+              value: {{ .Values.hive.metastore_db_type }}
+          args: ["schematool", "-initSchema"]
+          resources:
+            {{- toYaml .Values.resources | nindent 12 }}
+          volumeMounts:
+            - name: {{ include "hivemetastore.fullname" . }}-config
+              mountPath: "/etc/hive/"
+            - name: {{ include "hivemetastore.fullname" . }}-datadir
+              mountPath: "/opt/apache/hive/work-dir"
       containers:
         - name: {{ .Chart.Name }}
           securityContext:
@@ -62,7 +79,6 @@ spec:
               mountPath: "/etc/hive/"
             - name: {{ include "hivemetastore.fullname" . }}-datadir
               mountPath: "/opt/apache/hive/work-dir"
-
           resources:
             {{- toYaml .Values.resources | nindent 12 }}
       {{- with .Values.nodeSelector }}
