@@ -4,7 +4,7 @@ RUN set -ex && \
     dnf copr enable izhar/data-engineering -y && \
     dnf install -y apache-hadoop apache-spark3 apache-spark3-python && \
     mkdir -p /opt/apache/spark3/work-dir && \
-    dnf clean all
+    dnf clean all 
 
 RUN /opt/apache/spark3-python/bin/pip install ipykernel && \
     /opt/apache/spark3-python/bin/pip install /opt/apache/spark3/python/ 
