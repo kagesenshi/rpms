@@ -35,12 +35,15 @@ make %{?_smp_mflags} build
 %install
 cd dex-%{dex_version}
 mkdir -p %{buildroot}/%{_bindir}
+mkdir -p %{buildroot}/%{_datadir}/bash-completion/completions/
 mv bin/dex %{buildroot}/%{_bindir}/dex
+%{buildroot}/%{_bindir}/dex completion bash > %{buildroot}/%{_datadir}/bash-completion/completions/dex
 
 
 %files
 %defattr(-, root, root, -)
 %attr(0755, root, root) %{_bindir}/dex
+%{_datadir}/bash-completion/completions/dex
 
 
 %changelog
