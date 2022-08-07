@@ -1,13 +1,14 @@
 {{- include "require" . -}}
 {{- if .Values.spark.deploy_cluster -}}
 apiVersion: apps/v1
-kind: Deployment
+kind: StatefulSet
 metadata:
   name: {{ include "spark3.fullname" . }}-worker
   labels:
     {{- include "spark3.labels" . | nindent 4 }}
     component: worker
 spec:
+  serviceName: {{ include "spark3.fullname" . }}-worker
   {{- if not .Values.autoscaling.enabled }}
   replicas: {{ .Values.replicaCount }}
   {{- end }}

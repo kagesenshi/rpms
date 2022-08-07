@@ -23,6 +23,7 @@ spark.hadoop.mapreduce.outputcommitter.factory.scheme.s3a org.apache.hadoop.fs.s
 
 spark.kubernetes.driver.volumes.emptyDir.{{ include "spark3.fullname" . }}-datadir.mount.path    /opt/apache/spark3/work-dir
 spark.kubernetes.executor.volumes.emptyDir.{{ include "spark3.fullname" . }}-datadir.mount.path    /opt/apache/spark3/work-dir
+spark.kubernetes.allocation.batch.delay	15s
 
 
 spark.sql.catalogImplementation  hive

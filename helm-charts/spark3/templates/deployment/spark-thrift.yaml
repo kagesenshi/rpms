@@ -1,81 +1,82 @@
 {{- include "require" . -}}
 {{- if .Values.spark.deploy_thrift -}}
-apiVersion: v1
-kind: Service
+apiVersion: apps/v1
+kind: StatefulSet
 metadata:
   name: {{ include "spark3.fullname" . }}-thrift
   labels:
     {{- include "spark3.labels" . | nindent 4 }}
     component: thrift
 spec:
-  clusterIP: None
+  serviceName: {{ include "spark3.fullname" . }}-thrift
+  replicas: 1
   selector:
-    {{- include "spark3.selectorLabels" . | nindent 4 }}
-    component: thrift
----
-
-apiVersion: v1
-kind: Pod
-metadata:
-  name: {{ include "spark3.fullname" . }}-thrift
-  labels:
-    {{- include "spark3.labels" . | nindent 4 }}
-    component: thrift
-spec:
-  {{- with .Values.imagePullSecrets }}
-  imagePullSecrets:
-    {{- toYaml . | nindent 4 }}
-  {{- end }}
-  serviceAccountName: {{ include "spark3.serviceAccountName" . }}
-  securityContext:
-    {{- toYaml .Values.podSecurityContext | nindent 4 }}
-  volumes:
-    {{- include "spark3.volumes" . | nindent 4 }}
-  hostname: {{ include "spark3.fullname" . }}-thrift
-  setHostnameAsFQDN: true
-  containers:
-    - name: {{ .Chart.Name }}
+    matchLabels:
+      {{- include "spark3.selectorLabels" . | nindent 6 }}
+      component: thrift
+  template:
+    metadata:
+      {{- with .Values.podAnnotations }}
+      annotations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      labels:
+        {{- include "spark3.selectorLabels" . | nindent 8 }}
+        component: thrift
+    spec:
+      {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      serviceAccountName: {{ include "spark3.serviceAccountName" . }}
       securityContext:
-        {{- toYaml .Values.securityContext | nindent 8 }}
-      image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
-      imagePullPolicy: {{ .Values.image.pullPolicy }}
-      args: ["/usr/sbin/spark3-thrift", 
-             "--conf", 'spark.kubernetes.driver.pod.name={{ include "spark3.fullname" . }}-thrift',
-             "--conf", 'spark.kubernetes.executor.podNamePrefix={{ include "spark3.fullname" . }}-thrift']
-      ports:
-        - name: hiveserver2
-          containerPort: 10000
-          protocol: TCP
-        - name: http
-          containerPort: 4040
-          protocol: TCP
-      livenessProbe:
-        tcpSocket:
-          port: 10000
-        initialDelaySeconds: 60
-        periodSeconds: 10
-      readinessProbe:
-        tcpSocket: 
-          port: 10000
-        initialDelaySeconds: 60
-        periodSeconds: 10
-      volumeMounts:
-        {{- include "spark3.volume-mounts" . | nindent 8 }}
-      env:
-        {{- include "spark3.env" . | nindent 8 }}
-        {{- include "spark3.client-env" . | nindent 8 }}
-      resources:
-        {{- toYaml .Values.resources | nindent 8 }}
-  {{- with .Values.nodeSelector }}
-  nodeSelector:
-    {{- toYaml . | nindent 4 }}
-  {{- end }}
-  {{- with .Values.affinity }}
-  affinity:
-    {{- toYaml . | nindent 4 }}
-  {{- end }}
-  {{- with .Values.tolerations }}
-  tolerations:
-    {{- toYaml . | nindent 4 }}
-  {{- end }}
+        {{- toYaml .Values.podSecurityContext | nindent 8 }}
+      volumes:
+        {{- include "spark3.volumes" . | nindent 8 }}
+      setHostnameAsFQDN: true
+      containers:
+        - name: {{ .Chart.Name }}
+          securityContext:
+            {{- toYaml .Values.securityContext | nindent 12 }}
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          args: ["/usr/sbin/spark3-thrift", 
+                 "--conf", 'spark.kubernetes.driver.pod.name={{ include "spark3.fullname" . }}-thrift-0',
+                 "--conf", 'spark.kubernetes.executor.podNamePrefix={{ include "spark3.fullname" . }}-thrift-0']
+          ports:
+            - name: hiveserver2
+              containerPort: 10000
+              protocol: TCP
+            - name: http
+              containerPort: 4040
+              protocol: TCP
+          livenessProbe:
+            tcpSocket:
+              port: 10000
+            initialDelaySeconds: 60
+            periodSeconds: 10
+          readinessProbe:
+            tcpSocket: 
+              port: 10000
+            initialDelaySeconds: 60
+            periodSeconds: 10
+          volumeMounts:
+            {{- include "spark3.volume-mounts" . | nindent 12 }}
+          env:
+            {{- include "spark3.env" . | nindent 12 }}
+            {{- include "spark3.client-env" . | nindent 12 }}
+          resources:
+            {{- toYaml .Values.resources | nindent 12 }}
+      {{- with .Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
 {{- end }}
