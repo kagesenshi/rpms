@@ -8,7 +8,7 @@ spec:
   {{- end }}
   volumeMode: Filesystem
   accessModes:
-    - ReadWriteMany
+    - ReadWriteOnce
   resources:
     requests:
       storage: {{ .Values.git.pvc_size | required "git.pvc_size is required" }}
