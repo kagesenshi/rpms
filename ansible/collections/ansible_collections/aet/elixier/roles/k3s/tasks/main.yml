@@ -48,6 +48,7 @@
   get_url:
     url: https://raw.githubusercontent.com/kubernetes/ingress-nginx/controller-v1.3.0/deploy/static/provider/baremetal/deploy.yaml
     dest: /var/lib/rancher/k3s/server/manifests/ingress-nginx.yml
+    checksum: md5:95f9d44d14847666d4c27fec1a2894b8
 
 
 - name: wait for ingress to be ready

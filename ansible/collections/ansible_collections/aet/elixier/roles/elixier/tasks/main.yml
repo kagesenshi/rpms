@@ -119,7 +119,7 @@
 - name: create metastore database
   kubernetes.core.k8s_exec:
     namespace: "{{ release_namespace }}"
-    pod: citus
+    pod: citus-0
     command: "createdb_with_user.sh -d {{ metastore_db_name }} -u {{ metastore_db_user }} -p {{ metastore_db_password }}"
   vars:
     ansible_python_interpreter: /opt/ansible_virtualenv/bin/python
@@ -173,7 +173,7 @@
 - name: create superset database
   kubernetes.core.k8s_exec:
     namespace: "{{ release_namespace }}"
-    pod: citus
+    pod: citus-0
     command: "createdb_with_user.sh -d {{ aedv_db_name }} -u {{ aedv_db_user }} -p {{ aedv_db_password }}"
   vars:
     ansible_python_interpreter: /opt/ansible_virtualenv/bin/python
@@ -197,7 +197,7 @@
 - name: create git repo
   kubernetes.core.k8s_exec:
     namespace: "{{ release_namespace }}"
-    pod: gitserver
+    pod: gitserver-0
     command: newrepo myproject
   vars:
     ansible_python_interpreter: /opt/ansible_virtualenv/bin/python
@@ -205,7 +205,7 @@
 - name: create airflow database
   kubernetes.core.k8s_exec:
     namespace: "{{ release_namespace }}"
-    pod: citus
+    pod: citus-0
     command: "createdb_with_user.sh -d {{ aedwf_db_name }} -u {{ aedwf_db_user }} -p {{ aedwf_db_password }}"
 
   vars:
@@ -233,6 +233,8 @@
         db_uri: "postgresql+psycopg2://{{ aedwf_db_user }}:{{ aedwf_db_password }}@{{ aedwf_db_host }}:{{ aedwf_db_port }}/{{ aedwf_db_name }}"
       spark:
         secret_name: spark3-config
+      storageClass: "{{ aedwf_storage_class }}"
+      storageAccessMode: "{{ aedwf_storage_accessmode }}"
 
 - name: install jupyter
   kubernetes.core.helm:
