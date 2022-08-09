@@ -45,14 +45,14 @@ spec:
             - name: console
               containerPort: 9001
               protocol: TCP
-#          livenessProbe:
-#            httpGet:
-#              path: /
-#              port: http
-#          readinessProbe:
-#            httpGet:
-#              path: /
-#              port: http
+          livenessProbe:
+            httpGet:
+              path: /
+              port: console
+          readinessProbe:
+            httpGet:
+              path: /
+              port: console
           resources:
             {{- toYaml .Values.resources | nindent 12 }}
           volumeMounts:
@@ -98,7 +98,7 @@ spec:
         name: {{ include "minio.fullname" . }}-datadir0
       spec:
         accessModes:
-          - ReadWriteOnce
+          - ReadWriteMany
         {{ if .Values.storageClass -}}
         storageClassName: {{ quote .Values.storageClass }}
         {{- end }}

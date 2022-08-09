@@ -8,7 +8,7 @@ metadata:
     {{- include "spark3.labels" . | nindent 4 }}
     component: worker
 spec:
-  serviceName: {{ include "spark3.fullname" . }}-worker
+  serviceName: {{ include "spark3.fullname" . }}
   {{- if not .Values.autoscaling.enabled }}
   replicas: {{ .Values.replicaCount }}
   {{- end }}

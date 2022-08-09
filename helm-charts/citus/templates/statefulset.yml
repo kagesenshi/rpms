@@ -87,9 +87,11 @@ spec:
     - metadata:
         name: {{ include "citus.fullname" . }}-datadir
       spec:
-        storageClassName: {{ .Values.storageClass | default "" }}
+        {{ if .Values.storageClass -}}
+        storageClassName: {{ quote .Values.storageClass }}
+        {{- end }}
         accessModes: 
-          - ReadWriteOnce
+          - ReadWriteMany
         resources:
           requests:
             storage: {{ .Values.pgsql.pvc_size | required "pgsql.pvc_size is required" }}

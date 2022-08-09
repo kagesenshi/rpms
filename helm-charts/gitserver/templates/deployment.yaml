@@ -20,6 +20,7 @@ spec:
       labels:
         {{- include "gitserver.selectorLabels" . | nindent 8 }}
     spec:
+      setHostnameAsFQDN: true
       {{- with .Values.imagePullSecrets }}
       imagePullSecrets:
         {{- toYaml . | nindent 8 }}

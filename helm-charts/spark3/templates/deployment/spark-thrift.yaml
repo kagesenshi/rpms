@@ -8,7 +8,7 @@ metadata:
     {{- include "spark3.labels" . | nindent 4 }}
     component: thrift
 spec:
-  serviceName: {{ include "spark3.fullname" . }}-thrift
+  serviceName: {{ include "spark3.fullname" . }}
   replicas: 1
   selector:
     matchLabels:

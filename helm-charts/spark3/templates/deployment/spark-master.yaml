@@ -8,7 +8,7 @@ metadata:
     {{- include "spark3.labels" . | nindent 4 }}
     component: master
 spec:
-  serviceName: {{ include "spark3.fullname" . }}-master
+  serviceName: {{ include "spark3.fullname" . }}
   replicas: 1
   selector:
     matchLabels:
