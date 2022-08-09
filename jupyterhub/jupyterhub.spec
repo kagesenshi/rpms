@@ -6,7 +6,7 @@
 
 Name:       jupyterhub
 Version:    2.0.2
-Release:    6%{?dist}
+Release:    7%{?dist}
 Summary:    Multi-user jupyter hub
 
 License:    GPLv3+
@@ -147,6 +147,9 @@ rm -rf $RPM_BUILD_ROOT
 %config %{_sysconfdir}/sysconfig/%{name}
 
 %changelog
+* Wed Aug 10 2022 Izhar Firdaus <kagesenshi.87@gmail.com> 2.0.2-7
+- added kubespawner (kagesenshi.87@gmail.com)
+
 * Wed Aug 10 2022 Izhar Firdaus <kagesenshi.87@gmail.com> 2.0.2-6
 - added native authenticator (kagesenshi.87@gmail.com)
 
