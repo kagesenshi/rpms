@@ -27,15 +27,18 @@ ENV SPARK_HOME=/opt/apache/spark3 \
     SPARK_CONF_DIR=/etc/spark3/ \
     HADOOP_HOME=/opt/apache/hadoop/ \
     JAVA_HOME=/usr/lib/jvm/jre-1.8.0/ \
-    PATH="/opt/apache/spark3/bin:/opt/apache/hadoop/bin:${PATH}" \
+    PATH="/opt/apache/spark3/bin:/opt/apache/spark3-python/bin:/opt/apache/hadoop/bin:${PATH}" \
     PYSPARK_PYTHON=/opt/apache/spark3-python/bin/python \
     SPARK_DIST_CLASSPATH="/opt/apache/hadoop//etc/hadoop:/opt/apache/hadoop//share/hadoop/common/lib/*:/opt/apache/hadoop//share/hadoop/common/*:/opt/apache/hadoop//share/hadoop/hdfs:/opt/apache/hadoop//share/hadoop/hdfs/lib/*:/opt/apache/hadoop//share/hadoop/hdfs/*:/opt/apache/hadoop//share/hadoop/mapreduce/lib/*:/opt/apache/hadoop//share/hadoop/mapreduce/*:/opt/apache/hadoop//share/hadoop/yarn:/opt/apache/hadoop//share/hadoop/yarn/lib/*:/opt/apache/hadoop//share/hadoop/yarn/*:/opt/apache/hadoop/share/hadoop/tools/lib/*"
 
 USER root
 RUN chown -R sparkuser:sparkuser /opt/apache/spark3/jars/
 USER sparkuser
+# don't add whitespace in front of lines after --packages 
 RUN /opt/apache/spark3/bin/spark-submit \
-    --packages graphframes:graphframes:0.8.2-spark3.2-s_2.12,org.apache.iceberg:iceberg-spark-runtime-3.2_2.12:0.14.0 \
+    --packages graphframes:graphframes:0.8.2-spark3.2-s_2.12,\
+org.apache.iceberg:iceberg-spark-runtime-3.2_2.12:0.14.0,\
+io.openlineage:openlineage-spark:0.3.+ \
     /opt/noop.py && \
     cp /home/sparkuser/.ivy2/jars/* /opt/apache/spark3/jars/ && \
     rm -rf /home/sparkuser/.ivy2/jars/
