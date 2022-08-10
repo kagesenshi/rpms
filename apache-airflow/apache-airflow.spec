@@ -8,7 +8,7 @@
 
 Name:       apache-airflow
 Version:    2.2.5
-Release:    12%{?dist}
+Release:    13%{?dist}
 Summary:    ETL workflow management and monitoring
 
 License:    Apache2
@@ -288,6 +288,9 @@ rm -rf $RPM_BUILD_ROOT
 
 
 %changelog
+* Wed Aug 10 2022 Izhar Firdaus <kagesenshi.87@gmail.com> 2.2.5-13
+- reverted previous commit (kagesenshi.87@gmail.com)
+
 * Wed Aug 10 2022 Izhar Firdaus <kagesenshi.87@gmail.com> 2.2.5-12
 - added mssql cli (kagesenshi.87@gmail.com)
 
