@@ -1,4 +1,4 @@
-FROM registry.gitlab.com/abyres/releases/spark3:3.2.0-7
+FROM registry.gitlab.com/abyres/releases/spark3:3.2.0-11
 
 USER root
 RUN dnf copr enable izhar/aet -y  && \
