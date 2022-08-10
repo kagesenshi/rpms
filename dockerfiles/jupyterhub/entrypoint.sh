@@ -15,7 +15,7 @@ elif [ "$1" == "jupyterhub-singleuser" ];then
     groupadd ${JUPYTERHUB_USER} -g 1000
     useradd ${JUPYTERHUB_USER} -u 1000 -g 1000
     cd /home/${JUPYTERHUB_USER}
-    sudo -E -u ${JUPYTERHUB_USER} -- "$@"
+    sudo -E -u ${JUPYTERHUB_USER} -- env "PATH=$PATH" "$@"
 else
     "$@"
 fi
