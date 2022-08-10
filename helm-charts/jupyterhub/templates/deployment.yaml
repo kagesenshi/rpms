@@ -38,8 +38,6 @@ spec:
         - name: {{ include "jupyterhub.fullname" . }}-airflow-config
           secret:
             secretName: {{ .Values.airflow.secret_name }}
-        - name: {{ include "jupyterhub.fullname" . }}-datadir
-          emptyDir: {}
     
       containers:
         - name: {{ .Chart.Name }}
@@ -48,7 +46,7 @@ spec:
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           {{- if .Values.jupyter.enable_hub }}
-          args: ['hub']
+          args: ['hub', '-f', '/etc/jupyterhub/jupyterhub_config.py']
           {{- else }}
           args: ['lab']
           {{- end }}
@@ -59,6 +57,10 @@ spec:
                 secret: {{ include "jupyterhub.fullname" . }}-secret
                 key: auth-token
             {{- end }}
+            - name: K8S_POD_NAME
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.name
           ports:
             - name: http
               containerPort: 8000
@@ -100,3 +102,16 @@ spec:
       tolerations:
         {{- toYaml . | nindent 8 }}
       {{- end }}
+
+  volumeClaimTemplates:
+    - metadata:
+        name: {{ include "jupyterhub.fullname" . }}-datadir
+      spec:
+        accessModes:
+          - {{ .Values.storageAccessMode | default "ReadWriteMany" }}
+        {{ if .Values.storageClass -}}
+        storageClassName: {{ quote .Values.storageClass }}
+        {{- end }}
+        resources:
+          requests:
+            storage: {{ .Values.jupyterhub.instance_storage  | quote }}
