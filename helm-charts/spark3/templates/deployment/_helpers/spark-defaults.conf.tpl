@@ -40,7 +40,8 @@ spark.executor.cores {{ .Values.spark.executor_cores }}
 spark.executor.memory {{ .Values.spark.executor_memory }}
 
 
-spark.kubernetes.executor.podNamePrefix	{{ include "spark3.fullname" . }}
+spark.kubernetes.executor.podNamePrefix	${env:K8S_POD_NAME}
+spark.kubernetes.driver.pod.name	${env:K8S_POD_NAME}
 spark.kubernetes.memoryOverheadFactor   {{ .Values.spark.memory_overhead_factor }}
 
 spark.sql.extensions=org.apache.iceberg.spark.extensions.IcebergSparkSessionExtensions

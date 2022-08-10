@@ -40,9 +40,7 @@ spec:
             {{- toYaml .Values.securityContext | nindent 12 }}
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
           imagePullPolicy: {{ .Values.image.pullPolicy }}
-          args: ["/usr/sbin/spark3-thrift", 
-                 "--conf", 'spark.kubernetes.driver.pod.name={{ include "spark3.fullname" . }}-thrift-0',
-                 "--conf", 'spark.kubernetes.executor.podNamePrefix={{ include "spark3.fullname" . }}-thrift-0']
+          args: ["/usr/sbin/spark3-thrift"] 
           ports:
             - name: hiveserver2
               containerPort: 10000
