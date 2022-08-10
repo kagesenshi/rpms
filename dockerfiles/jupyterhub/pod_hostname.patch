@@ -1,0 +1,9 @@
+--- /opt/jupyterhub/lib/python3.8/site-packages/kubespawner/objects.py	2022-08-09 17:49:45.000000000 +0000
++++ /opt/jupyterhub/lib/python3.8/site-packages/kubespawner/objects.py	2022-08-10 07:32:07.027000000 +0000
+@@ -674,6 +674,7 @@
+             changes_name="extra_pod_config",
+         )
+ 
++    pod.spec.hostname = name
+     return pod
+
