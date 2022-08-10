@@ -42,4 +42,8 @@
   value: /opt/apache/spark3-python/bin/python
 - name: SPARK_WORKER_DIR
   value: /opt/apache/spark3/work-dir/worker
+- name: K8S_POD_NAME
+  valueFrom:
+    fieldRef:
+      fieldPath: metadata.name
 {{- end }}

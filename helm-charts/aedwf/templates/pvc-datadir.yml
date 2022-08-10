@@ -7,7 +7,9 @@ metadata:
 spec:
   accessModes:
     - {{ .Values.storageAccessMode | default "ReadWriteMany" }}
-  storageClassName: {{ .Values.storageClass | default "" }}
+  {{- if .Values.storageClass }}
+  storageClassName: {{ .Values.storageClass }}
+  {{- end }}
   resources:
     requests:
       storage: 1G
