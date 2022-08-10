@@ -45,18 +45,8 @@ spec:
             {{- toYaml .Values.securityContext | nindent 12 }}
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
           imagePullPolicy: {{ .Values.image.pullPolicy }}
-          {{- if .Values.jupyter.enable_hub }}
           args: ['hub', '-f', '/etc/jupyterhub/jupyterhub_config.py']
-          {{- else }}
-          args: ['lab']
-          {{- end }}
           env:
-            {{- if .Values.jupyter.token }}
-            - name: JUPYTER_LAB_TOKEN
-              valueFrom:
-                secret: {{ include "jupyterhub.fullname" . }}-secret
-                key: auth-token
-            {{- end }}
             - name: K8S_POD_NAME
               valueFrom:
                 fieldRef:

@@ -80,10 +80,6 @@ tolerations: []
 
 affinity: {}
 
-jupyter:
-  enable_hub: true
-  token: 
-
 jupyterhub:
   instance_storage: 1G
 
