@@ -22,12 +22,14 @@ BuildRequires: perl-interpreter findutils
 BuildRequires: git npm
 BuildRequires: systemd-rpm-macros python-rpm-macros
 BuildRequires: /usr/bin/pathfix.py
+BuildRequires: freetds-devel
 BuildRequires: desktop-file-utils
 
 Requires: python%{python_version}
 Requires: pkgconfig(python-%{python_version}) == %{python_version}
 Requires:   postgresql-libs postgresql 
 Requires: nodejs
+Requires: freetds
 Requires(pre): /usr/sbin/useradd, /usr/bin/getent
 Requires(postun): /usr/sbin/userdel
 Requires: /usr/bin/xelatex /usr/bin/mf /usr/bin/bibtex
@@ -58,11 +60,12 @@ mkdir -p %{buildroot}/%{_unitdir}/
 cp -r * ${RPM_BUILD_ROOT}/opt/%{name}/
 cd ${RPM_BUILD_ROOT}/opt/%{name}/
 python%{python_version} -m venv ${RPM_BUILD_ROOT}/opt/%{name}/
-${RPM_BUILD_ROOT}/opt/%{name}/bin/pip install jupyterhub==%{version} psycopg2-binary pymssql "jupyterlab==%{jupyterlab_version}" jupyter-server-proxy \
+${RPM_BUILD_ROOT}/opt/%{name}/bin/pip install jupyterhub==%{version} "jupyterlab==%{jupyterlab_version}" jupyter-server-proxy \
     jupyterlab-git jupyterlab_latex jupyterlab-fasta \
     jupyterlab-geojson jupyterlab-katex  jupyterlab-mathjax3 jupyterlab-vega2 \
     jupyterlab-vega3 jupyterlab_widgets sudospawner keycloakauthenticator \
-    jupyterhub-nativeauthenticator jupyterhub-kubespawner
+    jupyterhub-nativeauthenticator jupyterhub-kubespawner \
+    psycopg2-binary pymssql oracledb
 pushd ${RPM_BUILD_ROOT}/%{_sysconfdir}/%{name}
    ${RPM_BUILD_ROOT}/opt/%{name}/bin/jupyterhub --generate-config
 popd
