@@ -2,6 +2,7 @@
 {{- define "jupyterhub.config" -}}
 import os, nativeauthenticator
 import socket
+from kubespawner.objects import make_owner_reference
 
 c.JupyterHub.authenticator_class = 'nativeauthenticator.NativeAuthenticator'
 c.JupyterHub.template_paths = [os.path.join(
@@ -9,8 +10,6 @@ c.JupyterHub.template_paths = [os.path.join(
 c.Authenticator.admin_users = {'admin'}
 c.JupyterHub.spawner_class = 'kubespawner.KubeSpawner'
 c.JupyterHub.hub_ip = socket.gethostbyname(socket.gethostname())
-c.JupyterHub.internal_ssl = True
-
 c.KubeSpawner.cmd = ["jupyterhub-singleuser"]
 
 c.KubeSpawner.pod_name_template = '{{ include "jupyterhub.fullname" . }}-notebook-{username}'
@@ -69,6 +68,19 @@ c.KubeSpawner.volume_mounts = [
         'mountPath': "/etc/apache-airflow/",
     }
 ]
+
+
+
+def modify_pod(spawner, pod):
+    name = os.environ.get('K8S_POD_NAME')
+    uid = os.environ.get('K8S_POD_UID')
+    if not name or not uid:
+       return pod
+    ref = make_owner_reference(name, uid)
+    pod.metadata.owner_references = [ref]
+    return pod
+
+c.KubeSpawner.modify_pod_hook = modify_pod
 
 {{- end }}
 
