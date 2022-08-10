@@ -8,7 +8,7 @@ image:
   repository: registry.gitlab.com/abyres/releases/jupyterhub
   pullPolicy: Always
   # Overrides the image tag whose default is the chart appVersion.
-  tag: "2.0.2-6"
+  tag: "2.0.2-7"
 
 imagePullSecrets: []
 nameOverride: ""
