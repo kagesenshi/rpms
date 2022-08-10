@@ -8,9 +8,13 @@ RUN set -ex && \
     dnf install https://download.postgresql.org/pub/repos/yum/reporpms/EL-8-x86_64/pgdg-redhat-repo-latest.noarch.rpm -y && \
     wget 'https://repos.citusdata.com/community/config_file.repo?os=RHEL&dist=8&source=script' -O /etc/yum.repos.d/citus_community.repo && \
     dnf config-manager --set-disabled pgdg\* && \
+    dnf config-manager --set-enabled pgdg-common && \
     dnf config-manager --set-enabled pgdg14 && \
+    dnf config-manager --set-enabled powertools && \
     dnf module disable postgresql -y && \
-    dnf install -y citus102_14 && \
+    dnf install -y citus102_14 postgresql14-contrib \
+        postgresql14-plpython3 postgresql14-plperl postgresql14-pltcl \
+        postgresql14-llvmjit postgis32_14 pgrouting_14 && \
     dnf clean all
 
 WORKDIR /var/lib/pgsql/

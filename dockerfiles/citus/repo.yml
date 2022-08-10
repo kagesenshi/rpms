@@ -1,4 +1,4 @@
-build: 2
-last_updated: f2a8764ae1c172b26145086191f736d3
+build: 3
+last_updated: 7164d6da52bc0912f2a38228c4591a61
 repo: registry.gitlab.com/abyres/releases/pgsql-citus
 tag: pgsql14-1.0.2
