@@ -26,6 +26,7 @@ BuildRequires: unixODBC-devel libev-devel
 BuildRequires: systemd-rpm-macros
 BuildRequires: krb5-devel openldap-devel
 BuildRequires: systemd-rpm-macros python-rpm-macros
+BuildRequires: freetds-devel
 BuildRequires: /usr/bin/pathfix.py
 %if 0%{?fedora} >= 36
 BuildRequires: openldap-libldap_r
@@ -46,6 +47,7 @@ Requires(pre): /usr/sbin/useradd, /usr/bin/getent
 Requires(postun): /usr/sbin/userdel
 Provides: %{name} = %{version}-%{release}
 Requires: %{name}-logos = %{version}
+Requires: freetds
 AutoProv: no
 AutoReq: no
 
