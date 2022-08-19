@@ -2,7 +2,7 @@ FROM registry.gitlab.com/abyres/releases/fedora:36
 
 RUN set -ex && \
     dnf copr enable izhar/data-engineering -y && \
-    dnf install -y apache-hadoop apache-spark3 apache-spark3-python && \
+    dnf install -y apache-hadoop apache-spark3 apache-spark3-python freetds freetds-libs && \
     mkdir -p /opt/apache/spark3/work-dir && \
     dnf clean all 
 
