@@ -12,7 +12,7 @@ if [ "$1" == "start" ];then
     $BINDIR/postmaster -D ${PGDATA} -h 0.0.0.0 "${@:2}"
 elif [ "$1" == "initdb" ];then
     if [ ! -f "${PGDATA}/PG_VERSION" ];then
-        $BINDIR/initdb --pgdata=${PGDATA} -A md5 --auth-local=peer --pwfile $SHAREDIR/postgresql.conf.sample 
+        $BINDIR/initdb --pgdata=${PGDATA} -A md5 --auth-local=peer --encoding=UTF8 --pwfile $SHAREDIR/postgresql.conf.sample 
     fi
 else
     "$@"
