@@ -8,7 +8,7 @@ spec:
   {{- end }}
   volumeMode: Filesystem
   accessModes:
-    - ReadWriteMany
+    - {{ .Values.storageAccessMode | default "ReadWriteMany" }}
   resources:
     requests:
       storage: {{ .Values.registry.pvc_size | required "registry.pvc_size is required" }}
@@ -25,7 +25,7 @@ spec:
   {{- end }}
   volumeMode: Filesystem
   accessModes:
-    - ReadWriteMany
+    - {{ .Values.storageAccessMode | default "ReadWriteMany" }}
   resources:
     requests:
       storage: 50Mi

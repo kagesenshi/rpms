@@ -82,7 +82,7 @@ spec:
         name: {{ include "aedwf.fullname" . }}-redis
       spec:
         accessModes: 
-          - ReadWriteMany
+          - {{ .Values.storageAccessMode | default "ReadWriteMany" }}
         resources:
           requests:
             storage: 5G

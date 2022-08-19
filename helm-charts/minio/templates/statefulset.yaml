@@ -98,7 +98,7 @@ spec:
         name: {{ include "minio.fullname" . }}-datadir0
       spec:
         accessModes:
-          - ReadWriteMany
+          - {{ .Values.storageAccessMode | default "ReadWriteMany" }}
         {{ if .Values.storageClass -}}
         storageClassName: {{ quote .Values.storageClass }}
         {{- end }}

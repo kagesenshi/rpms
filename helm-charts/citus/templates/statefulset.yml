@@ -91,7 +91,7 @@ spec:
         storageClassName: {{ quote .Values.storageClass }}
         {{- end }}
         accessModes: 
-          - ReadWriteMany
+          - {{ .Values.storageAccessMode | default "ReadWriteMany" }}
         resources:
           requests:
             storage: {{ .Values.pgsql.pvc_size | required "pgsql.pvc_size is required" }}
