@@ -45,6 +45,10 @@ spec:
           env:
             - name: DB_TYPE
               value: {{ .Values.hive.metastore_db_type }}
+            {{- if .Values.hive.metastore_java_options }}
+            - name: HADOOP_CLIENT_OPTS
+              value: {{ .Values.hive.metastore_java_options }}
+            {{- end }}
           args: ["schematool", "-initSchema"]
           resources:
             {{- toYaml .Values.resources | nindent 12 }}

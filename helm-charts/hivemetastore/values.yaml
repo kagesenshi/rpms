@@ -73,6 +73,7 @@ hive:
   metastore_db_driver: 
   metastore_db_user: 
   metastore_db_password: 
+  metastore_java_options: 
 
 s3a:
   endpoint:
