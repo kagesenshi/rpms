@@ -8,7 +8,7 @@ image:
   repository: registry.gitlab.com/abyres/releases/jupyterhub
   pullPolicy: Always
   # Overrides the image tag whose default is the chart appVersion.
-  tag: "2.0.2-7"
+  tag: "2.0.2-8"
 
 imagePullSecrets: []
 nameOverride: ""
@@ -82,6 +82,7 @@ affinity: {}
 
 jupyterhub:
   instance_storage: 1G
+  db_uri: 'sqlite:////workdir/jupyterhub.sqlite'
 
 spark:
   secret_name: 

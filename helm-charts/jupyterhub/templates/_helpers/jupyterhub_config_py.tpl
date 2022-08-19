@@ -3,7 +3,9 @@
 import os, nativeauthenticator
 import socket
 from kubespawner.objects import make_owner_reference
+import json
 
+c.JupyterHub.db_url = "{{ .Values.jupyterhub.db_uri }}"
 c.JupyterHub.authenticator_class = 'nativeauthenticator.NativeAuthenticator'
 c.JupyterHub.template_paths = [os.path.join(
     os.path.dirname(nativeauthenticator.__file__), '/templates/')]
@@ -12,7 +14,7 @@ c.JupyterHub.spawner_class = 'kubespawner.KubeSpawner'
 c.JupyterHub.hub_ip = socket.gethostbyname(socket.gethostname())
 c.KubeSpawner.cmd = ["jupyterhub-singleuser"]
 
-c.KubeSpawner.pod_name_template = '{{ include "jupyterhub.fullname" . }}-notebook-{username}'
+c.KubeSpawner.pod_name_template = '{{ include "jupyterhub.name" . }}-nb-{username}'
 c.KubeSpawner.extra_pod_config = {
     "setHostnameAsFQDN": True,
     "subdomain": '{{ include "jupyterhub.name" . }}',
@@ -31,8 +33,11 @@ c.KubeSpawner.image_pull_secrets "{{- toYaml . -}}"
 {{- end }}
 
 c.KubeSpawner.storage_access_modes = ['{{ .Values.storageAccessMode | default "ReadWriteMany" }}']
-c.KubeSpawner.storage_capacity = '1G'
+c.KubeSpawner.storage_capacity = '{{ .Values.jupyterhub.nb_storage_capacity | default "1Gi" }}'
 c.KubeSpawner.fs_gid = 1000
+{{- if .Values.jupyterhub.nb_storage_class }}
+c.KubeSpawner.storage_class = "{{ .Values.jupyterhub.nb_storage_class }}"
+{{- end }}
 c.KubeSpawner.pvc_name_template = 'pvc-{{ include "jupyterhub.fullname" . }}-{username}'
 c.KubeSpawner.storage_pvc_ensure = True
 c.KubeSpawner.volumes = [
@@ -68,7 +73,7 @@ c.KubeSpawner.volume_mounts = [
         'mountPath': "/etc/apache-airflow/",
     }
 ]
-
+c.KubeSpawner.start_timeout = 300
 
 
 def modify_pod(spawner, pod):
@@ -82,5 +87,9 @@ def modify_pod(spawner, pod):
 
 c.KubeSpawner.modify_pod_hook = modify_pod
 
+{{- if .Values.jupyterhub.profiles }}
+profiles_json = """{{- toJson .Values.jupyterhub.profiles -}}"""
+c.KubeSpawner.profile_list = json.loads(profiles_json)
+{{- end }}
 {{- end }}
 
