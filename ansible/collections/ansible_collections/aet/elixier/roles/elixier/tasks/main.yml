@@ -47,6 +47,10 @@
       registry:
         user: "{{ registry_user }}"
         password: "{{ registry_password }}"
+        pvc_size: "{{ registry_storage_size | default(omit) }}"
+      storageClass: "{{ registry_storage_class | default(omit) }}"
+      storageAccessMode: "{{ registry_storage_accessmode | default(omit) }}"
+  when: install_registry == true 
 
 - name: install minio
   kubernetes.core.helm:
@@ -64,6 +68,10 @@
         root_user: "{{ minio_user }}"
         root_password: "{{ minio_password }}"
         instance_storage: "{{ minio_storage_size }}"
+      storageClass: "{{ minio_storage_class | default(omit) }}"
+      storageAccessMode: "{{ minio_storage_accessmode | default(omit) }}"
+
+  when: install_minio == true
 
 - name: install citus
   kubernetes.core.helm:
@@ -73,6 +81,11 @@
     create_namespace: true
     wait: true
     timeout: "{{ helm_timeout }}"
+    values:
+      storageClass: "{{ citus_storage_class | default(omit) }}"
+      storageAccessMode: "{{ citus_storage_accessmode | default(omit) }}"
+
+  when: install_citus == true 
 
 - name: install gitserver
   kubernetes.core.helm:
@@ -87,34 +100,51 @@
         host: "git.{{ ingress_domain }}"
       git:
         gitweb_password: "{{ dag_git_password }}"
+      storageAccessMode: "{{ gitserver_storage_accessmode | default(omit) }}"
 
 - name: create buckets
   amazon.aws.s3_bucket:
     name: "{{ item }}"
-    s3_url: "https://minio.{{ ingress_domain }}"
-    aws_access_key: "{{ minio_user }}"
-    aws_secret_key: "{{ minio_password }}"
-    validate_certs: no
+    s3_url: "{{ s3_url }}"
+    aws_access_key: "{{ s3_access_key }}"
+    aws_secret_key: "{{ s3_secret_key }}"
+    validate_certs: "{{ validate_certs }}"
   with_items:
-    - spark
+    - "{{ warehouse_bucket_name }}"
   vars:
     ansible_python_interpreter: /opt/ansible_virtualenv/bin/python
 
 - name: create directories
   amazon.aws.s3_object:
     object: "{{ item }}"
-    bucket: spark
+    bucket: "{{ warehouse_bucket_name }}"
     mode: create
-    s3_url: "https://minio.{{ ingress_domain }}"
-    aws_access_key: "{{ minio_user }}"
-    aws_secret_key: "{{ minio_password }}"
-    validate_certs: no
+    s3_url: "{{ s3_url }}"
+    aws_access_key: "{{ s3_access_key }}"
+    aws_secret_key: "{{ s3_secret_key }}"
+    validate_certs: "{{ validate_certs }}"
   with_items:
     - event_log/
     - tablespace/
   vars:
     ansible_python_interpreter: /opt/ansible_virtualenv/bin/python
 
+- name: 
+  kubernetes.core.helm:
+    name: dex
+    chart_ref: "{{ repo_name }}/dexidp"
+    release_namespace: "{{ release_namespace }}"
+    create_namespace: true
+    wait: true
+    timeout: "{{ helm_timeout }}"
+    values:
+      ingress:
+        host: "sso.{{ ingress_domain }}"
+      serviceAccount:
+        create: true
+        name: "{{ dex_service_account | default(omit) }}"
+
+  when: install_dex == true
 
 - name: create metastore database
   kubernetes.core.k8s_exec:
@@ -123,7 +153,7 @@
     command: "createdb_with_user.sh -d {{ metastore_db_name }} -u {{ metastore_db_user }} -p {{ metastore_db_password }}"
   vars:
     ansible_python_interpreter: /opt/ansible_virtualenv/bin/python
-
+  when: install_citus == true
 
 - name: install metastore
   kubernetes.core.helm:
@@ -135,17 +165,17 @@
     timeout: "{{ helm_timeout }}"
     values:
       hive:
-        metastore_db_url: "jdbc:postgresql://{{ metastore_db_host }}:{{ metastore_db_port }}/{{ metastore_db_name }}"
-        metastore_db_driver: org.postgresql.Driver
+        metastore_db_url: "{{ metastore_db_proto }}://{{ metastore_db_host }}/{{ metastore_db_name }}"
+        metastore_db_driver: "{{ metastore_db_driver }}"
         metastore_db_user: "{{ metastore_db_user }}"
         metastore_db_password: "{{ metastore_db_password }}"
-        metastore_db_type: postgres
-        metastore_warehouse_dir: s3a://spark/tablespace/
+        metastore_db_type: "{{ metastore_db_type }}"
+        metastore_warehouse_dir: "s3a://{{ warehouse_bucket_name }}/tablespace/"
+        metastore_java_options: "{{ metastore_java_options }}"
       s3a:
-        endpoint: http://minio:9000
-        access_key: "{{ minio_user }}"
-        secret_key: "{{ minio_password }}"
-
+        endpoint: "{{ s3_url }}"
+        access_key: "{{ s3_access_key }}"
+        secret_key: "{{ s3_secret_key }}"
 
 - name: install spark
   kubernetes.core.helm:
@@ -157,18 +187,23 @@
     timeout: "{{ helm_timeout }}"
     values:
       spark:
-        hive_metastore_uri: thrift://hivemetastore:9083
+        hive_metastore_uri: thrift://hivemetastore-0.hivemetastore:9083
         deploy_thrift: true
         k8s_namespace: "{{ release_namespace }}"
+        executor_java_options: "{{ spark_executor_java_options | default(omit) }}"
+        driver_java_options: "{{ spark_driver_java_options | default(omit) }}"
+        bucket: "{{ warehouse_bucket_name }}"
       ingress:
         thrift_host: "sparksql.{{ ingress_domain }}"
       s3a:
-        endpoint: http://minio:9000
-        access_key: "{{ minio_user }}"
-        secret_key: "{{ minio_password }}"
+        endpoint: "{{ s3_url }}"
+        access_key: "{{ s3_access_key }}"
+        secret_key: "{{ s3_secret_key }}"
       image:
         tag: "{{ spark_image_tag | default(omit) }}"
-
+      serviceAccount:
+        create: true
+        name: "{{ spark_service_account | default(omit) }}"
 
 - name: create superset database
   kubernetes.core.k8s_exec:
@@ -177,7 +212,7 @@
     command: "createdb_with_user.sh -d {{ aedv_db_name }} -u {{ aedv_db_user }} -p {{ aedv_db_password }}"
   vars:
     ansible_python_interpreter: /opt/ansible_virtualenv/bin/python
-
+  when: install_citus == true
 
 - name: install superset
   kubernetes.core.helm:
@@ -191,8 +226,9 @@
       ingress:
         host: "superset.{{ ingress_domain }}"
       superset:
-        secret_key: secretkey
-        db_uri: "postgresql+psycopg2://{{ aedv_db_user }}:{{ aedv_db_password }}@{{ aedv_db_host }}:{{ aedv_db_port }}/{{ aedv_db_name }}"
+        secret_key: "{{ secret_key }}"
+        db_uri: "{{ aedv_db_proto }}://{{ aedv_db_user }}:{{ aedv_db_password }}@{{ aedv_db_host }}/{{ aedv_db_name }}"
+      storageAccessMode: "{{ aedv_storage_accessmode | default(omit) }}"
 
 - name: create git repo
   kubernetes.core.k8s_exec:
@@ -207,9 +243,9 @@
     namespace: "{{ release_namespace }}"
     pod: citus-0
     command: "createdb_with_user.sh -d {{ aedwf_db_name }} -u {{ aedwf_db_user }} -p {{ aedwf_db_password }}"
-
   vars:
     ansible_python_interpreter: /opt/ansible_virtualenv/bin/python
+  when: install_citus == true
 
 - name: install airflow
   kubernetes.core.helm:
@@ -230,11 +266,24 @@
         dag_git_username: "{{ dag_git_username }}"
         dag_git_password: "{{ dag_git_password }}"
         dag_git_branch: "{{ dag_git_branch }}"
-        db_uri: "postgresql+psycopg2://{{ aedwf_db_user }}:{{ aedwf_db_password }}@{{ aedwf_db_host }}:{{ aedwf_db_port }}/{{ aedwf_db_name }}"
+        db_uri: "{{ aedwf_db_proto }}://{{ aedwf_db_user }}:{{ aedwf_db_password }}@{{ aedwf_db_host }}/{{ aedwf_db_name }}"
       spark:
         secret_name: spark3-config
-      storageClass: "{{ aedwf_storage_class }}"
-      storageAccessMode: "{{ aedwf_storage_accessmode }}"
+      storageClass: "{{ aedwf_storage_class | default(omit) }}"
+      storageAccessMode: "{{ aedwf_storage_accessmode | default(omit) }}"
+      serviceAccount:
+        create: true
+        name: "{{ aedwf_service_account | default(omit) }}"
+
+
+- name: create jupyterhub database
+  kubernetes.core.k8s_exec:
+    namespace: "{{ release_namespace }}"
+    pod: citus-0
+    command: "createdb_with_user.sh -d {{ jupyterhub_db_name }} -u {{ jupyterhub_db_user }} -p {{ jupyterhub_db_password }}"
+  vars:
+    ansible_python_interpreter: /opt/ansible_virtualenv/bin/python
+  when: install_citus == true
 
 - name: install jupyter
   kubernetes.core.helm:
@@ -251,3 +300,24 @@
         secret_name: spark3-config
       airflow:
         secret_name: aedwf-config
+      jupyterhub:
+        db_uri: "{{ jupyterhub_db_proto }}://{{ jupyterhub_db_user }}:{{ jupyterhub_db_password }}@{{ jupyterhub_db_host }}/{{ jupyterhub_db_name }}"
+        nb_storage_class: "{{ jupyterhub_nb_storage_class | default(omit) }}"
+        nb_storage_capacity: "{{ jupyterhub_nb_storage_capacity | default(omit) }}"
+      storageAccessMode: "{{ jupyterhub_storage_accessmode | default(omit) }}"
+      storageClass: "{{ jupyterhub_storage_class | default(omit) }}"
+      serviceAccount:
+        create: true
+        name: "{{ jupyterhub_service_account | default(omit) }}"
+
+
+- name: create warehouse database
+  kubernetes.core.k8s_exec:
+    namespace: "{{ release_namespace }}"
+    pod: citus-0
+    command: "createdb_with_user.sh -d {{ warehouse_db_name }} -u {{ warehouse_db_user }} -p {{ warehouse_db_password }}"
+  vars:
+    ansible_python_interpreter: /opt/ansible_virtualenv/bin/python
+  when: install_citus == true
+
+
