@@ -1,4 +1,4 @@
-FROM registry.gitlab.com/abyres/releases/aedwf:2.2.5-10
+FROM registry.gitlab.com/abyres/releases/aedwf:2.2.5-12
 
 USER root 
 RUN set -ex && \
