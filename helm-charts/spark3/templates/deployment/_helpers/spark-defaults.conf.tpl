@@ -48,4 +48,8 @@ spark.sql.extensions=org.apache.iceberg.spark.extensions.IcebergSparkSessionExte
 spark.sql.catalog.spark_catalog=org.apache.iceberg.spark.SparkSessionCatalog
 spark.sql.catalog.spark_catalog.type=hive
 
+spark.driver.extraJavaOptions {{ .Values.spark.driver_java_options }}
+spark.executor.extraJavaOptions {{ .Values.spark.executor_java_options }}
+
+spark.sql.parquet.int96RebaseModeInWrite {{ .Values.spark.int96_rebase | default "CORRECTED" }}
 {{- end }}
