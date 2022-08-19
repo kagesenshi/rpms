@@ -8,7 +8,7 @@ image:
   repository: registry.gitlab.com/abyres/releases/spark3
   pullPolicy: Always
   # Overrides the image tag whose default is the chart appVersion.
-  tag: "3.2.0-11"
+  tag: "3.2.0-12"
 
 imagePullSecrets: []
 nameOverride: ""
@@ -95,6 +95,7 @@ spark:
   deploy_cluster: false
   deploy_thrift: false
   memory_overhead_factor: 0.4
+  int96_rebase: CORRECTED
 
 s3a:
   endpoint:
