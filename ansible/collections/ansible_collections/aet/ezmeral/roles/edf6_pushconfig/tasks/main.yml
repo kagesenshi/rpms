@@ -1,0 +1,17 @@
+---
+# tasks file for edf6_pushconfig
+- name: extract core configs
+  unarchive:
+    src: cluster_initconfig.tar.bz2
+    dest: /opt/mapr/
+
+- name: init storage
+  command: /opt/mapr/server/disksetup /opt/mapr/conf/disks.txt
+  args:
+    creates: /opt/mapr/conf/disktab
+
+- name: allow overcommit
+  lineinfile:
+    path: /opt/mapr/conf/warden.conf
+    line: "enable.overcommit=true"
+    create: yes

@@ -1,0 +1,37 @@
+---
+# tasks file for edf6_cldb
+- name: install cldb
+  dnf:
+    name:
+      - mapr-client
+      - mapr-cldb
+      - mapr-mastgateway
+      - mapr-posix-client-basic
+      - mapr-webserver
+      - mapr-apiserver
+      - mapr-gateway
+  register: cldb_install
+
+- name: refresh config
+  command: "/opt/mapr/server/configure.sh -R {{ configure_opts }}"
+  when: cldb_install.changed == true
+
+- name: start warden
+  systemd:
+    name: mapr-warden
+    state: started
+    enabled: false
+  when: cldb_install.changed == true
+
+- name: wait for cldb
+  wait_for:
+    path: /opt/mapr/logs/cldb.log
+    search_regex: "(.*Metadata upgrade successfully done.*|.*CLDB got role of slave.*)"
+    timeout: 60
+  when: cldb_install.changed == true
+
+- name: wait for cldb
+  wait_for:
+    timeout: 60
+  when: cldb_install.changed == true
+

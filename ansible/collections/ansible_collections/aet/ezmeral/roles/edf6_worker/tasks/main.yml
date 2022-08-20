@@ -1,0 +1,20 @@
+---
+# tasks file for edf6_worker
+- name: install deps
+  dnf:
+    name:
+      - mapr-nodemanager
+      - mapr-hadoop-client
+      - mapr-hadoop-util
+
+- name: refresh config
+  command: "/opt/mapr/server/configure.sh -R {{ configure_opts }}"
+  when: skip_configure == false
+
+- name: start service
+  shell:
+    cmd: "maprcli node services -nodes `hostname` -name {{ item }} -action restart"
+  become: true
+  become_user: mapr
+  with_items:
+    - nodemanager

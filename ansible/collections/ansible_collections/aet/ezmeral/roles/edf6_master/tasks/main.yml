@@ -1,0 +1,42 @@
+---
+# tasks file for edf6_master
+- name: install deps
+  dnf:
+    name:
+      - mapr-hiveserver2
+      - mapr-httpfs
+      - mapr-spark-historyserver
+      - mapr-spark-thriftserver
+      - mapr-resourcemanager
+      - mapr-historyserver	
+      - mapr-timelineserver	
+      - mapr-hue
+      - mapr-hivemetastore
+      - mapr-sentry
+      - mapr-kafka
+      - mapr-ksql
+      - mapr-kafka-connect-jdbc	
+      - mapr-kafka-rest	
+      - mapr-hbase-rest
+      - mapr-hbasethrift
+      - mapr-spark-historyserver	
+      - mapr-spark-thriftserver	
+
+- name: get hostname
+  command: hostname --fqdn
+  register: hostname_out
+
+- set_fact:
+    host_fqdn: "{{ hostname_out.stdout }}"
+
+- name: install hue config
+  template:
+    src: hue.ini.tmpl
+    dest: /opt/mapr/hue/hue-4.6.0/desktop/conf/hue.ini
+
+
+- name: refresh config
+  command: "/opt/mapr/server/configure.sh -R {{ configure_opts }}"
+  when: skip_configure == false
+
+

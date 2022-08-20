@@ -1,0 +1,4 @@
+---
+# defaults file for edf6_master
+configure_opts: ""
+skip_configure: false

@@ -1,0 +1,24 @@
+---
+# tasks file for edf6_zookeeper
+- name: install deps
+  dnf:
+    name: 
+      - mapr-zookeeper
+  register: zookeeper_install
+
+- name: refresh config
+  command: "/opt/mapr/server/configure.sh -R {{ configure_opts }}"
+  when: zookeeper_install.changed
+
+- name: start zookeeper
+  systemd:
+    name: mapr-zookeeper
+    state: started
+    enabled: false
+
+- name: wait for zookeeper
+  wait_for:
+    host: localhost
+    port: 5181
+    timeout: 300
+

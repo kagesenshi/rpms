@@ -1,0 +1,36 @@
+---
+# tasks file for edf6_database
+#
+- name: install mariadb
+  dnf:
+    name: 
+      - mariadb-server
+      - python3-mysql
+
+
+- name: start mariadb
+  systemd:
+    name: mariadb
+    state: started
+    enabled: true
+
+- name: create databases
+  community.mysql.mysql_db:
+    name: "{{ item }}"
+    state: present
+  with_items:
+    - metastore
+
+- name: create users
+  community.mysql.mysql_user:
+    name: "{{ item['name'] }}"
+    password: "{{ item['password'] }}"
+    priv: "{{ item['database'] }}.*:ALL"
+    host: '%'
+    state: present
+  with_items:
+    - name: metastore
+      password: metastore
+      database: metastore
+
+

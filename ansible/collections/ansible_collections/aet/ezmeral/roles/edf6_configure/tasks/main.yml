@@ -1,0 +1,6 @@
+---
+# tasks file for edf6_configure
+#
+#
+- name: refresh config
+  command: "/opt/mapr/server/configure.sh -R {{ configure_opts }}"

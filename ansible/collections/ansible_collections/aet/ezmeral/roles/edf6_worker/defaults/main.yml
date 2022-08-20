@@ -1,0 +1,4 @@
+---
+# defaults file for edf6_worker
+configure_opts: ""
+skip_configure: false

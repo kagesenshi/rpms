@@ -1,0 +1,45 @@
+---
+# tasks file for edf6_mount
+- name: install deps
+  dnf:
+    name: 
+      - mapr-posix-client-basic
+      - mapr-objectstore-gateway
+
+- name: refresh config
+  command: /opt/mapr/server/configure.sh -R
+
+- name: create mapr mount dir
+  file:
+    path: /mapr
+    state: directory
+
+- name: login
+  shell:
+    cmd: echo mapr | maprlogin password
+  become: true
+  become_user: mapr
+
+- name: create mount ticket
+  shell:
+    cmd: maprlogin generateticket -type servicewithimpersonation -user mapr -out /opt/mapr/conf/maprfuseticket
+  become: true
+  become_user: mapr
+  args:
+    creates: /opt/mapr/conf/maprfuseticket
+
+- name: restart posix client
+  systemd:
+    name: mapr-posix-client-basic
+    state: restarted
+    enabled: false
+
+- name: wait for config propagation
+  wait_for:
+    timeout: 60
+
+- name: start objectstore
+  shell: 
+    cmd: maprcli node services -nodes `hostname` -name objectstore -action restart
+  become: true
+  become_user: mapr

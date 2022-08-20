@@ -1,0 +1,51 @@
+---
+# tasks file for edf6_init
+- name: install cldb
+  dnf:
+    name: mapr-cldb
+
+- name: generate keys
+  command: "/opt/mapr/server/configure.sh --isvm -secure -dare -genkeys -Z {{ zookeeper_nodes }} -C {{ cldb_nodes }} -N {{ cluster_name }} {{ configure_opts }}"
+  args:
+    creates: /opt/mapr/conf/cldb.key
+
+- name: archive core cluster config
+  archive:
+    path:
+      - /opt/mapr/conf/cldb.key
+      - /opt/mapr/conf/dare.master.key
+      - /opt/mapr/conf/maprserverticket
+      - /opt/mapr/conf/ca
+      - /opt/mapr/conf/mapr-clusters.conf
+      - /opt/mapr/conf/warden.conf
+      - /opt/mapr/conf/root-ca.conf
+      - /opt/mapr/conf/signing-ca.conf
+      - /opt/mapr/conf/ssl-client.xml
+      - /opt/mapr/conf/ssl_keystore
+      - /opt/mapr/conf/ssl_keystore.csr
+      - /opt/mapr/conf/ssl_keystore.p12
+      - /opt/mapr/conf/ssl_keystore.pem
+      - /opt/mapr/conf/ssl_keystore-signed.pem
+      - /opt/mapr/conf/ssl-server.xml
+      - /opt/mapr/conf/ssl_truststore
+      - /opt/mapr/conf/ssl_truststore.p12
+      - /opt/mapr/conf/ssl_truststore.pem
+      - /opt/mapr/conf/ssl_userkeystore
+      - /opt/mapr/conf/ssl_userkeystore.csr
+      - /opt/mapr/conf/ssl_userkeystore.p12
+      - /opt/mapr/conf/ssl_userkeystore.pem
+      - /opt/mapr/conf/ssl_userkeystore-signed.pem
+      - /opt/mapr/conf/ssl_usertruststore
+      - /opt/mapr/conf/ssl_usertruststore.p12
+      - /opt/mapr/conf/ssl_usertruststore.pem
+      - /opt/mapr/hadoop/hadoop-2.7.6/etc/hadoop/ssl-client.xml
+      - /opt/mapr/hadoop/hadoop-2.7.6/etc/hadoop/ssl-server.xml
+    dest: /root/cluster_initconfig.tar.bz2
+    format: bz2
+
+- name: fetch core cluster config
+  fetch:
+    src: /root/cluster_initconfig.tar.bz2
+    dest: cluster_initconfig.tar.bz2
+    flat: yes
+

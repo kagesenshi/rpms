@@ -1,0 +1,109 @@
+---
+# tasks file for edf6_common
+#
+- name: set hostname
+  copy:
+    content: "{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] | replace('.','-') }}.sslip.io"
+    dest: /etc/hostname
+  when: use_sslip == true
+
+- name: set hostname
+  command: hostname -F /etc/hostname
+  when: use_sslip == true
+
+- name: set selinux to permissive
+  selinux:
+    policy: targeted
+    state: permissive
+
+- name: disable firewalld
+  systemd:
+    name: firewalld
+    state: stopped
+    enabled: false
+
+
+- name: install repository config
+  template:
+    src: repo.conf
+    dest: "/etc/yum.repos.d/{{ item['name'] }}.repo"
+  vars:
+    repo_name: "{{ item['name'] }}"
+    repo_desc: "{{ item['desc'] }}"
+    repo_url: "{{ item['url'] }}"
+    repo_gpg: "{{ item['gpg'] }}"
+  with_items:
+    - name: edf6-core
+      desc: "Ezmeral Data Fabric 6 Core"
+      url: https://package.mapr.hpe.com/releases/v6.2.0/redhat/
+      gpg: https://package.mapr.hpe.com/releases/pub/maprgpg.key
+    - name: edf6-mep
+      desc: "Ezmeral Data Fabric 6 Ecosystem Pack"
+      url: https://package.mapr.hpe.com/releases/MEP/MEP-7.1.2/redhat/
+      gpg: https://package.mapr.hpe.com/releases/pub/maprgpg.key
+
+- name: enable EPEL
+  dnf:
+    name:
+      - epel-release
+
+- name: install core dependencies
+  dnf:
+    name: 
+      - java-11-openjdk
+      - java-11-openjdk-devel 
+      - clustershell
+      - bzip2
+      - zram-generator
+      - zram-generator-defaults
+
+- name: install core ezmeral packages
+  dnf:
+    name:
+      - mapr-fileserver
+      - mapr-core
+      - mapr-client
+
+- name: create group
+  group:
+    name: mapr
+    gid: 1000
+
+- name: create user
+  user:
+    name: mapr
+    uid: 1000
+    group: 1000
+
+- name: install common ezmeral packages
+  dnf:
+    name:
+      - mapr-spark
+      - mapr-hive
+      - mapr-hadoop-client
+
+- name: install clush config
+  lineinfile:
+    path: /etc/clustershell/groups.d/cluster.cfg
+    line: "edf: 10-210-14-[47-49].sslip.io"
+    create: yes
+
+- name: set pyspark python
+  lineinfile:
+    path: /opt/mapr/spark/spark-2.4.7/conf/spark-env.sh
+    line: "{{ item }}"
+    create: yes
+  with_items:
+    - "PYSPARK_DRIVER_PYTHON=/usr/bin/python3"
+    - "PYSPARK_PYTHON=/usr/bin/python3"
+
+- name: install core hadoop config
+  template:
+    src: core-site.xml.tmpl
+    dest: /opt/mapr/hadoop/hadoop-2.7.6/etc/hadoop/core-site.xml
+
+- name: install hive config
+  template:
+    src: hive-site.xml.tmpl
+    dest: /opt/mapr/hive/hive-2.3/conf/hive-site.xml
+
