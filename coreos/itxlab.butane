@@ -72,13 +72,17 @@ storage:
                                 libvirt-daemon-driver-secret libvirt-daemon-driver-storage-scsi \
                                 libvirt-daemon-driver-nwfilter python3-libvirt cockpit-machines \
                                 cockpit cockpit-storaged cockpit-networkmanager cockpit-bridge \
-                                iwl3160-firmware pciutils vagrant-libvirt vagrant
+                                iwl3160-firmware pciutils vagrant-libvirt vagrant guestfs-tools \
+                                libguestfs
             OUT=$?
             sleep 5
           done
 
           MAC=`ifconfig | grep ether | awk '{print $2}' | sed 's|:||g' | head -n 1 | cut -c 6-`
           echo "coreos-${MAC}" > /etc/hostname
+          ETH=`nmcli -t c show --active|grep ethernet|cut -d':' -f 4`
+          nmcli con add ifname bridge0 type bridge con-name bridge0
+          nmcli con add type bridge-slave ifname $ETH master bridge0
           systemctl reboot
       mode: 0755
       user:
@@ -101,6 +105,8 @@ systemd:
         ExecStart=bash -x /opt/firstboot.sh
         Restart=on-failure
         RestartSec=30
+        StandardOutput=journal+console
+        StandardError=journal+console
 
         [Install]
         WantedBy=multi-user.target
@@ -157,8 +163,6 @@ systemd:
         Before=getty@tty1.service
         ConditionPathIsDirectory=/usr/share/licenses/iwl3160-firmware
         ConditionPathExists=!/etc/NetworkManager/system-connections/hotspot.connection
-        StandardOutput=journal+console
-        StandardError=journal+console
 
         [Service]
         Type=oneshot
@@ -166,6 +170,9 @@ systemd:
         ExecStart=nmcli con modify hotspot connection.autoconnect true
         Restart=on-failure
         RestartSec=30
+        StandardOutput=journal+console
+        StandardError=journal+console
+
 
         [Install]
         WantedBy=multi-user.target
