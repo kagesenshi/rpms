@@ -1,0 +1,173 @@
+# vim: set ft=yaml: 
+
+variant: fcos
+version: 1.4.0
+passwd:
+  users:
+    - name: core
+      # password is password
+      ssh_authorized_keys:
+        - ssh-dss AAAAB3NzaC1kc3MAAACBALW5jF+j7ZN9VbvE1e4oxJqRLVSA4Ci2SrLHIZH6m2lEbgg+fk5NUdwwo6zR8q2mm0WujI47t2cVlzD6N+7fOBAhMyBenmco4Gycua5+bWwQ6e2YeWDqxfMh3i5nhsJr31gspFg3d/cr5uAhur6b/hoXNr2RncxHZ8O+Bs7Hs2f5AAAAFQDYUAC4mcm7J6E5inl+wDI4TlRuWwAAAIEAh1X6y6qflNiQ0V8gvhe7z2m4Kard989dHzLTTASP4ilHKVmd20GB2Ew2Vu93oJQHC5oYVvdGUMG3tnni68g0YAa+H5wZOsOcPqI/V0mMwmx2I60YH0KJKv9POPrj/IAJ+UtGLDUoKR4myNOXSY1XhX9APifuxTGGg339jaLe8B4AAACAb2DRFd74hGCw4485C6kCTPh/l3xiOjRaI19+/NhBv1632SvF/AKEjvQ/I5Z7qVr37gnHVlo8wT9o9ewchOuURpPEGeBwJ/4cJ9/G4i4tMCndijdGLii1m3ceXqDNiTDbBAMyNiKMDPIwmRZWKX0tHwsV4H8dasZgiCZLXPT5dW0=
+        - ssh-rsa AAAAB3NzaC1yc2EAAAABIwAAAgEAznQgJn6qm/4tRGtHOgQpa3slk0FpjaIdxk8XK2yf45FoX8LClJc6/I5+80mP6evg4Nr06MP/uXXrVt+eXPcK4bMnfNqBNBxZwp+T4t/MPjo4rJoxFSzG1yPG1nQC/nWm8cyL884yeezWPZhIPNFrLmPeCkKhh5Gpi5+i/VJjjq2ZK9YtwQ+rU8VNPNuNVFigVq4e7AC+gr/6gK1q19x2bQnq71Pd6BVYhpnmrU08XxXea7Pn8Lj7FbqircI8ZboBOav3yy/WBeGhuO4gVzjnL6sKC4hAF/ywdOffiFd7ltWV56D0awXsQg7jY2jRWau3wXXyRFLUFL4sm9l2Ns8rFB1pjmPxhiFYpVEICTAoG1tEpgu3JV/mus72eOxODl04TpsroPJZHW5NaTH4xeLVW7ACYj517O8QjWSNBRPjtnOg5en9O5f0s2a2xGNeFN7vJpM0587BOJJlSICXfkF4WO8niOzVZVwX+YQF5YabP4wUp2tx0GO/PKhdD8GrWZn1aL2VKWq+G7Ven8mCoKIv6Pybsiuln3XOfOB0Hf/gjxa38oVB0Uu0ke1/iqPLAkZ2+fH59tnN5mN/5mXglHyrcQ7IZ/1d9v+md83PmLeVgSStn54J3hrsz0nCmBpENWhds26LsP/+oyemjIZbaUStwQFa91F6ubDPG28bvkA4nbs=
+      password_hash: $y$j9T$Lkbm8.lID7g0OEp6U.oX40$pc7IZgjpw4sSYQsGpdcpqSY5nnSnIWb9t4oTttem5TA
+      groups:
+        - wheel
+storage:
+  disks:
+    - device: /dev/disk/by-id/coreos-boot-disk
+      wipe_table: false
+      partitions:
+        - number: 4
+          label: root
+          size_mib: 51200
+          resize: true
+        - number: 5
+          label: swap
+          size_mib: 32768
+        - number: 6
+          label: var
+          size_mib: 0
+  filesystems:
+    - path: /var
+      device: /dev/disk/by-partlabel/var
+      format: ext4
+      wipe_filesystem: true
+      label: var
+      with_mount_unit: true
+    - device: /dev/disk/by-partlabel/swap
+      format: swap
+      wipe_filesystem: true
+      with_mount_unit: true
+  files:
+    - path: /opt/firstboot.sh
+      contents:
+        inline: |
+          set -e
+          systemctl disable --now zincati.service
+
+          getent group libvirt >/dev/null || groupadd -r libvirt 
+          usermod -G libvirt -a core
+
+          getent group saslauth >/dev/null || groupadd saslauth -g 76
+          getent passwd saslauth >/dev/null || useradd saslauth --system -d /run/saslauthd -s /sbin/nologin -g 76
+
+          getent group unbound >/dev/null || groupadd -r unbound
+          getent passwd unbound >/dev/null || useradd unbound --system -d /etc/unbound -s /sbin/nologin -g unbound
+
+          set +e
+          OUT=1
+          while [ "x$OUT" != "x0" ];do
+            rpm-ostree override remove nfs-utils-coreos --install nfs-utils
+            OUT=$?
+            sleep 5
+          done
+
+          OUT=1
+          while [ "x$OUT" != "x0" ];do
+            rpm-ostree install libvirt-daemon NetworkManager-wifi libvirt-daemon-kvm \
+                               libvirt-daemon-driver-qemu libvirt-daemon-driver-storage \
+                                libvirt-daemon-driver-network  libvirt-daemon-driver-storage-core \
+                                libvirt-daemon-config-network libvirt-daemon-driver-storage-disk \
+                                libvirt-daemon-driver-interface libvirt-daemon-driver-nodedev \
+                                libvirt-daemon-driver-secret libvirt-daemon-driver-storage-scsi \
+                                libvirt-daemon-driver-nwfilter python3-libvirt cockpit-machines \
+                                cockpit cockpit-storaged cockpit-networkmanager cockpit-bridge \
+                                iwl3160-firmware pciutils vagrant-libvirt vagrant
+            OUT=$?
+            sleep 5
+          done
+
+          MAC=`ifconfig | grep ether | awk '{print $2}' | sed 's|:||g' | head -n 1 | cut -c 6-`
+          echo "coreos-${MAC}" > /etc/hostname
+          systemctl reboot
+      mode: 0755
+      user:
+        id: 0
+      group:
+        id: 0
+systemd:
+  units:
+    - name: extrapkgs.service
+      enabled: true
+      contents: |
+        [Unit]
+        Description=Install extra packages only once
+        After=network-online.target
+        Before=getty@tty1.service
+        ConditionPathExists=!/usr/lib/systemd/system/libvirtd.service
+
+        [Service]
+        Type=oneshot
+        ExecStart=bash -x /opt/firstboot.sh
+        Restart=on-failure
+        RestartSec=30
+
+        [Install]
+        WantedBy=multi-user.target
+
+    - name: enable-libvirtd.service
+      enabled: true
+      contents: |
+        [Unit]
+        Description=Enable and start libvirtd
+        After=network-online.target
+        Before=getty@tty1.service
+        ConditionPathExists=/usr/lib/systemd/system/libvirtd.service
+        ConditionPathExists=!/etc/systemd/system/multi-user.target.wants/libvirtd.service
+
+
+        [Service]
+        Type=oneshot
+        ExecStart=systemctl enable --now libvirtd
+        Restart=on-failure
+        RestartSec=30
+        StandardOutput=journal+console
+        StandardError=journal+console
+
+        [Install]
+        WantedBy=multi-user.target
+
+    - name: enable-cockpit.service
+      enabled: true
+      contents: |
+        [Unit]
+        Description=Enable and start cockpit
+        After=network-online.target
+        Before=getty@tty1.service
+        ConditionPathExists=/usr/lib/systemd/system/cockpit.socket
+        ConditionPathExists=!/etc/systemd/system/sockets.target.wants/cockpit.socket
+
+        [Service]
+        Type=oneshot
+        ExecStart=systemctl enable --now cockpit.socket
+        Restart=on-failure
+        RestartSec=30
+        StandardOutput=journal+console
+        StandardError=journal+console
+
+        [Install]
+        WantedBy=multi-user.target
+
+    - name: enable-hotspot.service
+      enabled: true
+      contents: |
+        [Unit]
+        Description=Enable and start hotspot
+        After=network-online.target
+        Before=getty@tty1.service
+        ConditionPathIsDirectory=/usr/share/licenses/iwl3160-firmware
+        ConditionPathExists=!/etc/NetworkManager/system-connections/hotspot.connection
+        StandardOutput=journal+console
+        StandardError=journal+console
+
+        [Service]
+        Type=oneshot
+        ExecStart=nmcli device wifi hotspot con-name hotspot password password
+        ExecStart=nmcli con modify hotspot connection.autoconnect true
+        Restart=on-failure
+        RestartSec=30
+
+        [Install]
+        WantedBy=multi-user.target
+
+
