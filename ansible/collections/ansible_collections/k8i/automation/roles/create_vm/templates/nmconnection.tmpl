@@ -1,0 +1,12 @@
+[connection]
+id={{ vm_net_dev }}
+type=ethernet
+autoconnect-priority=-999
+interface-name={{ vm_net_dev }}
+
+[ipv4]
+address1={{ vm_net_ip }}/{{ vm_net_prefix }},{{ vm_net_gateway }}
+dns={{ vm_net_dns }}
+dns-search=
+may-fail=false
+method=manual

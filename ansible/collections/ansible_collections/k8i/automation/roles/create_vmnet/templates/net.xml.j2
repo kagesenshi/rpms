@@ -1,0 +1,10 @@
+<network>
+  <name>{{ vmnet_name }}</name>
+  <forward mode="route"/>
+  <domain name="{{ vmnet_name }}"/>
+  <ip address="{{ vmnet_ipaddr }}" netmask="{{ vmnet_netmask }}">
+    <dhcp>
+      <range start="{{ vmnet_ipstart }}" end="{{ vmnet_ipend }}"/>
+    </dhcp>
+  </ip>
+</network>

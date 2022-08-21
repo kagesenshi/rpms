@@ -1,0 +1,70 @@
+<domain type='kvm'>
+  <name>{{ vm_name }}</name>
+  <memory unit="MiB">{{ vm_memory_mb }}</memory>
+  <vcpu>{{ vm_cpu }}</vcpu>
+  <cpu mode="host-model" check="partial"/>
+  <features>
+    <acpi/>
+    <apic/>
+    <vmport state="off"/>
+  </features>
+  <memoryBacking>
+    <source type="memfd"/>
+    <access mode="shared"/>
+  </memoryBacking>
+  <pm>
+    <suspend-to-mem enabled="no"/>
+    <suspend-to-disk enabled="no"/>
+  </pm>
+  <os>
+    <type arch="x86_64">hvm</type>
+    <boot dev="hd"/>
+  </os>
+  <clock sync="localtime"/>
+  <devices>
+    <emulator>/usr/bin/qemu-kvm</emulator>
+
+
+
+
+    <disk type='file' device='disk'>
+      <driver name="qemu" type="qcow2"/>
+      <source file="{{ vm_boot_disk_path }}"/>
+      <target dev="vda" bus="virtio"/>
+    </disk>   
+    {% for disk in vm_disks %}
+    <disk type='file' device='disk'>
+      <driver name="qemu" type="qcow2"/>
+      {% if 'path' in disk %}
+      <source file="{{ disk['path'] }}"/>
+      {% else %}
+      <source file="{{ images_root }}/{{ vm_name }}-{{ disk['name'] }}.qcow2"/>
+      {% endif %}
+      <target dev="{{ disk['device'] }}" bus="{{ disk['bus'] }}"/>
+    </disk>
+    {% endfor %}
+
+    {% if vm_bridge %}
+    <interface type="bridge">
+      <source bridge="{{ vm_bridge }}"/>
+      <model type="virtio"/>
+    </interface>
+    {% endif %}
+    {% if vm_network and not vm_bridge %}
+    <interface type="network">
+      <source network="{{ vm_network }}"/>
+      <model type="virtio"/>
+    </interface>
+    {% endif %}
+    <graphics type='spice' autoport="yes">
+        <listen type="address"/>
+        <image compression="off"/>
+    </graphics>
+
+
+    <rng model="virtio">
+      <backend model="random">/dev/urandom</backend>
+    </rng>
+  </devices>
+</domain>
+

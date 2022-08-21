@@ -1,0 +1,14 @@
+---
+# tasks file for create_vm_net
+- name: setup networking
+  community.libvirt.virt_net:
+    name: "{{ vmnet_name }}"
+    command: define
+    xml: "{{ lookup('template', 'net.xml.j2') }}"
+    autostart: "{{ vmnet_autostart }}"
+
+- name: start networking
+  community.libvirt.virt_net:
+    name: "{{ vmnet_name }}"
+    command: start
+

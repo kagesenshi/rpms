@@ -1,0 +1,12 @@
+---
+# defaults file for create_vm
+
+images_root: /var/lib/libvirt/images
+vm_cpu: 1
+vm_memory_mb: 1024
+vm_disks: [] # valid keys: path, device, bus
+vm_network: ''
+vm_bridge: ''
+vm_autostart: true
+base_image_name: base_image.qcow2
+vm_net_dev: ens3

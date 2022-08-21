@@ -1,0 +1,4 @@
+---
+# defaults file for create_vm_net
+vmnet_netmask: 255.255.255.0
+vmnet_autostart: yes

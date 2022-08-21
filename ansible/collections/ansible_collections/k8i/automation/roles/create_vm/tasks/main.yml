@@ -1,0 +1,71 @@
+---
+# tasks file for create_vm
+
+- name: unarchive base image
+  unarchive:
+    src: "{{ base_image_archive }}"
+    dest: "{{ images_root }}/"
+    creates: "{{ images_root }}/{{ base_image_name }}"
+
+- name: delete image
+  file:
+    path: "{{ images_root }}/{{ vm_name }}.qcow2"
+    state: absent
+
+- name: clone base image
+  command: "cp '{{ images_root }}/{{ base_image_name }}' '{{ images_root }}/{{ vm_name }}.qcow2'"
+  args:
+    creates: "{{ images_root }}/{{ vm_name }}.qcow2"
+
+- name: set hostname
+  command: "guestfish -i -a '{{ images_root }}/{{ vm_name }}.qcow2' write /etc/hostname '{{ vm_hostname | default(vm_name, true) }}'"
+
+- name: delete old network config files
+  command: "guestfish -i -a '{{ images_root }}/{{ vm_name }}.qcow2' rm-f /etc/sysconfig/network-scripts/ifcfg-enp1s0"
+
+- name: create network config file
+  template:
+    src: nmconnection.tmpl
+    dest: "/var/tmp/{{ vm_name }}-{{ vm_net_dev }}.nmconnection"
+
+- name: upload network config file
+  command: "guestfish -i -a '{{ images_root }}/{{ vm_name }}.qcow2' upload /var/tmp/{{ vm_name }}-{{ vm_net_dev }}.nmconnection /etc/NetworkManager/system-connections/{{ vm_net_dev }}.nmconnection"
+
+- name: set config file permission
+  command: "guestfish -i -a '{{ images_root }}/{{ vm_name }}.qcow2' chmod 0600 /etc/NetworkManager/system-connections/{{ vm_net_dev }}.nmconnection"
+
+- name: delete existing additional disks
+  file:
+    path: "{{ images_root }}/{{ vm_name }}-{{ item['name'] }}.qcow2"
+    state: absent
+  with_items: "{{ vm_disks }}"
+
+
+- name: create additional disks
+  command: "qemu-img create -f qcow2 -o preallocation=metadata {{ images_root }}/{{ vm_name }}-{{ item['name'] }}.qcow2 {{ item['size'] }}"
+  with_items: "{{ vm_disks }}"
+
+- name: change ownership of disks
+  command: "chown qemu:libvirt -R {{ images_root }}"
+
+- name: change permission of boot  disk
+  command: "chmod 0640 -R {{ images_root }}/{{ vm_name }}.qcow2"
+
+- name: change permission of disks
+  command: "chmod 0640 -R {{ images_root }}/{{ vm_name }}-{{ item['name'] }}.qcow2"
+  with_items: "{{ vm_disks }}"
+
+
+- name: create vm
+  community.libvirt.virt:
+    command: define
+    xml: "{{ lookup('template', 'vm.xml.j2') }}"
+    autostart: "{{ vm_autostart }}"
+  vars:
+    vm_boot_disk_path: '{{ images_root }}/{{ vm_name }}.qcow2'
+
+- name: start vm
+  community.libvirt.virt:
+    command: start
+    name: "{{ vm_name }}"
+  when: vm_autostart == true
