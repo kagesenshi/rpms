@@ -4,8 +4,6 @@
   dnf:
     name:
       - mapr-nodemanager
-      - mapr-hadoop-client
-      - mapr-hadoop-util
 
 - name: refresh config
   command: "/opt/mapr/server/configure.sh -R {{ configure_opts }}"

@@ -5,9 +5,11 @@
     name: 
       - mapr-posix-client-basic
       - mapr-objectstore-gateway
+  register: posixclient_install
 
 - name: refresh config
   command: /opt/mapr/server/configure.sh -R
+  when: posixclient_install.changed
 
 - name: create mapr mount dir
   file:
@@ -28,18 +30,21 @@
   args:
     creates: /opt/mapr/conf/maprfuseticket
 
-- name: restart posix client
+- name: start posix client
   systemd:
     name: mapr-posix-client-basic
-    state: restarted
+    state: started
     enabled: false
+  register: posixclient_start
 
 - name: wait for config propagation
   wait_for:
     timeout: 60
+  when: posixclient_start.changed
 
 - name: start objectstore
   shell: 
     cmd: maprcli node services -nodes `hostname` -name objectstore -action restart
   become: true
   become_user: mapr
+  when: posixclient_start.changed

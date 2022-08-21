@@ -20,6 +20,7 @@
     state: present
   with_items:
     - metastore
+    - hue
 
 - name: create users
   community.mysql.mysql_user:
@@ -32,5 +33,7 @@
     - name: metastore
       password: metastore
       database: metastore
-
+    - name: hue
+      password: hue
+      database: hue
 

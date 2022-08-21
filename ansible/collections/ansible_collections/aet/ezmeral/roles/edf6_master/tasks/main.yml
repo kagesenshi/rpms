@@ -20,7 +20,8 @@
       - mapr-hbase-rest
       - mapr-hbasethrift
       - mapr-spark-historyserver	
-      - mapr-spark-thriftserver	
+      - mapr-spark-thriftserver
+      - mapr-livy
 
 - name: get hostname
   command: hostname --fqdn
@@ -34,6 +35,9 @@
     src: hue.ini.tmpl
     dest: /opt/mapr/hue/hue-4.6.0/desktop/conf/hue.ini
 
+- name: create maprdb directory
+  shell:
+    cmd: /opt/mapr/hadoop/hadoop-2.7.6/bin/hadoop dfs -mkdir -p /maprdb
 
 - name: refresh config
   command: "/opt/mapr/server/configure.sh -R {{ configure_opts }}"

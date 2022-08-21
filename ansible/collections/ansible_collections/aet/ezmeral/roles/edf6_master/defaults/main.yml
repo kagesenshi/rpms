@@ -2,3 +2,11 @@
 # defaults file for edf6_master
 configure_opts: ""
 skip_configure: false
+hue_app_blacklist: "search,zookeeper,sqoop,oozie,security"
+hue_db_host: ""
+hue_db_engine: ""
+hue_db_port: 
+hue_db_schema: ''
+hue_db_password: ''
+hue_db_user: ''
+hue_db_options: ''

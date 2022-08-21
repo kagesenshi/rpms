@@ -189,7 +189,7 @@
 
   # Comma separated list of apps to not load at server startup.
   # e.g.: pig,zookeeper
-  app_blacklist=search,zookeeper,sqoop
+  app_blacklist={{ hue_app_blacklist }}
 
   # Id of the cluster where Hue is located.
   ## cluster_id='default'
@@ -640,6 +640,38 @@
     ## options={}
     # Database schema, to be used only when public schema is revoked in postgres
     ## schema=public
+    {% if hue_db_engine %}
+    engine={{ hue_db_engine }}
+    {% endif %}
+
+    {% if hue_db_host %}
+    host={{ hue_db_host }}
+    {% endif %}
+
+    {% if hue_db_port %}
+    port={{ hue_db_port }}
+    {% endif %}
+
+    {% if hue_db_name %}
+    name={{ hue_db_name }}
+    {% endif %}
+
+    {% if hue_db_user %}
+    user={{ hue_db_user }}
+    {% endif %}
+
+    {% if hue_db_password %}
+    password={{ hue_db_password }}
+    {% endif %}
+
+    {% if hue_db_schema %}
+    schema={{ hue_db_schema }}
+    {% endif %}
+
+    {% if hue_db_options %}
+    option={{ hue_db_options }}
+    {% endif %}
+
 
   # Configuration options for specifying the Desktop session.
   # For more info, see https://docs.djangoproject.com/en/1.4/topics/http/sessions/
@@ -867,10 +899,10 @@
 [notebook]
 
   ## Show the notebook menu or not
-  # show_notebooks=true
+  show_notebooks=true
 
   ## Flag to enable the selection of queries from files, saved queries into the editor or as snippet.
-  # enable_external_statements=false
+  enable_external_statements=false
 
   ## Flag to enable the bulk submission of queries as a background task through Oozie.
   # enable_batch_execute=true
@@ -879,7 +911,7 @@
   # enable_sql_indexer=false
 
   ## Flag to turn on the Presentation mode of the editor.
-  # enable_presentation=true
+  enable_presentation=true
 
   ## Flag to enable the SQL query builder of the table assist.
   # enable_query_builder=true
@@ -921,10 +953,10 @@
 #       name=Impala
 #       interface=hiveserver2
 #
-#     [[[drill]]]
+#    [[[drill]]]
 #       name=Drill
 #       interface=rdbms
-
+#
     # [[[postgresql]]]
     #   name = postgresql
     #   interface=sqlalchemy
@@ -966,15 +998,15 @@
      [[[markdown]]]
        name=Markdown
        interface=text
-
-     [[[sqlite]]]
-       name = SQLite
-       interface=rdbms
-
-     [[[oracle]]]
-       name = Oracle
-       interface=rdbms
-
+#
+#     [[[sqlite]]]
+#       name = SQLite
+#       interface=rdbms
+#
+#     [[[oracle]]]
+#       name = Oracle
+#       interface=rdbms
+#
     # [[[solr]]]
     #   name = Solr SQL
     #   interface=solr
@@ -1392,7 +1424,7 @@
 
 [spark]
   # The Livy Server URL.
-  ## livy_server_url=http://localhost:8998
+  livy_server_url=https://{{ host_fqdn }}:8998
 
   # Configure Livy to start in local 'process' mode, or 'yarn' workers.
   ## livy_server_session_kind=yarn
@@ -1526,7 +1558,7 @@
   # Comma-separated list of HBase Thrift servers for clusters in the format of '(name|host:port)'.
   # Use full hostname. If hbase.thrift.ssl.enabled in hbase-site is set to true, https will be used otherwise it will use http
   # If using Kerberos we assume GSSAPI SASL, not PLAIN.
-  ## hbase_clusters=(Cluster|localhost:9090)
+  hbase_clusters=(Cluster|{{ host_fqdn }}:9090)
 
   # HBase configuration directory, where hbase-site.xml is located.
   ## hbase_conf_dir=/opt/mapr/hbase/hbase-1.4.13/conf
@@ -1909,7 +1941,7 @@
       connection_type=direct
 
       # Drillbit address for direct connection.
-      drillbits=localhost:31010
+      drillbits={{ host_fqdn }}:31010
 
       # ZooKeeper quorum for connection through ZooKeeper.
       ## zk_quorum=localhost:5181
