@@ -1,0 +1,85 @@
+---
+# tasks file for edf6_installer
+- name: set dnf minrate 
+  lineinfile:
+    path: /etc/dnf/dnf.conf
+    line: minrate=512k
+
+- set_fact:
+    node_index: "{{ inventory_group.index(inventory_hostname) }}"
+
+- import_role: 
+    name: aet.ezmeral.edf6_common
+  vars:
+    use_sslip: true
+    metastore_db_uri: "jdbc:mysql://{{ master_node }}/metastore?permitMysqlScheme&amp;createDatabaseIfNotExist=true"
+    metastore_db_user: metastore
+    metastore_db_password: metastore
+
+- name: create disks file
+  copy:
+    content: |
+      /dev/sda
+      /dev/sdb
+      /dev/sdc
+    dest: /opt/mapr/conf/disks.txt
+
+- block:
+  - import_role: 
+      name: aet.ezmeral.edf6_init
+    vars: 
+      zookeeper_nodes: "{{ zookeeper_nodes }}"
+      cldb_nodes: "{{ master_node }}"
+      cluster_name: edftraining
+  when: node_index == "0"
+
+- import_role: 
+    name: aet.ezmeral.edf6_pushconfig
+- import_role:
+    name: aet.ezmeral.edf6_zookeeper
+
+- block:
+  - import_role:
+      name: aet.ezmeral.edf6_database
+  - import_role:
+      name: aet.ezmeral.edf6_cldb
+  - import_role:
+      name: aet.ezmeral.edf6_master
+    vars:
+      skip_configure: true
+      timezone: Asia/Kuala_Lumpur
+      hue_hive_server_host: "{{ master_node }}"
+      hue_hive_metastore_host: "{{ master_node }}"
+      hue_db_engine: mysql
+      hue_db_host: "{{ master_node }}"
+      hue_db_name: hue
+      hue_db_user: hue
+      hue_db_password: hue
+  when: node_index == "0"
+
+- block:
+  - import_role:
+      name: aet.ezmeral.edf6_worker
+    vars:
+      skip_configure: true
+  when: node_index != "0"
+
+- import_role:
+    name: aet.ezmeral.edf6_configure
+  vars:
+    configure_opts: "-HS {{ master_node }} -EC {{ master_node }}"
+
+- block:
+
+  - name: initialize hive schema
+    shell:
+      cmd: /opt/mapr/hive/hive-2.3/bin/schematool -dbType mysql -initSchema
+    become: true
+    become_user: mapr
+    ignore_errors: yes
+
+  when: node_index == "0"
+  
+- import_role:
+    name: aet.ezmeral.edf6_mount
+
