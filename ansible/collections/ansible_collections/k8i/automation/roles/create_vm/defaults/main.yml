@@ -9,4 +9,4 @@ vm_network: ''
 vm_bridge: ''
 vm_autostart: true
 base_image_name: base_image.qcow2
-vm_net_dev: ens3
+vm_net_dev: enp1s0

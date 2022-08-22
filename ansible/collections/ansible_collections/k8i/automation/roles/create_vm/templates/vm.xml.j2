@@ -17,7 +17,7 @@
     <suspend-to-disk enabled="no"/>
   </pm>
   <os>
-    <type arch="x86_64">hvm</type>
+    <type arch="x86_64" machine="pc-q35-5.2">hvm</type>
     <boot dev="hd"/>
   </os>
   <clock sync="localtime"/>
@@ -60,6 +60,12 @@
         <listen type="address"/>
         <image compression="off"/>
     </graphics>
+    <controller type="scsi" index="0" model="virtio-scsi">
+      <alias name="scsi0"/>
+    </controller>
+    <controller type="pci" index="0" model="pcie-root">
+      <alias name="pcie.0"/>
+    </controller>
 
 
     <rng model="virtio">
