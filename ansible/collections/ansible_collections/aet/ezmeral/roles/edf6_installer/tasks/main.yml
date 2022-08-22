@@ -1,5 +1,17 @@
 ---
 # tasks file for edf6_installer
+- name: master node
+  debug:
+    msg: "{{ master_node }}"
+
+- name: zk nodes
+  debug:
+    msg: "{{ zk_nodes }}"
+
+- name: all nodes
+  debug:
+    msg: "{{ inventory_group | join(', ') }}"
+
 - name: set dnf minrate 
   lineinfile:
     path: /etc/dnf/dnf.conf
