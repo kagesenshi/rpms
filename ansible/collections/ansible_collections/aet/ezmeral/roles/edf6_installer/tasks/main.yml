@@ -76,17 +76,6 @@
   vars:
     configure_opts: "-HS {{ master_node }} -EC {{ master_node }}"
 
-- block:
-
-  - name: initialize hive schema
-    shell:
-      cmd: /opt/mapr/hive/hive-2.3/bin/schematool -dbType mysql -initSchema
-    become: true
-    become_user: mapr
-    ignore_errors: yes
-
-  when: node_index == "0"
-  
 - import_role:
     name: aet.ezmeral.edf6_mount
 

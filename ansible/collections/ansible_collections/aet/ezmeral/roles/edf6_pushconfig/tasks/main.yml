@@ -5,12 +5,6 @@
     src: cluster_initconfig.tar.bz2
     dest: /opt/mapr/
 
-- name: init storage
-  command: /opt/mapr/server/disksetup /opt/mapr/conf/disks.txt
-  args:
-    creates: /opt/mapr/conf/disktab
-  when: init_storage == true
-
 - name: allow overcommit
   lineinfile:
     path: /opt/mapr/conf/warden.conf

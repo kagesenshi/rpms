@@ -56,6 +56,7 @@
       - bzip2
       - zram-generator
       - zram-generator-defaults
+      - sshpass
 
 - name: install core ezmeral packages
   dnf:

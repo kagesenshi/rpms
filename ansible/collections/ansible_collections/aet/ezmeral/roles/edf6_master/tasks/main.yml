@@ -51,6 +51,8 @@
   shell:
     cmd: "/opt/mapr/hive/hive-2.3/bin/schematool -dbType {{ metastore_initdb_engine }} -initSchema"
   ignore_errors: true
+  become: true
+  become_user: mapr
 
 - name: refresh config
   command: "/opt/mapr/server/configure.sh -R {{ configure_opts }}"

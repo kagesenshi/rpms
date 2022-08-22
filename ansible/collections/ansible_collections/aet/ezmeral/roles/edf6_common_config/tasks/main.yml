@@ -3,7 +3,7 @@
 - name: set clustershell group
   lineinfile: 
     path: /etc/clustershell/groups.d/cluster.cfg
-    line: "{{ nodes }}"
+    line: "edf: {{ nodes }}"
     create: yes
 
 - name: set pyspark python
