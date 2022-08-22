@@ -1,7 +1,7 @@
 ---
 # tasks file for edf6_common
 #
-- name: set hostname
+- name: set hostname file
   copy:
     content: "{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] | replace('.','-') }}.sslip.io"
     dest: /etc/hostname
@@ -74,6 +74,12 @@
     name: mapr
     uid: 1000
     group: 1000
+  register: create_user
+
+- name: set mapr password
+  shell:
+    cmd: echo "mapr"| passwd --stdin -f mapr
+  when: create_user.changed == true
 
 - name: install common ezmeral packages
   dnf:
@@ -83,29 +89,4 @@
       - mapr-hbase
       - mapr-hadoop-client
 #      - mapr-drill
-
-- name: install clush config
-  lineinfile:
-    path: /etc/clustershell/groups.d/cluster.cfg
-    line: "edf: 10-210-14-[47-49].sslip.io"
-    create: yes
-
-- name: set pyspark python
-  lineinfile:
-    path: /opt/mapr/spark/spark-2.4.7/conf/spark-env.sh
-    line: "{{ item }}"
-    create: yes
-  with_items:
-    - "PYSPARK_DRIVER_PYTHON=/usr/bin/python3"
-    - "PYSPARK_PYTHON=/usr/bin/python3"
-
-- name: install core hadoop config
-  template:
-    src: core-site.xml.tmpl
-    dest: /opt/mapr/hadoop/hadoop-2.7.6/etc/hadoop/core-site.xml
-
-- name: install hive config
-  template:
-    src: hive-site.xml.tmpl
-    dest: /opt/mapr/hive/hive-2.3/conf/hive-site.xml
 

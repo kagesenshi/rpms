@@ -4,10 +4,27 @@
   dnf:
     name:
       - mapr-nodemanager
+  register: nm_install
 
 - name: refresh config
   command: "/opt/mapr/server/configure.sh -R {{ configure_opts }}"
-  when: skip_configure == false
+  when: nm_install.changed == true
+
+- name: start warden
+  systemd:
+    name: mapr-warden
+    state: started
+    enabled: false
+
+- name: login
+  shell:
+    cmd: echo mapr | maprlogin password
+  become: true
+  become_user: mapr
+
+- name: wait for warden propagation
+  wait_for:
+    timeout: 60
 
 - name: start service
   shell:

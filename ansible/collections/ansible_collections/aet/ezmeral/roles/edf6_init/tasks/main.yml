@@ -5,15 +5,14 @@
     name: mapr-cldb
 
 - name: generate keys
-  command: "/opt/mapr/server/configure.sh --isvm -genkeys"
-  args:
-    creates: /opt/mapr/conf/cldb.key
-
-- name: initialize config
-  command: "/opt/mapr/server/configure.sh --isvm -secure -dare -Z {{ zookeeper_nodes }} -C {{ cldb_nodes }} -N {{ cluster_name }} {{ configure_opts }}"
+  command: "/opt/mapr/server/configure.sh --isvm -genkeys -secure -dare -Z {{ zookeeper_nodes }} -C {{ cldb_nodes }} -N {{ cluster_name }} {{ configure_opts }}"
   args:
     creates: /opt/mapr/conf/mapr-clusters.conf
+  register: genkeys
 
+- name: reinit config
+  command: "/opt/mapr/server/configure.sh --isvm -secure -dare -Z {{ zookeeper_nodes }} -C {{ cldb_nodes }} -N {{ cluster_name }} {{ configure_opts }}"
+  when: genkeys.changed == false
 
 - name: archive core cluster config
   archive:

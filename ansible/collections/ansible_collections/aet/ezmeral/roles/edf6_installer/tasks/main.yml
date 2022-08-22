@@ -12,6 +12,11 @@
     name: aet.ezmeral.edf6_common
   vars:
     use_sslip: true
+
+- import_role:
+    name: aet.ezmeral.edf6_common_config
+  vars:
+    nodes: "{{ inventory_group | join(' ') }}"
     metastore_db_uri: "jdbc:mysql://{{ master_node }}/metastore?permitMysqlScheme&amp;createDatabaseIfNotExist=true"
     metastore_db_user: metastore
     metastore_db_password: metastore
@@ -28,13 +33,14 @@
   - import_role: 
       name: aet.ezmeral.edf6_init
     vars: 
-      zookeeper_nodes: "{{ zookeeper_nodes }}"
+      zookeeper_nodes: "{{ zk_nodes }}"
       cldb_nodes: "{{ master_node }}"
       cluster_name: edftraining
   when: node_index == "0"
 
 - import_role: 
     name: aet.ezmeral.edf6_pushconfig
+
 - import_role:
     name: aet.ezmeral.edf6_zookeeper
 
@@ -46,6 +52,7 @@
   - import_role:
       name: aet.ezmeral.edf6_master
     vars:
+      metastore_initdb_engine: mysql
       skip_configure: true
       timezone: Asia/Kuala_Lumpur
       hue_hive_server_host: "{{ master_node }}"

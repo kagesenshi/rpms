@@ -35,9 +35,22 @@
     src: hue.ini.tmpl
     dest: /opt/mapr/hue/hue-4.6.0/desktop/conf/hue.ini
 
+- name: login
+  shell:
+    cmd: echo mapr | maprlogin password
+  become: true
+  become_user: mapr
+
 - name: create maprdb directory
   shell:
     cmd: /opt/mapr/hadoop/hadoop-2.7.6/bin/hadoop dfs -mkdir -p /maprdb
+  become: true
+  become_user: mapr
+
+- name: initialize metastore
+  shell:
+    cmd: "/opt/mapr/hive/hive-2.3/bin/schematool -dbType {{ metastore_initdb_engine }} -initSchema"
+  ignore_errors: true
 
 - name: refresh config
   command: "/opt/mapr/server/configure.sh -R {{ configure_opts }}"

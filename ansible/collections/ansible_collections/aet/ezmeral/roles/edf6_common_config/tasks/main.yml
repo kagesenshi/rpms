@@ -1,0 +1,27 @@
+---
+# tasks file for edf6_common_config
+- name: set clustershell group
+  lineinfile: 
+    path: /etc/clustershell/groups.d/cluster.cfg
+    line: "{{ nodes }}"
+    create: yes
+
+- name: set pyspark python
+  lineinfile:
+    path: /opt/mapr/spark/spark-2.4.7/conf/spark-env.sh
+    line: "{{ item }}"
+    create: yes
+  with_items:
+    - "PYSPARK_DRIVER_PYTHON=/usr/bin/python3"
+    - "PYSPARK_PYTHON=/usr/bin/python3"
+
+- name: install core hadoop config
+  template:
+    src: core-site.xml.tmpl
+    dest: /opt/mapr/hadoop/hadoop-2.7.6/etc/hadoop/core-site.xml
+
+- name: install hive config
+  template:
+    src: hive-site.xml.tmpl
+    dest: /opt/mapr/hive/hive-2.3/conf/hive-site.xml
+

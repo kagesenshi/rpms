@@ -9,6 +9,7 @@
   command: /opt/mapr/server/disksetup /opt/mapr/conf/disks.txt
   args:
     creates: /opt/mapr/conf/disktab
+  when: init_storage == true
 
 - name: allow overcommit
   lineinfile:

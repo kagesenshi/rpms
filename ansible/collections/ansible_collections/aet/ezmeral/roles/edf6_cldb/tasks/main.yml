@@ -16,6 +16,11 @@
   command: "/opt/mapr/server/configure.sh -R {{ configure_opts }}"
   when: cldb_install.changed == true
 
+- name: init storage
+  command: /opt/mapr/server/disksetup /opt/mapr/conf/disks.txt
+  args:
+    creates: /opt/mapr/conf/disktab
+
 - name: start warden
   systemd:
     name: mapr-warden
@@ -27,11 +32,11 @@
   wait_for:
     path: /opt/mapr/logs/cldb.log
     search_regex: "(.*Metadata upgrade successfully done.*|.*CLDB got role of slave.*)"
-    timeout: 60
+    timeout: 600
   when: cldb_install.changed == true
 
 - name: wait for cldb
   wait_for:
-    timeout: 60
-  when: cldb_install.changed == true
+    host: localhost
+    port: 7443
 

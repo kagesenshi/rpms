@@ -1,2 +1,3 @@
 ---
 # defaults file for edf6_pushconfig
+init_storage: true
