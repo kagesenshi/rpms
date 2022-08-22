@@ -1,0 +1,30 @@
+- include_role:
+    name: k8i.automation.create_vm
+  vars:
+    base_image_archive: base_image.tar.bz2
+    vm_name: "{{ std['name'] }}-{{ node['name'] }}"
+    vm_hostname: "{{ node['ip'].replace('.','-') }}.sslip.io"
+    vm_cpu: 4
+    vm_memory_mb: 8192
+    vm_disks:
+      - name: disk1
+        device: sda
+        bus: scsi
+        size: 20G
+      - name: disk2
+        device: sdb
+        bus: scsi
+        size: 20G
+      - name: disk3
+        device: sdc
+        bus: scsi
+        size: 20G
+    vm_network: "{{ std['network'] }}"
+    vm_net_ip: "{{ node['ip'] }}"
+    vm_net_prefix: 24
+    vm_net_gateway: "{{ std['gateway'] }}"
+    vm_net_dns: "{{ std['gateway'] }}"
+  loop: "{{ std['nodes'] }}"
+  loop_control:
+    loop_var: node
+

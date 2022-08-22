@@ -1,0 +1,15 @@
+- import_role:
+    name: aet.ezmeral.edf6_common
+
+- import_role:
+    name: aet.ezmeral.edf6_pushconfig
+  vars:
+    init_storage: false
+
+- import_role:
+    name: aet.ezmeral.edf6_installer
+  vars:
+    master_node: "{{ inv_group[0] | replace('.','-') }}.sslip.io"
+    zk_nodes: "{{ inv_group | map('replace', '.', '-') | map('regex_replace', '$', '.sslip.io') | join(',') }}"
+    inventory_group: "{{ inv_group }}"
+
