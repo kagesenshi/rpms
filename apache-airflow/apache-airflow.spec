@@ -8,7 +8,7 @@
 
 Name:       apache-airflow
 Version:    2.2.5
-Release:    15%{?dist}
+Release:    16%{?dist}
 Summary:    ETL workflow management and monitoring
 
 License:    Apache2
@@ -291,6 +291,10 @@ rm -rf $RPM_BUILD_ROOT
 
 
 %changelog
+* Sun Oct 16 2022 Izhar Firdaus <kagesenshi.87@gmail.com> 2.2.5-16
+- bump version (kagesenshi.87@gmail.com)
+- added virtualenv and mongo provider dependency (kagesenshi.87@gmail.com)
+
 * Wed Aug 10 2022 Izhar Firdaus <kagesenshi.87@gmail.com> 2.2.5-14
 - added freetds as requirement (kagesenshi.87@gmail.com)
 
