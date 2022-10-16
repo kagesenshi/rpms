@@ -8,7 +8,7 @@
 
 Name:       apache-airflow
 Version:    2.2.5
-Release:    14%{?dist}
+Release:    15%{?dist}
 Summary:    ETL workflow management and monitoring
 
 License:    Apache2
