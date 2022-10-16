@@ -94,6 +94,7 @@ ${RPM_BUILD_ROOT}/opt/%{name}/bin/pip install "apache-airflow[celery,async,postg
     apache-airflow-providers-oracle \
     apache-airflow-providers-mongo \
     openlineage-airflow \
+    oracledb \
     dag-factory \
     --constraint https://raw.githubusercontent.com/apache/airflow/constraints-%{version}/constraints-%{python_version}.txt
 #pushd ${RPM_BUILD_ROOT}/opt/%{name}/lib/python%{python_version}/site-packages/airflow/www/
