@@ -1,0 +1,11 @@
+FROM registry.gitlab.com/abyres/releases/centos8:latest
+
+RUN dnf install -y python3
+
+# https://repo1.maven.org/maven2/com/facebook/presto/presto-server/0.277/presto-server-0.277.tar.gz
+ADD presto-server-0.277.tar.gz /opt/
+ADD https://repo1.maven.org/maven2/com/facebook/presto/presto-cli/0.277/presto-cli-0.277-executable.jar /usr/local/bin/presto
+RUN mv /opt/presto-server-0.277 /opt/presto/ && \
+    chmod a+rx /usr/local/bin/presto
+
+ENTRYPOINT ["python3", "/opt/presto/bin/launcher.py"]
