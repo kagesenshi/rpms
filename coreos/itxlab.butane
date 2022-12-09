@@ -23,10 +23,18 @@ storage:
           resize: true
         - number: 5
           label: swap
-          size_mib: 32768
+          size_mib: 65535
         - number: 6
           label: var
           size_mib: 0
+    - device: /dev/sda
+      wipe_table: true
+      partitions:
+        - label: swap2
+          size_mib: 262144
+        - label: data
+          size_mib: 0
+
   filesystems:
     - path: /var
       device: /dev/disk/by-partlabel/var
@@ -38,7 +46,17 @@ storage:
       format: swap
       wipe_filesystem: true
       with_mount_unit: true
+    - device: /dev/sda1
+      format: swap
+      wipe_filesystem: true
+      with_mount_unit: true
+
   files:
+    - path: /etc/sysconfig/selinux
+      contents: |
+        SELINUX=permissive
+        SELINUXTYPE=targeted
+
     - path: /opt/firstboot.sh
       contents:
         inline: |
@@ -47,6 +65,9 @@ storage:
 
           getent group libvirt >/dev/null || groupadd -r libvirt 
           usermod -G libvirt -a core
+
+          getent group qemu >/dev/null || groupadd -r qemu 
+          usermod -G qemu -a core
 
           getent group saslauth >/dev/null || groupadd saslauth -g 76
           getent passwd saslauth >/dev/null || useradd saslauth --system -d /run/saslauthd -s /sbin/nologin -g 76
@@ -64,8 +85,8 @@ storage:
 
           OUT=1
           while [ "x$OUT" != "x0" ];do
-            rpm-ostree install libvirt-daemon NetworkManager-wifi libvirt-daemon-kvm \
-                               libvirt-daemon-driver-qemu libvirt-daemon-driver-storage \
+            rpm-ostree install  libvirt-daemon NetworkManager-wifi libvirt-daemon-kvm \
+                                libvirt-daemon-driver-qemu libvirt-daemon-driver-storage \
                                 libvirt-daemon-driver-network  libvirt-daemon-driver-storage-core \
                                 libvirt-daemon-config-network libvirt-daemon-driver-storage-disk \
                                 libvirt-daemon-driver-interface libvirt-daemon-driver-nodedev \
@@ -73,15 +94,16 @@ storage:
                                 libvirt-daemon-driver-nwfilter python3-libvirt cockpit-machines \
                                 cockpit cockpit-storaged cockpit-networkmanager cockpit-bridge \
                                 iwl3160-firmware pciutils vagrant-libvirt vagrant guestfs-tools \
-                                libguestfs
+                                libguestfs python3-lxml firewalld openrgb lm_sensors i2c-tools
             OUT=$?
             sleep 5
           done
 
-          MAC=`ifconfig | grep ether | awk '{print $2}' | sed 's|:||g' | head -n 1 | cut -c 6-`
-          echo "coreos-${MAC}" > /etc/hostname
+          MAC=`ifconfig | grep ether | awk '{print $2}' | head -n 1 | cut -c 10-`
+          MACS=`echo ${MAC}|sed 's|:||g'`
+          echo "coreos-${MACS}" > /etc/hostname
           ETH=`nmcli -t c show --active|grep ethernet|cut -d':' -f 4`
-          nmcli con add ifname bridge0 type bridge con-name bridge0
+          nmcli con add ifname bridge0 type bridge con-name bridge0 bridge.mac "9E:9D:34:${MAC^^}"
           nmcli con add type bridge-slave ifname $ETH master bridge0
           systemctl reboot
       mode: 0755
@@ -125,6 +147,8 @@ systemd:
         [Service]
         Type=oneshot
         ExecStart=systemctl enable --now libvirtd
+        ExecStart=systemctl enable --now virtnetworkd.service
+        ExecStart=systemctl enable --now virtnwfilterd.service
         Restart=on-failure
         RestartSec=30
         StandardOutput=journal+console
@@ -173,6 +197,69 @@ systemd:
         StandardOutput=journal+console
         StandardError=journal+console
 
+
+        [Install]
+        WantedBy=multi-user.target
+
+    - name: open-firewall.service
+      enabled: true
+      contents: |
+        [Unit]
+        Description=Open firewall 
+        After=firewalld.service
+        Before=getty@tty1.service
+        ConditionPathExists=/usr/lib/systemd/system/firewalld.service
+
+        [Service]
+        Type=oneshot
+        ExecStart=firewall-cmd --zone=public --add-masquerade
+        ExecStart=firewall-cmd --zone=nm-shared --add-port=0-65535/tcp
+        ExecStart=firewall-cmd --zone=libvirt --add-port=0-65535/tcp
+        Restart=on-failure
+        RestartSec=30
+        StandardOutput=journal+console
+        StandardError=journal+console
+
+        [Install]
+        WantedBy=multi-user.target
+
+    - name: openrgb.service
+      enabled: true
+      contents: |
+        [Unit]
+        Description=OpenRGB SDK Daemon
+        After=enable-hotspot.service
+        ConditionPathExists=/usr/bin/openrgb
+
+        [Service]
+        Type=simple
+        ExecStart=/usr/bin/openrgb --server
+        Restart=on-failure
+        RestartSec=30
+        StandardOutput=journal+console
+        StandardError=journal+console
+        WorkingDirectory=/var/tmp
+
+        [Install]
+        WantedBy=multi-user.target
+
+
+    - name: ready-led.service
+      enabled: true
+      contents: |
+        [Unit]
+        Description=Change LED mode when machine is ready
+        After=openrgb.service
+        ConditionPathExists=/usr/bin/openrgb
+
+        [Service]
+        Type=oneshot
+        ExecStart=/usr/bin/openrgb -d 0 -m breathing
+        Restart=on-failure
+        RestartSec=30
+        StandardOutput=journal+console
+        StandardError=journal+console
+        WorkingDirectory=/var/tmp
 
         [Install]
         WantedBy=multi-user.target
