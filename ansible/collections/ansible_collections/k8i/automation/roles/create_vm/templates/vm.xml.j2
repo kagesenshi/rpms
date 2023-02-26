@@ -17,7 +17,7 @@
     <suspend-to-disk enabled="no"/>
   </pm>
   <os>
-    <type arch="x86_64" machine="pc-q35-5.2">hvm</type>
+    <type arch="x86_64" machine="{{ vm_machine_type }}">hvm</type>
     <boot dev="hd"/>
   </os>
   <clock sync="localtime"/>

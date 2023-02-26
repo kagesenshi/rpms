@@ -36,7 +36,7 @@
       command: "guestfish -i -a '{{ images_root }}/{{ vm_name }}.qcow2' write /etc/hostname '{{ vm_hostname | default(vm_name, true) }}'"
     
     - name: delete old network config files
-      command: "guestfish -i -a '{{ images_root }}/{{ vm_name }}.qcow2' rm-f /etc/sysconfig/network-scripts/ifcfg-enp1s0"
+      command: "guestfish -i -a '{{ images_root }}/{{ vm_name }}.qcow2' rm-f /etc/sysconfig/network-scripts/ifcfg-{{ vm_net_dev }}"
     
     - name: create network config file
       template:

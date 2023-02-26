@@ -10,3 +10,4 @@ vm_bridge: ''
 vm_autostart: true
 base_image_name: base_image.qcow2
 vm_net_dev: enp1s0
+vm_machine_type: pc-q35-rhel8.6.0
