@@ -1,7 +1,7 @@
 #!/bin/bash
 
 
-PARSED=$(getopt -a -n setup-node -o :n:i:g:d: --long name:,ip: -- "$@")
+PARSED=$(getopt -a -n setup-node -o :n:i:g:d:I: --long name:,ip: -- "$@")
 VALID_ARGS=$?
 
 usage() {
@@ -21,6 +21,7 @@ do
      -i | --ip) IP="$2"; shift 2 ;;
      -g | --gateway) GATEWAY="$2"; shift 2;;
      -d | --dns) DNS="$2"; shift 2;;
+     -I | --interface) INTERFACE="$2"; shift 2;;
      --) shift; break;;
      *) echo "Invalid option $1"; usage;;
 
@@ -35,12 +36,24 @@ if [ "x$IP" == "x" ];then
    usage
 fi
 
+if [ "x$GATEWAY" == "x" ];then
+   usage
+fi
+
+if [ "x$DNS" == "x" ];then
+   usage
+fi
+
+if [ "x$INTERFACE" == "x" ];then
+   usage
+fi
+
 set -x
 
-nmcli con mod enp1s0 ipv4.addresses ${IP}/24
-nmcli con mod enp1s0 ipv4.gateway ${GATEWAY}
-nmcli con mod enp1s0 ipv4.dns ${DNS}
-nmcli con mod enp1s0 ipv4.method manual
+nmcli con mod ${INTERFACE} ipv4.addresses ${IP}/24
+nmcli con mod ${INTERFACE} ipv4.gateway ${GATEWAY}
+nmcli con mod ${INTERFACE} ipv4.dns ${DNS}
+nmcli con mod ${INTERFACE} ipv4.method manual
 
 cat << EOF > /etc/NetworkManager/conf.d/99-dns-none.conf
 [main]
