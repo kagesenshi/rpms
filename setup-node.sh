@@ -5,7 +5,7 @@ PARSED=$(getopt -a -n setup-node -o :n:i: --long name:,ip: -- "$@")
 VALID_ARGS=$?
 
 usage() {
-   echo "Usage: $0 -n [NAME] -i [IP]"
+   echo "Usage: $0 -n [NAME] -i [IP] -g [GATEWAY] -d [DNS]"
    exit 1
 }
 
