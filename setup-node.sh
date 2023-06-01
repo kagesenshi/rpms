@@ -1,7 +1,7 @@
 #!/bin/bash
 
 
-PARSED=$(getopt -a -n setup-node -o :n:i: --long name:,ip: -- "$@")
+PARSED=$(getopt -a -n setup-node -o :n:i:g:d: --long name:,ip: -- "$@")
 VALID_ARGS=$?
 
 usage() {
