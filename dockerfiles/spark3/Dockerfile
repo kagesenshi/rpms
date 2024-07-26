@@ -45,6 +45,7 @@ io.openlineage:openlineage-spark:0.3.+ \
 
 USER root
 ADD https://repo1.maven.org/maven2/org/apache/spark/spark-hadoop-cloud_2.12/3.2.0/spark-hadoop-cloud_2.12-3.2.0.jar /opt/apache/spark3/jars/
+ADD https://download.oracle.com/otn-pub/otn_software/jdbc/217/ojdbc8.jar /opt/apache/spark3/jars/
 RUN chown -R root:root /opt/apache/spark3/jars/ && chmod a+r -R /opt/apache/spark3/jars/
 RUN /opt/apache/spark3-python/bin/pip install spark-dataloader==0.1.3
 USER sparkuser

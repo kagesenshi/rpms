@@ -1,11 +1,19 @@
 FROM registry.gitlab.com/abyres/releases/centos8:latest
 
-RUN dnf install -y python3
+RUN dnf install -y python3 java-1.8.0-openjdk-headless
 
 # https://repo1.maven.org/maven2/com/facebook/presto/presto-server/0.277/presto-server-0.277.tar.gz
 ADD presto-server-0.277.tar.gz /opt/
 ADD https://repo1.maven.org/maven2/com/facebook/presto/presto-cli/0.277/presto-cli-0.277-executable.jar /usr/local/bin/presto
 RUN mv /opt/presto-server-0.277 /opt/presto/ && \
     chmod a+rx /usr/local/bin/presto
+ADD entrypoint.sh /opt/presto/entrypoint.sh
 
-ENTRYPOINT ["python3", "/opt/presto/bin/launcher.py"]
+RUN /usr/sbin/groupadd -r user --gid 1000 && \
+     /usr/sbin/useradd -r -g user --uid 1000 \
+     -m -d /home/user \
+     -s /sbin/nologin user && \
+     mkdir /opt/presto/etc/ && \
+     chown user:user /opt/presto/etc/
+
+ENTRYPOINT ["/opt/presto/entrypoint.sh"]

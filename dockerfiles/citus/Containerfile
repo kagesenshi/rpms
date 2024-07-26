@@ -24,7 +24,8 @@ ADD createdb_with_user.sh /usr/bin/
 ADD pg_hba.conf /etc/pg_hba.conf
 RUN chown postgres:postgres /etc/pg_hba.conf && \
     chmod a+rx /usr/bin/createdb_with_user.sh && \
-    chmod +x /opt/entrypoint.sh
+    chmod +x /opt/entrypoint.sh && \
+    rm -rf /var/lib/pgsql/*
 USER postgres
 
 ENTRYPOINT [ "/opt/entrypoint.sh" ]

@@ -1,4 +1,8 @@
-build: 1
-last_updated: 6d642dbb31ef3c3a316f9cfe67b492d6
-repo: registry.gitlab.com/abyres/releases/minio
+build: 2
+last_updated: 994b5ba2a0adb0e5692fdcc8b6b83a16
+repos:
+- target: base
+  url: registry.gitlab.com/abyres/releases/minio
+- target: client
+  url: registry.gitlab.com/abyres/releases/mc
 tag: 20220620231345.0.0

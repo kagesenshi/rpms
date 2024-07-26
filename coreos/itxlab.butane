@@ -53,9 +53,10 @@ storage:
 
   files:
     - path: /etc/sysconfig/selinux
-      contents: |
-        SELINUX=permissive
-        SELINUXTYPE=targeted
+      contents: 
+        inline: |
+          SELINUX=permissive
+          SELINUXTYPE=targeted
 
     - path: /opt/firstboot.sh
       contents:

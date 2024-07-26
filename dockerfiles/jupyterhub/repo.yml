@@ -1,4 +1,4 @@
-build: 8
-last_updated: e2ebbf8a2d1d1b0150d5ba860835fc03
+build: 10
+last_updated: f6531b4cfe201a0c6d0f950a6b5926f0
 repo: registry.gitlab.com/abyres/releases/jupyterhub
 tag: 2.0.2

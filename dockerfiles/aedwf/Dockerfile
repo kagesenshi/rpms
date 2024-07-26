@@ -1,7 +1,7 @@
-FROM registry.gitlab.com/abyres/releases/spark3:3.2.0-12
+FROM registry.gitlab.com/abyres/releases/spark3:3.2.0-13
 
 USER root
-RUN dnf copr enable izhar/aet -y  && \
+RUN dnf copr enable izhar/aet -y && \
     dnf install mariadb-connector-c apache-airflow -y && \
     dnf swap apache-airflow-logos aedwf-logos -y && \
     dnf clean all

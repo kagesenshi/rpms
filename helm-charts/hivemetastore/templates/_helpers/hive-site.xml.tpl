@@ -44,5 +44,13 @@
                 <name>fs.s3a.aws.credentials.provider</name>
                 <value>org.apache.hadoop.fs.s3a.SimpleAWSCredentialsProvider</value>
         </property>
+        <property>
+                <name>hive.metastore.schema.verification</name>
+                <value>false</value>
+        </property>
+        <property>
+                <name>hive.metastore.schema.verification.record.version</name>
+                <value>false</value>
+        </property>
 </configuration>
 {{- end }}

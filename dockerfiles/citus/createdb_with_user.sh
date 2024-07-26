@@ -24,10 +24,12 @@ shift $((OPTIND-1))
 echo ${user} ${database} ${password}
 if [ -z "${database}" ] || [ -z "${user}" ] || [ -z "${password}" ];then
     usage
-    exit
+    exit 1
 fi
 
 createdb ${database}
 
 psql -c "create role ${user} with login encrypted password '${password}';"
 psql -c "grant all privileges on database ${database} to ${user};"
+
+exit 0

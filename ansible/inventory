@@ -1,2 +1,21 @@
 [k3s]
-k3s.abyres.lan ansible_ssh_user=root 
+10.210.14.41 ansible_ssh_user=root 
+
+[edf]
+10.210.14.47 ansible_ssh_user=root
+10.210.14.48 ansible_ssh_user=root
+10.210.14.49 ansible_ssh_user=root
+
+[edf_itx]
+10.210.14.73 ansible_ssh_user=core ansible_become=yes ansible_become_user=root ansible_become_method=sudo
+
+[edf_std1]
+192.168.177.4
+192.168.177.5
+192.168.177.6
+
+[edf_std1:vars]
+ansible_ssh_user=root
+ansible_ssh_pass=password 
+ansible_ssh_common_args='-o ProxyCommand="ssh -W %h:%p -q core@10.210.14.73"'
+
