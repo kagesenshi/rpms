@@ -24,21 +24,48 @@ def _c(color, t):
     return "%s%s%s" % (c, t, bcolors.ENDC)
 
 class Tag(object):
-    def __init__(self, major, minor, patch):
+    def __init__(self, major, minor, patch, variant=None):
         self.major = major
         self.minor = minor 
         self.patch = patch
+        self.variant = variant
     
     @classmethod
     def parse(cls, tag):
-        t = tag.split('.')
+        comp = tag.split('-')
+        version = comp[-1]
+        variant = None
+        if len(comp) > 1:
+            variant = '-'.join(comp[:-1])
+        t = version.split('.')
         if len(t) == 3:
-            return cls(t[0],t[1],t[2])
+            return cls(t[0],t[1],t[2], variant=variant)
         elif len(t) == 2:
-            return cls(t[0],t[1],None)
+            return cls(t[0],t[1],None, variant=variant)
         elif len(t) == 1:
-            return cls(t[0],None,None)
+            return cls(t[0],None,None, variant=variant)
         raise AssertionError('Unable to parse %s' % tag)
+
+    def tags(self, build=None):
+        parts = [self.major, self.minor, self.patch]
+        tags = []
+        tag = []
+        for idx, pt in enumerate(parts):
+            if pt is not None:
+                tag.append(str(pt))
+                if idx == 0:
+                    continue
+                if self.variant:
+                    tags.append(self.variant + '-' + '.'.join(tag))
+                    if idx == (len(parts) - 1):
+                        if build is not None:
+                            tags.append(self.variant + '-' + '.'.join(tag) + '-' + str(build))
+                else:
+                    tags.append('.'.join(tag))
+                    if idx == (len(parts) - 1):
+                        if build is not None:
+                            tags.append('.'.join(tag) + '-' + str(build))
+        return tags
 
 parser = argparse.ArgumentParser()
 parser.add_argument('-p','--push', default=False, action='store_true')
@@ -82,10 +109,10 @@ if not last_updated:
     last_updated = current_hash
     conf['last_updated'] = last_updated
 
-tags = []
 
 stag = Tag.parse(tag)
 
+tags = []
 if args.release or args.force_release:
 
     if (last_updated != current_hash) or args.force_release:
@@ -93,19 +120,10 @@ if args.release or args.force_release:
         build += 1
         conf['build'] = build
 
+    for t in stag.tags(build):
+        tags.append('%s:%s' % (repo, t))
     tags.append('%s:latest' % repo)
-    if stag.patch is not None:
-        tags.append('%s:%s.%s.%s-%s' % (repo, stag.major, stag.minor, stag.patch, build))
-        tags.append('%s:%s.%s.%s' % (repo, stag.major, stag.minor, stag.patch))
-        tags.append('%s:%s.%s' % (repo, stag.major, stag.minor))
-        tags.append('%s:%s' % (repo, stag.major))
-    elif stag.minor is not None:
-        tags.append('%s:%s.%s-%s' % (repo, stag.major, stag.minor, build))
-        tags.append('%s:%s.%s' % (repo, stag.major, stag.minor))
-        tags.append('%s:%s' % (repo, stag.major))
-    else:
-        tags.append('%s:%s-%s' % (repo, stag.major, build))
-        tags.append('%s:%s' % (repo, stag.major))
+
 else:
     tags.append('%s:development' % repo)
 
